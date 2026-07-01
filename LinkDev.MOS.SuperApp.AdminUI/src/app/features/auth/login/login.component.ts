@@ -1,0 +1,97 @@
+import { Component, inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { LanguageSwitcherComponent } from '../../../shared/components/language-switcher/language-switcher.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [ReactiveFormsModule, LanguageSwitcherComponent, TranslatePipe],
+  template: `
+    <div class="login-page">
+      <div class="login-lang">
+        <app-language-switcher />
+      </div>
+      <div class="login-card u-card">
+        <div class="login-card__brand">
+          <img src="assets/images/logo.svg" alt="Logo" class="login-card__logo" />
+          <h1>{{ 'app.title' | translate }}</h1>
+          <p class="login-card__subtitle">{{ 'login.subtitle' | translate }}</p>
+        </div>
+        <img src="assets/images/main-illustration.svg" alt="" class="login-card__illustration" />
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+          <div class="form-group">
+            <label class="form-label">{{ 'login.email' | translate }} <span class="required">*</span></label>
+            <input type="email" class="form-input" formControlName="email" autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ 'login.password' | translate }} <span class="required">*</span></label>
+            <input type="password" class="form-input" formControlName="password" autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg login-submit" [disabled]="form.invalid">
+            {{ 'login.submit' | translate }}
+          </button>
+        </form>
+        <p class="login-hint">{{ 'login.hint' | translate }}</p>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      background: var(--page-gradient);
+      position: relative;
+    }
+    .login-lang {
+      position: absolute;
+      top: 1.25rem;
+      inset-inline-end: 1.25rem;
+    }
+    .login-card {
+      max-width: 440px;
+      width: 100%;
+      padding: 2rem 2rem 1.75rem;
+      text-align: center;
+      animation: fadeInUp 0.4s ease;
+    }
+    .login-card__logo { width: 52px; height: 52px; margin-bottom: 0.875rem; }
+    .login-card h1 { margin: 0 0 0.25rem; font-size: 1.375rem; font-weight: 700; color: var(--text-dark); }
+    .login-card__subtitle { margin: 0 0 1.25rem; color: var(--text-muted); font-size: 0.875rem; }
+    .login-card__illustration { width: 100%; max-width: 260px; margin: 0 auto 1.5rem; display: block; }
+    .login-form { text-align: start; }
+    .login-submit { width: 100%; margin-top: 0.5rem; }
+    .login-hint { margin: 1.25rem 0 0; font-size: 0.75rem; color: var(--text-light); line-height: 1.5; }
+    @media (max-width: 767px) {
+      .login-page { padding: 1.25rem 1rem; align-items: flex-start; padding-top: 4rem; }
+      .login-card { padding: 1.5rem 1.25rem; }
+      .login-card h1 { font-size: 1.125rem; }
+      .login-card__illustration { max-width: 200px; margin-bottom: 1.25rem; }
+    }
+    @media (max-width: 479px) {
+      .login-lang { top: 0.75rem; inset-inline-end: 0.75rem; }
+    }
+  `]
+})
+export class LoginComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly auth = inject(MockAuthService);
+  private readonly router = inject(Router);
+
+  form = this.fb.group({
+    email: ['admin@portal.local', [Validators.required, Validators.email]],
+    password: ['password', Validators.required]
+  });
+
+  onSubmit(): void {
+    if (this.form.invalid) return;
+    const { email, password } = this.form.value;
+    this.auth.login(email!, password!);
+    this.router.navigate(['/dashboard']);
+  }
+}

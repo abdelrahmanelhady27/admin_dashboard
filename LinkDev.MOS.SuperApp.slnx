@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Business/">
+    <Project Path="Linkdev.MOS.SuperApp.Business/Linkdev.MOS.SuperApp.Business.csproj" Id="6302b85d-263a-43fd-9a86-757c0da00c5e" />
+  </Folder>
+  <Folder Name="/Common/">
+    <Project Path="LinkDev.MOS.SuperApp.Utility/LinkDev.MOS.SuperApp.Utility.csproj" />
+  </Folder>
+  <Folder Name="/Identity/">
+    <Project Path="LinkDev.MOS.SuperApp.Identity/LinkDev.MOS.SuperApp.Identity.csproj" />
+  </Folder>
+  <Folder Name="/Web/">
+    <Project Path="LinkDev.MOS.SuperApp.AdminAPI/LinkDev.MOS.SuperApp.AdminAPI.csproj" />
+  </Folder>
+</Solution>
