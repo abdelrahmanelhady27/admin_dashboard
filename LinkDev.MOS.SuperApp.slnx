@@ -5,6 +5,9 @@
   <Folder Name="/Common/">
     <Project Path="LinkDev.MOS.SuperApp.Utility/LinkDev.MOS.SuperApp.Utility.csproj" />
   </Folder>
+  <Folder Name="/Data/">
+    <Project Path="LinkDev.MOS.SuperApp.DataAccess/LinkDev.MOS.SuperApp.DataAccess.csproj" Id="3f9a171a-33fc-4c8b-aa16-65327a0a168c" />
+  </Folder>
   <Folder Name="/Identity/">
     <Project Path="LinkDev.MOS.SuperApp.Identity/LinkDev.MOS.SuperApp.Identity.csproj" />
   </Folder>
