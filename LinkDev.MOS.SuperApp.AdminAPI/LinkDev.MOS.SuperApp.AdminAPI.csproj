@@ -10,11 +10,22 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Services\LinkDev.MOS.SuperApp.Services.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Business\LinkDev.MOS.SuperApp.Business.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.DataAccess\LinkDev.MOS.SuperApp.DataAccess.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Identity\LinkDev.MOS.SuperApp.Identity.csproj" />
     <ProjectReference Include="..\LinkDev.MOS.SuperApp.Utility\LinkDev.MOS.SuperApp.Utility.csproj" />
   </ItemGroup>
 
