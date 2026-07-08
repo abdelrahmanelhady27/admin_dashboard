@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LinkDev.MOS.SuperApp.Identity.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialIdentity : Migration
+    public partial class IntialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

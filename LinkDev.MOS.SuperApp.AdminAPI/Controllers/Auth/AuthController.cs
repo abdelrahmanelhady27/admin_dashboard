@@ -59,7 +59,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Auth
             }
             catch (Exception)
             {
-                return StatusCode(500, "An error occurred while loggin in.");
+                return StatusCode(500, "An error occurred while logging in.");
             }
         }
     }

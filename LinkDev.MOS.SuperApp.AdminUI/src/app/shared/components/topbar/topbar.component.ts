@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-
-import { RouterLink } from '@angular/router';
-
-import { MockAuthService } from '../../../core/services/mock-auth.service';
-
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
-
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 
@@ -68,7 +64,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
             <img src="assets/images/avatar-placeholder.svg" alt="" class="avatar" />
 
-            <span class="user-name">{{ auth.currentUser?.fullNameEn ?? 'Admin' }}</span>
+            <span class="user-name">{{ auth.currentUser?.fullName ?? 'Admin' }}</span>
 
             <svg class="user-menu__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
 
@@ -80,13 +76,17 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
               <div class="user-dropdown__info">
 
-                <strong>{{ auth.currentUser?.fullNameEn }}</strong>
+                <strong>{{ auth.currentUser?.fullName }}</strong>
 
                 <span>{{ auth.currentUser?.email }}</span>
 
               </div>
 
               <a routerLink="/settings" class="user-dropdown__item" (click)="avatarOpen = false">{{ 'nav.settings' | translate }}</a>
+              
+              <button type="button" class="user-dropdown__item logout-btn" (click)="onLogout()" style="width: 100%; text-align: start; border: none; background: none; cursor: pointer; color: var(--text-dark);">
+                {{ auth.currentUser ? 'Logout' : 'Logout' }}
+              </button>
 
             </div>
 
@@ -500,7 +500,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export class TopbarComponent {
 
-  readonly auth = inject(MockAuthService);
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   @Input() pageTitle = 'nav.dashboard';
 
@@ -509,6 +510,12 @@ export class TopbarComponent {
   @Output() menuToggle = new EventEmitter<void>();
 
   avatarOpen = false;
+
+  onLogout(): void {
+    this.auth.logout();
+    this.avatarOpen = false;
+    this.router.navigate(['/login']);
+  }
 
 }
 

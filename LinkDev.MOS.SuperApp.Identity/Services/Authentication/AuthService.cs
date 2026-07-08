@@ -31,14 +31,14 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
             var user = await _userManager.FindByEmailAsync(LogDto.Email);
             if (user == null || !user.IsActive)
             {
-                throw new Exception("Invalid login");
+                throw new Exception("Invalid email or password.");
             }
 
             // 2. validate pass
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, LogDto.Password);
             if(!isPasswordValid)
             {
-                throw new Exception("Invalid login");
+                throw new Exception("Invalid email or password.");
             }
 
             // 3. get user roles
