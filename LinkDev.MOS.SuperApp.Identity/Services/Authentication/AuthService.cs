@@ -1,4 +1,4 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.Authentication;
+using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Entities;
@@ -16,13 +16,16 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
     public class AuthService : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IJwtService _jwtService;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
             IJwtService jwtService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _jwtService = jwtService;
         }
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto LogDto)
@@ -84,12 +87,19 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
                 throw new Exception("User registration failed");
             }
 
+            // 4. assign admin role to the created user
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new ApplicationRole { Name = "Admin" });
+            }
+            await _userManager.AddToRoleAsync(user, "Admin");
+
             // 4. generate token
             var token = _jwtService.GenerateAccessToken(
                 user.Id,
                 user.Email,
                 user.FullName ?? "",
-                new List<string>());
+                new List<string> { "Admin" });
 
             // 5. return response
             return new AuthResponseDto

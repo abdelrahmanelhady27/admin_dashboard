@@ -7,6 +7,10 @@
   </Folder>
   <Folder Name="/Data/">
     <Project Path="LinkDev.MOS.SuperApp.DataAccess/LinkDev.MOS.SuperApp.DataAccess.csproj" Id="3f9a171a-33fc-4c8b-aa16-65327a0a168c" />
+    <Project Path="LinkDev.MOS.SuperApp.Database/LinkDev.MOS.SuperApp.Database.sqlproj" Id="eaf0b2a1-d74f-455e-a8a7-f2d6ab2ff489">
+      <Build />
+      <Deploy />
+    </Project>
   </Folder>
   <Folder Name="/Identity/">
     <Project Path="LinkDev.MOS.SuperApp.Identity/LinkDev.MOS.SuperApp.Identity.csproj" />

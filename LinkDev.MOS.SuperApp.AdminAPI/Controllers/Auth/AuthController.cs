@@ -1,7 +1,8 @@
-﻿using Azure.Core;
-using Linkdev.MOS.SuperApp.Business.DTOs.Authentication;
+using Azure.Core;
+using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 using LinkDev.MOS.SuperApp.Identity.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,8 +24,9 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Auth
             _signInManager = signInManager;
         }
 
-        // POST api/auth/register
+        // POST api/auth/createAdmin
         [HttpPost("register")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<ActionResult<RegisterRequestDto>> Register([FromBody] RegisterRequestDto RegDto)
         {
 

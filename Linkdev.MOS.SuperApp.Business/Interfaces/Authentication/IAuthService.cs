@@ -1,4 +1,4 @@
-﻿using Linkdev.MOS.SuperApp.Business.DTOs.Authentication;
+﻿using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Text;

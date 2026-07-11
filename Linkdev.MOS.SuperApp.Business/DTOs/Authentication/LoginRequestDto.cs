@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.Authentication
+namespace Linkdev.MOS.SuperApp.Business.Dtos.Authentication
 {
     public class LoginRequestDto
     {
