@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { MockAuthService } from '../services/mock-auth.service';
+import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(MockAuthService);
+  const auth = inject(AuthService);
   const router = inject(Router);
   if (auth.isAuthenticated) {
     return true;
@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = () => {
 };
 
 export const guestGuard: CanActivateFn = () => {
-  const auth = inject(MockAuthService);
+  const auth = inject(AuthService);
   const router = inject(Router);
   if (!auth.isAuthenticated) {
     return true;

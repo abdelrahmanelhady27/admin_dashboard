@@ -4,13 +4,17 @@ import { Router } from '@angular/router';
 import { MockAuthService } from '../../../core/services/mock-auth.service';
 import { LanguageSwitcherComponent } from '../../../shared/components/language-switcher/language-switcher.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { ToastContainerComponent } from '../../../shared/components/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, LanguageSwitcherComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, LanguageSwitcherComponent, TranslatePipe, ToastContainerComponent],
   template: `
     <div class="login-page">
+      <app-toast-container />
       <div class="login-lang">
         <app-language-switcher />
       </div>
@@ -22,6 +26,11 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
         </div>
         <img src="assets/images/main-illustration.svg" alt="" class="login-card__illustration" />
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+          @if (errorMessage) {
+            <div class="login-error">
+              {{ errorMessage | translate }}
+            </div>
+          }
           <div class="form-group">
             <label class="form-label">{{ 'login.email' | translate }} <span class="required">*</span></label>
             <input type="email" class="form-input" formControlName="email" autocomplete="username" />
@@ -67,6 +76,16 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
     .login-form { text-align: start; }
     .login-submit { width: 100%; margin-top: 0.5rem; }
     .login-hint { margin: 1.25rem 0 0; font-size: 0.75rem; color: var(--text-light); line-height: 1.5; }
+    .login-error {
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      color: #991b1b;
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+      text-align: start;
+    }
     @media (max-width: 767px) {
       .login-page { padding: 1.25rem 1rem; align-items: flex-start; padding-top: 4rem; }
       .login-card { padding: 1.5rem 1.25rem; }
@@ -80,18 +99,35 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+
+  errorMessage: string = '';
 
   form = this.fb.group({
-    email: ['admin@portal.local', [Validators.required, Validators.email]],
-    password: ['password', Validators.required]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required]
   });
 
   onSubmit(): void {
     if (this.form.invalid) return;
-    const { email, password } = this.form.value;
-    this.auth.login(email!, password!);
-    this.router.navigate(['/dashboard']);
+
+    const credintials = {
+      email: this.form.value.email!,
+      password: this.form.value.password!,
+    }
+    this.auth.login(credintials!).subscribe({
+      next: (response) => {
+        console.log('Login successfull', response);
+        this.toast.success('login.loginSuccess');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        console.log('Login failed', err);
+        this.errorMessage = 'login.loginFailed';
+        this.toast.error('login.loginFailed');
+      }
+    });
   }
 }
