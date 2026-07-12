@@ -1,11 +1,13 @@
+using AutoMapper;
+using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
 using Linkdev.MOS.SuperApp.Business.Entites;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +16,15 @@ namespace Linkdev.MOS.SuperApp.Business.Services
 {
     public class PermissionService : IPermissionService
     {
-        private readonly IUserPermissionRepository _repo;
+        private readonly IUserPermissionRepository _permissionRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public PermissionService(IUserPermissionRepository repo, IUnitOfWork unitOfWork)
+        public PermissionService(IUserPermissionRepository permissionRepo, IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _repo = repo;
+            _permissionRepo = permissionRepo;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public bool HasPermission(ClaimsPrincipal user, FeatureType feature, PermissionAction action)
@@ -34,41 +38,46 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             {
                 return false;
             }
-            var permissions = _repo.GetAllByUserId(userId);
+            var permissions = _permissionRepo.GetAllByUserId(userId);
 
             return permissions.Any(p => p.Feature == feature && p.Permission.HasFlag(action));
         }
 
-        public async Task<UserPermission> GetPermissionByIdAsync(int id)
+        public async Task<UserPermissionDto?> GetPermissionByIdAsync(int id)
         {
-            return await _repo.GetByIdAsync(id);
+            var entity = await _permissionRepo.GetByIdAsync(id);
+            return entity == null ? null : _mapper.Map<UserPermissionDto>(entity);
         }
 
-        public async Task<IEnumerable<UserPermission>> GetAllPermissionsAsync()
+        public async Task<IEnumerable<UserPermissionDto>> GetAllPermissionsAsync()
         {
-            return await _repo.GetAllAsync();
+            var entities = await _permissionRepo.GetAllAsync();
+            return _mapper.Map<IEnumerable<UserPermissionDto>>(entities);
         }
 
-        public async Task<IEnumerable<UserPermission>> GetPermissionsByUserIdAsync(int userId)
+        public async Task<IEnumerable<UserPermissionDto>> GetPermissionsByUserIdAsync(int userId)
         {
-            return _repo.GetAllByUserId(userId);
+            var entities = _permissionRepo.GetAllByUserId(userId);
+            return _mapper.Map<IEnumerable<UserPermissionDto>>(entities);
         }
 
-        public async Task CreatePermissionAsync(UserPermission permission)
+        public async Task CreatePermissionAsync(UserPermissionDto permissionDto)
         {
-            await _repo.AddAsync(permission);
+            var entity = _mapper.Map<UserPermission>(permissionDto);
+            await _permissionRepo.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdatePermissionAsync(UserPermission permission)
+        public async Task UpdatePermissionAsync(UserPermissionDto permissionDto)
         {
-            _repo.Update(permission);
+            var entity = _mapper.Map<UserPermission>(permissionDto);
+            _permissionRepo.Update(entity);
             await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeletePermissionAsync(int id)
         {
-            await _repo.DeleteAsync(id);
+            await _permissionRepo.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
         }
     }

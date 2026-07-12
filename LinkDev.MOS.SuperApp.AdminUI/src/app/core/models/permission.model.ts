@@ -1,7 +1,8 @@
 import { ContentType } from './enums';
 
 export interface PermissionSet {
-  contentType: ContentType;
+  contentType?: ContentType;
+  feature?: ContentType;
   canView: boolean;
   canCreate: boolean;
   canEdit: boolean;
@@ -12,6 +13,7 @@ export interface PermissionSet {
 export function createEmptyPermissionSet(contentType: ContentType): PermissionSet {
   return {
     contentType,
+    feature: contentType,
     canView: false,
     canCreate: false,
     canEdit: false,

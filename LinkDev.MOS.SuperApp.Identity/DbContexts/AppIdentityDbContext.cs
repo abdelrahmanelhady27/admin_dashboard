@@ -1,4 +1,3 @@
-using LinkDev.MOS.SuperApp.Identity.Entities;
 using Linkdev.MOS.SuperApp.Business.Entites;
 using Linkdev.MOS.SuperApp.Business.Entites.Common;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,12 +7,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Linkdev.MOS.SuperApp.Business.Entites.Identity;
 
 namespace LinkDev.MOS.SuperApp.Identity.DbContexts
 {
     public class AppIdentityDbContext : IdentityDbContext <ApplicationUser, ApplicationRole, int> 
     {
         public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options) : base(options) { }
+
+        public DbSet<StaticUser> StaticUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +24,11 @@ namespace LinkDev.MOS.SuperApp.Identity.DbContexts
             modelBuilder.Entity<UserPermission>(entity =>
             {
                 entity.ToTable("UserPermissions", t => t.ExcludeFromMigrations());
+            });
+
+            modelBuilder.Entity<StaticUser>(entity =>
+            {
+                entity.ToTable("StaticUsers", t => t.ExcludeFromMigrations());
             });
         }
 

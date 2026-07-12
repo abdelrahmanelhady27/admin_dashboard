@@ -2,8 +2,6 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import { STORAGE_KEYS } from './app/core/constants/storage-keys';
-import { MockDirectoryService } from './app/core/services/mock-directory.service';
-import { UsersService } from './app/core/services/users.service';
 import { ServicePagesService } from './app/core/services/service-pages.service';
 import { QuickLinksService } from './app/core/services/quick-links.service';
 import { EmployeeNewsService } from './app/core/services/employee-news.service';
@@ -13,8 +11,6 @@ function seedMockDataIfNeeded(): void {
   if (localStorage.getItem(STORAGE_KEYS.SEEDED) === 'true') {
     return;
   }
-  localStorage.setItem(STORAGE_KEYS.DIRECTORY_USERS, JSON.stringify(MockDirectoryService.seedData()));
-  localStorage.setItem(STORAGE_KEYS.DASHBOARD_USERS, JSON.stringify(UsersService.seedData()));
   localStorage.setItem(STORAGE_KEYS.SYSTEMS, JSON.stringify(ServicePagesService.seedSystems()));
   localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(ServicePagesService.seedServices()));
   localStorage.setItem(STORAGE_KEYS.SERVICE_PAGES, JSON.stringify(ServicePagesService.seedPages()));

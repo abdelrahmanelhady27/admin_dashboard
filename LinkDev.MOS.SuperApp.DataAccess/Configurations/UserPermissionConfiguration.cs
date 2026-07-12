@@ -1,5 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.Entites;
-using LinkDev.MOS.SuperApp.Identity.Entities;
+using Linkdev.MOS.SuperApp.Business.Entites.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

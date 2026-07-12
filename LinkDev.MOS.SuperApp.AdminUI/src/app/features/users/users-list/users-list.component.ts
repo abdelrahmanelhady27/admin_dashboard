@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { UsersService } from '../../../core/services/users.service';
-import { LanguageService } from '../../../core/services/language.service';
 import { ContentType, UserStatus } from '../../../core/models/enums';
 import { DashboardUser } from '../../../core/models/user.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -84,7 +83,11 @@ import { ToastService } from '../../../core/services/toast.service';
                 <td><strong>{{ getName(user) }}</strong></td>
                 <td>{{ user.email }}</td>
                 <td><app-status-badge [status]="user.status" size="sm" /></td>
-                <td>{{ getContentTypes(user) }}</td>
+                <td>
+                  @for (p of getViewablePermissions(user); track p.contentType; let last = $last) {
+                    <span>{{ 'contentTypes.' + p.contentType | translate }}{{ last ? '' : ', ' }}</span>
+                  }
+                </td>
                 <td>{{ user.createdAt | date:'mediumDate' }}</td>
                 <td>{{ user.modifiedBy }}</td>
                 <td>{{ user.modifiedAt | date:'medium' }}</td>
@@ -112,7 +115,6 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class UsersListComponent implements OnInit {
   private readonly usersService = inject(UsersService);
-  private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
@@ -134,8 +136,8 @@ export class UsersListComponent implements OnInit {
     const chips: { key: string; label: string }[] = [];
     const v = this.filterForm.value;
     if (v.search) chips.push({ key: 'search', label: v.search });
-    if (v.status) chips.push({ key: 'status', label: this.language.translate('status.' + v.status) });
-    if (v.contentType) chips.push({ key: 'contentType', label: this.language.translate('contentTypes.' + v.contentType) });
+    if (v.status) chips.push({ key: 'status', label: v.status });
+    if (v.contentType) chips.push({ key: 'contentType', label: v.contentType });
     return chips;
   }
 
@@ -143,15 +145,21 @@ export class UsersListComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    setTimeout(() => {
-      const v = this.filterForm.value;
-      this.users = this.usersService.getAll({
-        search: v.search || undefined,
-        status: (v.status as UserStatus) || undefined,
-        contentType: (v.contentType as ContentType) || undefined
-      });
-      this.loading = false;
-    }, 350);
+    const v = this.filterForm.value;
+    this.usersService.getAll({
+      search: v.search || undefined,
+      status: (v.status as UserStatus) || undefined,
+      contentType: (v.contentType as ContentType) || undefined
+    }).subscribe({
+      next: (data) => {
+        this.users = data;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.toast.error('common.error');
+      }
+    });
   }
 
   applyFilters(): void { this.loadUsers(); }
@@ -167,13 +175,11 @@ export class UsersListComponent implements OnInit {
   }
 
   getName(user: DashboardUser): string {
-    return this.language.currentLang === 'ar' ? user.fullNameAr : user.fullNameEn;
+    return user.fullName;
   }
 
-  getContentTypes(user: DashboardUser): string {
-    return user.permissions.filter((p) => p.canView).map((p) =>
-      this.language.translate(`contentTypes.${p.contentType}`)
-    ).join(', ');
+  getViewablePermissions(user: DashboardUser) {
+    return user.permissions.filter((p) => p.canView);
   }
 
   confirmDelete(user: DashboardUser): void {
@@ -181,9 +187,13 @@ export class UsersListComponent implements OnInit {
     this.confirmMessage = 'users.confirmDelete';
     this.confirmDanger = true;
     this.confirmAction = () => {
-      this.usersService.delete(user.id);
-      this.toast.success('messages.userDeleted');
-      this.loadUsers();
+      this.usersService.delete(user.id).subscribe({
+        next: () => {
+          this.toast.success('messages.userDeleted');
+          this.loadUsers();
+        },
+        error: () => this.toast.error('common.error')
+      });
     };
     this.showConfirm = true;
   }
@@ -193,9 +203,13 @@ export class UsersListComponent implements OnInit {
     this.confirmMessage = 'users.confirmSuspend';
     this.confirmDanger = true;
     this.confirmAction = () => {
-      this.usersService.suspend(user.id);
-      this.toast.success('messages.userSuspended');
-      this.loadUsers();
+      this.usersService.suspend(user.id).subscribe({
+        next: () => {
+          this.toast.success('messages.userSuspended');
+          this.loadUsers();
+        },
+        error: () => this.toast.error('common.error')
+      });
     };
     this.showConfirm = true;
   }

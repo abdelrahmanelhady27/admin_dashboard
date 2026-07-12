@@ -1,19 +1,17 @@
 import { UserStatus } from './enums';
 import { PermissionSet } from './permission.model';
 
-export interface DirectoryUser {
-  id: string;
-  fullNameAr: string;
-  fullNameEn: string;
+export interface StaticUser {
+  id: number;
+  fullName: string;
   email: string;
   status: UserStatus;
 }
 
 export interface DashboardUser {
-  id: string;
-  directoryUserId: string;
-  fullNameAr: string;
-  fullNameEn: string;
+  id: number;
+  staticUserId: number;
+  fullName: string;
   email: string;
   status: UserStatus;
   permissions: PermissionSet[];
@@ -25,7 +23,6 @@ export interface DashboardUser {
 export interface AuthUser {
   id: string;
   email: string;
-  fullNameAr: string;
   fullNameEn: string;
   isAdmin: boolean;
 }

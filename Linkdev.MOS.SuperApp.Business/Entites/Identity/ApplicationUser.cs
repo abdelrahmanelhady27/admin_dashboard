@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LinkDev.MOS.SuperApp.Identity.Entities
+namespace Linkdev.MOS.SuperApp.Business.Entites.Identity
 {
     public class ApplicationUser : IdentityUser<int>
     {

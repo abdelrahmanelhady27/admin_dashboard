@@ -1,6 +1,6 @@
 using Linkdev.MOS.SuperApp.Business.Entites;
 using Linkdev.MOS.SuperApp.Business.Entites.Common;
-using LinkDev.MOS.SuperApp.Identity.Entities;
+using Linkdev.MOS.SuperApp.Business.Entites.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;

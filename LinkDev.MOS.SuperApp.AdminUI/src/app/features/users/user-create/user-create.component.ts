@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MockDirectoryService } from '../../../core/services/mock-directory.service';
+import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { StaticUserService } from '../../../core/services/static-user.service';
 import { UsersService } from '../../../core/services/users.service';
-import { DirectoryUser } from '../../../core/models/user.model';
+import { StaticUser } from '../../../core/models/user.model';
 import { ContentType, UserStatus } from '../../../core/models/enums';
 import { PermissionSet, createEmptyPermissionSet } from '../../../core/models/permission.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -11,17 +11,18 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { PermissionMatrixComponent } from '../../../shared/components/permission-matrix/permission-matrix.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
-import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-user-create',
   standalone: true,
   imports: [
-    ReactiveFormsModule, RouterLink, PageHeaderComponent, StatusBadgeComponent,
+    ReactiveFormsModule, FormsModule, RouterLink, PageHeaderComponent, StatusBadgeComponent,
     PermissionMatrixComponent, TranslatePipe
   ],
   template: `
-    <app-page-header title="users.createTitle" subtitle="users.createSubtitle" />
+    <app-page-header title="users.createTitle" subtitle="users.createSubtitle">
+      <a routerLink="/users" class="btn btn-outline">{{ 'common.back' | translate }}</a>
+    </app-page-header>
 
     <div class="u-card" style="padding:1.5rem">
       <div class="form-section">
@@ -32,50 +33,57 @@ import { LanguageService } from '../../../core/services/language.service';
           <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
         </form>
 
-      @if (searchResults.length) {
-        <div class="results">
-          @for (user of searchResults; track user.id) {
-            <button type="button" class="result-item" [class.selected]="selectedUser?.id === user.id" (click)="selectUser(user)">
-              <span>{{ getName(user) }}</span>
-              <span>{{ user.email }}</span>
-              <app-status-badge [status]="user.status" size="sm" />
-            </button>
-          }
-        </div>
-      }
-
-      @if (selectedUser) {
-        <div class="selected-info">
-          <h4>{{ 'users.selectedUser' | translate }}</h4>
-          <div class="info-grid">
-            <div><label>{{ 'users.name' | translate }}</label><span>{{ getName(selectedUser) }}</span></div>
-            <div><label>{{ 'users.email' | translate }}</label><span>{{ selectedUser.email }}</span></div>
-            <div><label>{{ 'users.status' | translate }}</label><app-status-badge [status]="selectedUser.status" size="sm" /></div>
+        @if (searchResults.length) {
+          <div class="results">
+            @for (user of searchResults; track user.id) {
+              <button type="button" class="result-item" [class.selected]="selectedUser?.id === user.id" (click)="selectUser(user)">
+                <span>{{ user.fullName }}</span>
+                <span>{{ user.email }}</span>
+                <app-status-badge [status]="user.status" size="sm" />
+              </button>
+            }
           </div>
-          @if (selectedUser.status === inactiveStatus) {
-            <div class="alert alert-error">{{ 'validation.inactiveDirectoryUser' | translate }}</div>
-          }
-        </div>
-      }
+        }
+
+        @if (selectedUser) {
+          <div class="selected-info">
+            <h4>{{ 'users.selectedUser' | translate }}</h4>
+            <div class="info-grid" style="margin-bottom:1.5rem">
+              <div style="display:flex; flex-direction:column">
+                <label>{{ 'users.name' | translate }}</label>
+                <input type="text" class="form-input" [value]="selectedUser.fullName" readonly style="width:100%" />
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <label>{{ 'users.email' | translate }}</label>
+                <input type="email" class="form-input" [value]="selectedUser.email" readonly style="width:100%" />
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <label>{{ 'users.status' | translate }}</label>
+                <div style="margin-top:0.25rem">
+                  <app-status-badge [status]="selectedUser.status" size="sm" />
+                </div>
+              </div>
+            </div>
+            @if (selectedUser.status === inactiveStatus) {
+              <div class="alert alert-error">{{ 'validation.inactiveDirectoryUser' | translate }}</div>
+            }
+          </div>
+        }
       </div>
 
       @if (selectedUser && selectedUser.status === activeStatus) {
         <div class="form-section">
-          <h4 class="form-section__title">{{ 'users.selectContentTypes' | translate }}</h4>
-          @for (ct of contentTypes; track ct) {
-            <label class="checkbox-label">
-              <input type="checkbox" [checked]="selectedContentTypes.includes(ct)" (change)="toggleContentType(ct, $event)" />
-              {{ 'contentTypes.' + ct | translate }}
-            </label>
-          }
+          <h4 class="form-section__title">{{ 'users.accountSecurity' | translate }}</h4>
+          <div style="margin-bottom:1rem; max-width:400px">
+            <label>{{ 'users.password' | translate }}</label>
+            <input type="password" class="form-input" [(ngModel)]="password" placeholder="Enter user password..." style="width:100%" />
+          </div>
         </div>
 
-        @if (selectedContentTypes.length) {
-          <app-permission-matrix
+        <app-permission-matrix
             [permissions]="permissions"
-            [selectedContentTypes]="selectedContentTypes"
+            [selectedContentTypes]="allContentTypes"
             (permissionsChange)="onPermissionsChange($event)" />
-        }
 
         <div class="form-action-bar">
           <a routerLink="/users" class="btn btn-outline">{{ 'common.cancel' | translate }}</a>
@@ -103,19 +111,19 @@ import { LanguageService } from '../../../core/services/language.service';
   `]
 })
 export class UserCreateComponent {
-  private readonly directory = inject(MockDirectoryService);
+  private readonly staticUserService = inject(StaticUserService);
   private readonly usersService = inject(UsersService);
   private readonly toast = inject(ToastService);
-  private readonly language = inject(LanguageService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   searchForm = this.fb.group({ term: ['', Validators.required] });
-  searchResults: DirectoryUser[] = [];
-  selectedUser: DirectoryUser | null = null;
-  selectedContentTypes: ContentType[] = [];
+  searchResults: StaticUser[] = [];
+  selectedUser: StaticUser | null = null;
   permissions: PermissionSet[] = Object.values(ContentType).map(createEmptyPermissionSet);
+  password = '';
 
+  readonly allContentTypes = Object.values(ContentType);
   readonly contentTypes = Object.values(ContentType);
   readonly activeStatus = UserStatus.Active;
   readonly inactiveStatus = UserStatus.Inactive;
@@ -125,27 +133,16 @@ export class UserCreateComponent {
       this.toast.warning('validation.searchTermRequired');
       return;
     }
-    this.searchResults = this.directory.search(this.searchForm.value.term!);
+    this.staticUserService.search(this.searchForm.value.term!).subscribe({
+      next: (data) => this.searchResults = data,
+      error: () => this.toast.error('common.error')
+    });
   }
 
-  selectUser(user: DirectoryUser): void {
+  selectUser(user: StaticUser): void {
     this.selectedUser = user;
-  }
-
-  getName(user: DirectoryUser): string {
-    return this.language.currentLang === 'ar' ? user.fullNameAr : user.fullNameEn;
-  }
-
-  toggleContentType(ct: ContentType, event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    if (checked) {
-      this.selectedContentTypes = [...this.selectedContentTypes, ct];
-    } else {
-      this.selectedContentTypes = this.selectedContentTypes.filter((c) => c !== ct);
-      this.permissions = this.permissions.map((p) =>
-        p.contentType === ct ? createEmptyPermissionSet(ct) : p
-      );
-    }
+    this.permissions = Object.values(ContentType).map(createEmptyPermissionSet);
+    this.password = '';
   }
 
   onPermissionsChange(perms: PermissionSet[]): void {
@@ -161,16 +158,25 @@ export class UserCreateComponent {
       this.toast.error('validation.inactiveDirectoryUser');
       return;
     }
-    if (this.usersService.existsByDirectoryUserId(this.selectedUser.id)) {
-      this.toast.error('validation.duplicateDashboardUser');
+    if (!this.selectedUser.fullName || !this.selectedUser.fullName.trim()) {
+      this.toast.error('validation.nameRequired');
       return;
     }
-    if (!this.selectedContentTypes.length) {
+    if (!this.selectedUser.email || !this.selectedUser.email.trim()) {
+      this.toast.error('validation.emailRequired');
+      return;
+    }
+    if (!this.password || this.password.trim().length < 6) {
+      this.toast.error('validation.passwordRequired');
+      return;
+    }
+    const activePerms = this.permissions.filter(
+      (p) => p.canView || p.canCreate || p.canEdit || p.canDelete || p.canPublish
+    );
+    if (!activePerms.length) {
       this.toast.error('validation.contentTypeRequired');
       return;
     }
-
-    const activePerms = this.permissions.filter((p) => this.selectedContentTypes.includes(p.contentType));
     const hasView = activePerms.some((p) => p.canView);
     if (!hasView) {
       this.toast.error('validation.viewPermissionRequired');
@@ -186,15 +192,20 @@ export class UserCreateComponent {
     }
 
     this.usersService.create({
-      directoryUserId: this.selectedUser.id,
-      fullNameAr: this.selectedUser.fullNameAr,
-      fullNameEn: this.selectedUser.fullNameEn,
+      staticUserId: this.selectedUser.id,
+      fullName: this.selectedUser.fullName,
       email: this.selectedUser.email,
-      status: UserStatus.Active,
+      password: this.password,
       permissions: activePerms
+    }).subscribe({
+      next: () => {
+        this.toast.success('messages.userAdded');
+        this.router.navigate(['/users']);
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'common.error';
+        this.toast.error(msg);
+      }
     });
-
-    this.toast.success('messages.userAdded');
-    this.router.navigate(['/users']);
   }
 }

@@ -1,5 +1,7 @@
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Mapping;
 using Linkdev.MOS.SuperApp.Business.Services;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories;
@@ -13,14 +15,17 @@ namespace LinkDev.MOS.SuperApp.DataAccess
     {
         public static IServiceCollection AddDataAccessServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
             services.AddDbContext<AdminDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("AdminDb")));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(IQueryableRepository<>), typeof(QueryableRepository<>));
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
             services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IUserService, UserService>();
 
 
             return services;

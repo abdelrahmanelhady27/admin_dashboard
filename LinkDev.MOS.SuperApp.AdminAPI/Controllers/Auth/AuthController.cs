@@ -1,7 +1,7 @@
 using Azure.Core;
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
-using LinkDev.MOS.SuperApp.Identity.Entities;
+using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

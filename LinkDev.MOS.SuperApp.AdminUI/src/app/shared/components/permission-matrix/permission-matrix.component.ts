@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContentType } from '../../../core/models/enums';
 import { PermissionSet, autoSelectView, validatePermissionSet } from '../../../core/models/permission.model';
-import { LanguageService } from '../../../core/services/language.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -22,14 +21,14 @@ import { ToastService } from '../../../core/services/toast.service';
           </tr>
         </thead>
         <tbody>
-          @for (perm of permissions; track perm.contentType) {
+          @for (perm of permissions; track getContentType(perm)) {
             <tr>
-              <td>{{ 'contentTypes.' + perm.contentType | translate }}</td>
-              <td><input type="checkbox" [checked]="perm.canView" [disabled]="readonly" (change)="toggle(perm.contentType, 'canView', $event)" /></td>
-              <td><input type="checkbox" [checked]="perm.canCreate" [disabled]="readonly || !isSelected(perm.contentType)" (change)="toggle(perm.contentType, 'canCreate', $event)" /></td>
-              <td><input type="checkbox" [checked]="perm.canEdit" [disabled]="readonly || !isSelected(perm.contentType)" (change)="toggle(perm.contentType, 'canEdit', $event)" /></td>
-              <td><input type="checkbox" [checked]="perm.canDelete" [disabled]="readonly || !isSelected(perm.contentType)" (change)="toggle(perm.contentType, 'canDelete', $event)" /></td>
-              <td><input type="checkbox" [checked]="perm.canPublish" [disabled]="readonly || !isSelected(perm.contentType)" (change)="toggle(perm.contentType, 'canPublish', $event)" /></td>
+              <td>{{ 'contentTypes.' + getContentType(perm) | translate }}</td>
+              <td><input type="checkbox" [checked]="perm.canView" [disabled]="readonly" (change)="toggle(getContentType(perm), 'canView', $event)" /></td>
+              <td><input type="checkbox" [checked]="perm.canCreate" [disabled]="readonly || !isSelected(getContentType(perm))" (change)="toggle(getContentType(perm), 'canCreate', $event)" /></td>
+              <td><input type="checkbox" [checked]="perm.canEdit" [disabled]="readonly || !isSelected(getContentType(perm))" (change)="toggle(getContentType(perm), 'canEdit', $event)" /></td>
+              <td><input type="checkbox" [checked]="perm.canDelete" [disabled]="readonly || !isSelected(getContentType(perm))" (change)="toggle(getContentType(perm), 'canDelete', $event)" /></td>
+              <td><input type="checkbox" [checked]="perm.canPublish" [disabled]="readonly || !isSelected(getContentType(perm))" (change)="toggle(getContentType(perm), 'canPublish', $event)" /></td>
             </tr>
           }
         </tbody>
@@ -46,7 +45,6 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class PermissionMatrixComponent {
   private readonly toast = inject(ToastService);
-  private readonly language = inject(LanguageService);
 
   @Input() permissions: PermissionSet[] = [];
   @Input() selectedContentTypes: ContentType[] = [];
@@ -55,6 +53,10 @@ export class PermissionMatrixComponent {
 
   readonly permissionCols = ['View', 'Create', 'Edit', 'Delete', 'Publish'];
 
+  getContentType(perm: PermissionSet): ContentType {
+    return perm.contentType ?? perm.feature!;
+  }
+
   isSelected(contentType: ContentType): boolean {
     return this.selectedContentTypes.includes(contentType);
   }
@@ -62,18 +64,18 @@ export class PermissionMatrixComponent {
   toggle(contentType: ContentType, field: keyof PermissionSet, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     const updated = this.permissions.map((p) => {
-      if (p.contentType !== contentType) {
+      if (this.getContentType(p) !== contentType) {
         return p;
       }
-      let next = { ...p, [field]: checked };
+      let next: PermissionSet = { ...p, [field]: checked, contentType, feature: contentType };
       if (field !== 'canView' && checked) {
-        next = autoSelectView(next);
+        next = autoSelectView(next as PermissionSet);
       }
       if (field === 'canView' && !checked) {
         const hasAdvanced = next.canCreate || next.canEdit || next.canDelete || next.canPublish;
         if (hasAdvanced) {
           this.toast.warning('validation.advancedRequiresView');
-          return { ...p, canView: true };
+          return { ...p, canView: true, contentType, feature: contentType };
         }
       }
       const error = validatePermissionSet(next);

@@ -20,7 +20,6 @@ export class MockAuthService {
     const user: AuthUser = {
       id: 'auth-admin-1',
       email: email || 'admin@portal.local',
-      fullNameAr: 'مدير النظام',
       fullNameEn: 'System Administrator',
       isAdmin: true
     };

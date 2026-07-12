@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,7 +6,6 @@ namespace Linkdev.MOS.SuperApp.Business.Enums
 {
     public enum FeatureType
     {
-        UserManagement = 0,
         ServiceIntroPage = 1,
         QuickLinks = 2,
         EmployeeNews = 3,

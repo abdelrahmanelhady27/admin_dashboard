@@ -7,10 +7,10 @@ export enum PermissionType {
 }
 
 export enum ContentType {
-  ServicePages = 'ServicePages',
+  ServiceIntroPage = 'ServiceIntroPage',
   QuickLinks = 'QuickLinks',
   EmployeeNews = 'EmployeeNews',
-  GeneralContent = 'GeneralContent'
+  AuditLog = 'AuditLog'
 }
 
 export enum UserStatus {
