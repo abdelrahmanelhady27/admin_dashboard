@@ -1,10 +1,11 @@
+using LinkDev.MOS.SuperApp.Utility.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Entites.Common
+namespace Linkdev.MOS.SuperApp.DataAccess.Entites.Common
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity : IAuditableEntity
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }

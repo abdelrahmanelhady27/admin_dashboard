@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Authentication
+namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication
 {
     public interface IJwtService
     {

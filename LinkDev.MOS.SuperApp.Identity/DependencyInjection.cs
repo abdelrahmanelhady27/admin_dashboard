@@ -1,7 +1,7 @@
-﻿using LinkDev.MOS.SuperApp.Identity.DbContexts;
-using LinkDev.MOS.SuperApp.Identity.Entities;
+using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Options;
 using LinkDev.MOS.SuperApp.Identity.Services.Authentication;
+using LinkDev.MOS.SuperApp.Identity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
+using Linkdev.MOS.SuperApp.Identity.Entites;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 
 namespace LinkDev.MOS.SuperApp.Identity
 {
@@ -31,6 +33,7 @@ namespace LinkDev.MOS.SuperApp.Identity
             // Auth
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IUserAccountService, UserAccountService>();
 
 
             // JWT

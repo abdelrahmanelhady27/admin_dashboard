@@ -1,6 +1,7 @@
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Filters;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -15,8 +16,6 @@ namespace Linkdev.MOS.SuperApp.Business.Filters
     {
         private readonly PermissionAction _permission;
         private readonly IPermissionService _permissionService;
-
-
         public HasPermissionFilter(PermissionAction permission, IPermissionService permissionService)
         {
             _permission = permission;

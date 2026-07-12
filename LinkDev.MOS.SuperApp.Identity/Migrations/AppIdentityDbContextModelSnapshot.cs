@@ -22,7 +22,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationRole", b =>
+            modelBuilder.Entity("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +52,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,15 +121,15 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StaticUserId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("UserPermissionId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -142,51 +142,6 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Linkdev.MOS.SuperApp.Business.Entites.UserPermission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApplicationUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Feature")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Permission")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("UserPermissions", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -292,16 +247,9 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Linkdev.MOS.SuperApp.Business.Entites.UserPermission", b =>
-                {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", null)
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationRole", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -310,7 +258,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -319,7 +267,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -328,13 +276,13 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationRole", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -343,16 +291,11 @@ namespace LinkDev.MOS.SuperApp.Identity.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", null)
+                    b.HasOne("Linkdev.MOS.SuperApp.Identity.Entites.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("LinkDev.MOS.SuperApp.Identity.Entities.ApplicationUser", b =>
-                {
-                    b.Navigation("UserPermissions");
                 });
 #pragma warning restore 612, 618
         }

@@ -68,10 +68,10 @@
     "Closed": "Closed"
   },
   "contentTypes": {
-    "ServicePages": "Service Pages",
+    "ServiceIntroPage": "Service Pages",
     "QuickLinks": "Quick Links",
     "EmployeeNews": "Employee News",
-    "GeneralContent": "General Content"
+    "AuditLog": "AuditLog"
   },
   "permissions": {
     "View": "View",

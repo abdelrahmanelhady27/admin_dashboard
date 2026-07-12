@@ -10,7 +10,6 @@ import { PermissionMatrixComponent } from '../../../shared/components/permission
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-import { LanguageService } from '../../../core/services/language.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
@@ -41,7 +40,7 @@ import { ToastService } from '../../../core/services/toast.service';
 
       <div class="u-card" style="padding:1.5rem">
         <div class="info-grid">
-          <div><label>{{ 'users.name' | translate }}</label><span>{{ getName(user) }}</span></div>
+          <div><label>{{ 'users.name' | translate }}</label><span>{{ user.fullName }}</span></div>
           <div><label>{{ 'users.email' | translate }}</label><span>{{ user.email }}</span></div>
           <div><label>{{ 'users.status' | translate }}</label><app-status-badge [status]="user.status" /></div>
           <div><label>{{ 'users.createdAt' | translate }}</label><span>{{ user.createdAt | date:'medium' }}</span></div>
@@ -52,7 +51,7 @@ import { ToastService } from '../../../core/services/toast.service';
         <h3>{{ 'users.permissions' | translate }}</h3>
         <app-permission-matrix
           [permissions]="user.permissions"
-          [selectedContentTypes]="selectedContentTypes"
+          [selectedContentTypes]="allContentTypes"
           [readonly]="true" />
       </div>
     }
@@ -66,7 +65,6 @@ import { ToastService } from '../../../core/services/toast.service';
     .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
     h3 { margin: 1.5rem 0 1rem; font-size: 1rem; font-weight: 600; }
-    .section p, .section span, .section li { word-break: break-word; overflow-wrap: anywhere; }
     @media (max-width: 767px) {
       .info-grid { grid-template-columns: 1fr; }
     }
@@ -76,45 +74,51 @@ export class UserDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly usersService = inject(UsersService);
-  private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
 
   user: DashboardUser | null = null;
   loading = true;
-  selectedContentTypes: ContentType[] = [];
   showDeleteConfirm = false;
   showSuspendConfirm = false;
   readonly suspendedStatus = UserStatus.Suspended;
+  readonly allContentTypes = Object.values(ContentType);
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    setTimeout(() => {
-      this.user = this.usersService.getById(id) ?? null;
-      if (this.user) {
-        this.selectedContentTypes = this.user.permissions.filter((p) => p.canView).map((p) => p.contentType);
+    const id = +this.route.snapshot.paramMap.get('id')!;
+    this.usersService.getById(id).subscribe({
+      next: (data) => {
+        this.user = data;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.toast.error('common.error');
       }
-      this.loading = false;
-    }, 350);
-  }
-
-  getName(user: DashboardUser): string {
-    return this.language.currentLang === 'ar' ? user.fullNameAr : user.fullNameEn;
+    });
   }
 
   deleteUser(): void {
     if (this.user) {
-      this.usersService.delete(this.user.id);
-      this.toast.success('messages.userDeleted');
-      this.router.navigate(['/users']);
+      this.usersService.delete(this.user.id).subscribe({
+        next: () => {
+          this.toast.success('messages.userDeleted');
+          this.router.navigate(['/users']);
+        },
+        error: () => this.toast.error('common.error')
+      });
     }
     this.showDeleteConfirm = false;
   }
 
   suspendUser(): void {
     if (this.user) {
-      this.usersService.suspend(this.user.id);
-      this.toast.success('messages.userSuspended');
-      this.user = this.usersService.getById(this.user.id) ?? null;
+      this.usersService.suspend(this.user.id).subscribe({
+        next: (updatedUser) => {
+          this.toast.success('messages.userSuspended');
+          this.user = updatedUser;
+        },
+        error: () => this.toast.error('common.error')
+      });
     }
     this.showSuspendConfirm = false;
   }

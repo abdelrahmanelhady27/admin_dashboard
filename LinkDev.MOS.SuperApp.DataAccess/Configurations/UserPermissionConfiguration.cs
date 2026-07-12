@@ -1,5 +1,5 @@
-using Linkdev.MOS.SuperApp.Business.Entites;
-using LinkDev.MOS.SuperApp.Identity.Entities;
+using Linkdev.MOS.SuperApp.DataAccess.Entites;
+using Linkdev.MOS.SuperApp.Identity.Entites;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -19,10 +19,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Configurations
             builder.Property(p => p.UserId)
                    .IsRequired();
 
-            builder.HasOne<ApplicationUser>()
-            .WithMany(u => u.UserPermissions)
-            .HasForeignKey(p => p.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            builder.HasIndex(p => p.UserId);
         }
     }
 }

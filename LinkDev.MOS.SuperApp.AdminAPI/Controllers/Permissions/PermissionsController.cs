@@ -1,5 +1,6 @@
-using Linkdev.MOS.SuperApp.Business.Entites;
+using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,26 +11,26 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "SuperAdmin")]
-    public class UserPermissionsController : ControllerBase
+    public class PermissionsController : ControllerBase
     {
         private readonly IPermissionService _permissionService;
 
-        public UserPermissionsController(IPermissionService permissionService)
+        public PermissionsController(IPermissionService permissionService)
         {
             _permissionService = permissionService;
         }
 
-        // GET: api/UserPermissions
+        // GET: api/Permissions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserPermission>>> GetAll()
+        public async Task<ActionResult<IEnumerable<UserPermissionDto>>> GetAll()
         {
             var permissions = await _permissionService.GetAllPermissionsAsync();
             return Ok(permissions);
         }
 
-        // GET: api/UserPermissions/5
+        // GET: api/Permissions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserPermission>> GetById(int id)
+        public async Task<ActionResult<UserPermissionDto>> GetById(int id)
         {
             var permission = await _permissionService.GetPermissionByIdAsync(id);
             if (permission == null)
@@ -39,32 +40,32 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return Ok(permission);
         }
 
-        // GET: api/UserPermissions/user/5
+        // GET: api/Permissions/user/5
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<UserPermission>>> GetByUserId(int userId)
+        public async Task<ActionResult<IEnumerable<UserPermissionDto>>> GetByUserId(int userId)
         {
             var permissions = await _permissionService.GetPermissionsByUserIdAsync(userId);
             return Ok(permissions);
         }
 
-        // POST: api/UserPermissions
+        // POST: api/Permissions
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] UserPermission permission)
+        public async Task<ActionResult> Create([FromBody] UserPermissionDto permissionDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _permissionService.CreatePermissionAsync(permission);
-            return CreatedAtAction(nameof(GetById), new { id = permission.Id }, permission);
+            await _permissionService.CreatePermissionAsync(permissionDto);
+            return CreatedAtAction(nameof(GetById), new { id = permissionDto.Id }, permissionDto);
         }
 
-        // PUT: api/UserPermissions/5
+        // PUT: api/Permissions/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, [FromBody] UserPermission permission)
+        public async Task<ActionResult> Update(int id, [FromBody] UserPermissionDto permissionDto)
         {
-            if (id != permission.Id)
+            if (id != permissionDto.Id)
             {
                 return BadRequest("ID mismatch");
             }
@@ -80,11 +81,11 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
                 return NotFound();
             }
 
-            await _permissionService.UpdatePermissionAsync(permission);
+            await _permissionService.UpdatePermissionAsync(permissionDto);
             return NoContent();
         }
 
-        // DELETE: api/UserPermissions/5
+        // DELETE: api/Permissions/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

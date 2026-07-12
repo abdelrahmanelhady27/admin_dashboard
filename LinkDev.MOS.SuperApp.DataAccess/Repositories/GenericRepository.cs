@@ -1,4 +1,4 @@
-﻿using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
+using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +9,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly AdminDbContext _context;
+        protected readonly AdminDbContext _context;
 
         public GenericRepository(AdminDbContext context)
         {

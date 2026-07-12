@@ -68,10 +68,10 @@
     "Closed": "مغلق"
   },
   "contentTypes": {
-    "ServicePages": "الصفحات التعريفية للخدمات",
+    "ServiceIntroPage": "الصفحات التعريفية للخدمات",
     "QuickLinks": "الروابط السريعة",
     "EmployeeNews": "أخبار الموظفين",
-    "GeneralContent": "المحتوى العام"
+    "AuditLog": "سجل العمليات"
   },
   "permissions": {
     "View": "عرض",
@@ -105,7 +105,9 @@
     "permissions": "الصلاحيات",
     "contentType": "نوع المحتوى",
     "confirmDelete": "هل أنت متأكد من حذف هذا المستخدم من لوحة الإدارة؟",
-    "confirmSuspend": "هل أنت متأكد من إيقاف هذا الحساب؟"
+    "confirmSuspend": "هل أنت متأكد من إيقاف هذا الحساب؟",
+    "accountSecurity": "أمان الحساب",
+    "password": "كلمة المرور"
   },
   "servicePages": {
     "serviceName": "اسم الخدمة",
@@ -249,10 +251,13 @@
   "validation": {
     "searchTermRequired": "يجب إدخال مصطلح البحث قبل البحث.",
     "userSelectionRequired": "يرجى اختيار مستخدم من الدليل.",
+    "nameRequired": "الاسم مطلوب.",
+    "emailRequired": "البريد الإلكتروني مطلوب.",
     "inactiveDirectoryUser": "لا يمكن إضافة مستخدم غير نشط من الدليل.",
     "contentTypeRequired": "يجب اختيار نوع محتوى واحد على الأقل.",
     "viewPermissionRequired": "يجب منح صلاحية العرض لنوع محتوى واحد على الأقل.",
     "duplicateDashboardUser": "هذا المستخدم موجود بالفعل في لوحة الإدارة.",
+    "passwordRequired": "كلمة المرور مطلوبة (على الأقل 6 أحرف).",
     "advancedRequiresView": "الصلاحيات المتقدمة تتطلب تحديد صلاحية العرض.",
     "serviceRequired": "يرجى اختيار خدمة.",
     "duplicateServicePage": "توجد صفحة بالفعل لهذه الخدمة.",

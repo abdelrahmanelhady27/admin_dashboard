@@ -1,7 +1,7 @@
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using Linkdev.MOS.SuperApp.Identity.Entites;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
-using LinkDev.MOS.SuperApp.Identity.Entities;
 using LinkDev.MOS.SuperApp.Identity.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;

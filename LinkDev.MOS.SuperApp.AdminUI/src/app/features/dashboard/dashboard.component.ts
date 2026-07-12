@@ -7,7 +7,7 @@ import { QuickLinksService } from '../../core/services/quick-links.service';
 import { EmployeeNewsService } from '../../core/services/employee-news.service';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
-import { LanguageService } from '../../core/services/language.service';
+import { AuthService } from '../../core/services/auth.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -235,7 +235,8 @@ export class DashboardComponent implements OnInit {
   private readonly news = inject(EmployeeNewsService);
   private readonly auditLog = inject(AuditLogService);
   private readonly auth = inject(MockAuthService);
-  private readonly language = inject(LanguageService);
+  private readonly realAuth = inject(AuthService);
+
 
   loading = true;
   today = new Date();
@@ -250,7 +251,7 @@ export class DashboardComponent implements OnInit {
   get userName(): string {
     const user = this.auth.currentUser;
     if (!user) return 'Admin';
-    return this.language.currentLang === 'ar' ? user.fullNameAr : user.fullNameEn;
+    return user.fullNameEn;
   }
 
   get stats() {
@@ -263,12 +264,19 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  readonly quickActions = [
+  readonly rawQuickActions = [
     { route: '/users/create', labelKey: 'common.addUser', icon: '👤' },
     { route: '/service-pages/create', labelKey: 'servicePages.createTitle', icon: '📄' },
     { route: '/quick-links', labelKey: 'nav.quickLinks', icon: '🔗' },
     { route: '/employee-news/create', labelKey: 'common.createNews', icon: '📰' }
   ];
+
+  get quickActions() {
+    if (this.realAuth.hasRole('Admin')) {
+      return this.rawQuickActions.filter(action => action.route !== '/users/create');
+    }
+    return this.rawQuickActions;
+  }
 
   ngOnInit(): void {
     setTimeout(() => {
