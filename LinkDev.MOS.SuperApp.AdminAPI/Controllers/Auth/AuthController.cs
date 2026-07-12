@@ -1,13 +1,14 @@
 using Azure.Core;
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
-using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using Linkdev.MOS.SuperApp.Identity.Entites;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Auth
+namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -15,13 +16,33 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Auth
     {
         private readonly IAuthService _authService;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly Linkdev.MOS.SuperApp.Business.Interfaces.Services.IUserService _userService;
 
         public AuthController(
             IAuthService authService,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            Linkdev.MOS.SuperApp.Business.Interfaces.Services.IUserService userService)
         {
             _authService = authService;
             _signInManager = signInManager;
+            _userService = userService;
+        }
+
+        // GET api/auth/myPermissions
+        [HttpGet("myPermissions")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<PermissionSetDto>>> MyPermissions()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var userDto = await _userService.GetUserByIdAsync(userId);
+            if (userDto == null) return NotFound();
+
+            return Ok(userDto.Permissions);
         }
 
         // POST api/auth/createAdmin

@@ -1,9 +1,9 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
-using Linkdev.MOS.SuperApp.Business.Entites;
+using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
+using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using System;
 using System.Collections.Generic;

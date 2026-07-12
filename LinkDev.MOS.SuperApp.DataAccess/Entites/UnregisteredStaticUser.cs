@@ -1,11 +1,11 @@
-﻿using Linkdev.MOS.SuperApp.Business.Entites.Common;
+using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Entites
+namespace LinkDev.MOS.SuperApp.DataAccess.Entites
 {
-    public class StaticUser : BaseEntity
+    public class UnregisteredStaticUser : BaseEntity
     {
         public string FullName { get; set; }
         public string Email { get; set; }

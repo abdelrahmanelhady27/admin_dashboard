@@ -1,10 +1,10 @@
-﻿using Linkdev.MOS.SuperApp.Business.Entites.Common;
+﻿using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Entites
+namespace Linkdev.MOS.SuperApp.DataAccess.Entites
 {
     public class UserPermission : BaseEntity
     {

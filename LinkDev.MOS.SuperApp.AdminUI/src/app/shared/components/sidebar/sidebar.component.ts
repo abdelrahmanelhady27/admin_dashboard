@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LanguageService } from '../../../core/services/language.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AuthService } from '../../../core/services/auth.service';
+import { ContentType } from '../../../core/models/enums';
 
 interface NavItem {
   route: string;
@@ -39,7 +41,7 @@ interface NavItem {
         }
       </div>
       <nav class="sidebar-nav">
-        @for (item of navItems; track item.route) {
+        @for (item of filteredNavItems; track item.route) {
           <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }" (click)="close.emit()">
             <span class="nav-icon">{{ icons[item.route] }}</span>
             @if (!collapsed) { <span class="nav-label">{{ item.labelKey | translate }}</span> }
@@ -263,6 +265,7 @@ interface NavItem {
 })
 export class SidebarComponent {
   private readonly language = inject(LanguageService);
+  private readonly auth = inject(AuthService);
 
   @Input() isOpen = false;
   @Input() collapsed = false;
@@ -293,4 +296,28 @@ export class SidebarComponent {
     '/audit-log': '📋',
     '/settings': '⚙'
   };
+
+  private readonly routeToContentTypeMap: Record<string, ContentType> = {
+    '/service-pages': ContentType.ServiceIntroPage,
+    '/quick-links': ContentType.QuickLinks,
+    '/employee-news': ContentType.EmployeeNews,
+    '/audit-log': ContentType.AuditLog
+  };
+
+  get filteredNavItems(): NavItem[] {
+    if (this.auth.isSuperAdmin) {
+      return this.navItems;
+    }
+    return this.navItems.filter(item => {
+      if (item.route === '/dashboard') return false;
+      if (item.route === '/users') return false;
+      if (item.route === '/settings') return true;
+
+      const ct = this.routeToContentTypeMap[item.route];
+      if (!ct) return false;
+
+      const perm = this.auth.permissions.find(p => (p.contentType ?? p.feature) === ct);
+      return perm?.canView ?? false;
+    });
+  }
 }

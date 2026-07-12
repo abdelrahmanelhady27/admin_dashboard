@@ -21,7 +21,7 @@
     [IsDeleted]            BIT                DEFAULT (CONVERT([bit],(0))) NOT NULL,
     [ModifiedAt]           DATETIME2 (7)      NULL,
     [ModifiedBy]           NVARCHAR (MAX)     NULL,
-    [UserPermissionId]     INT                DEFAULT ((0)) NOT NULL,
+    [StaticUserId]     INT                DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

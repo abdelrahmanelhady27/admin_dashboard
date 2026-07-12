@@ -1,5 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
-using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.Identity.Entites;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Options;

@@ -1,9 +1,9 @@
-﻿using Linkdev.MOS.SuperApp.Business.Entites;
+﻿using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Repositories
+namespace Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories
 {
     public interface IUserPermissionRepository : IGenericRepository<UserPermission>
     {

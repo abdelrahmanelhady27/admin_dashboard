@@ -1,10 +1,12 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Business.Entites;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Mapping;
+using Linkdev.MOS.SuperApp.DataAccess.Entites;
+using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
+using LinkDev.MOS.SuperApp.DataAccess.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         private readonly IUserAccountService _userAccountService;
         private readonly IUserPermissionRepository _permissionRepo;
         private readonly IQueryableRepository<StaticUser> _staticUserRepo;
+        private readonly IQueryableRepository<UnregisteredStaticUser> _unregisteredStaticUserRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -24,12 +27,14 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             IUserAccountService userAccountService,
             IUserPermissionRepository permissionRepo,
             IQueryableRepository<StaticUser> staticUserRepo,
+            IQueryableRepository<UnregisteredStaticUser> unregisteredStaticUserRepo,
             IUnitOfWork unitOfWork,
             IMapper mapper)
         {
             _userAccountService = userAccountService;
             _permissionRepo = permissionRepo;
             _staticUserRepo = staticUserRepo;
+            _unregisteredStaticUserRepo = unregisteredStaticUserRepo;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
@@ -42,7 +47,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             foreach (var acc in accounts)
             {
                 var userPermissions = _permissionRepo.GetAllByUserId(acc.Id).ToList();
-                var dto = _mapper.Map<UserDto>(new Linkdev.MOS.SuperApp.Business.Mapping.UserMappingModel { Account = acc, Permissions = userPermissions });
+                var dto = _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
 
                 // Filter by status
                 if (!string.IsNullOrEmpty(status) && !dto.Status.Equals(status, StringComparison.OrdinalIgnoreCase))
@@ -69,7 +74,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             if (acc == null) return null;
 
             var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();
-            return _mapper.Map<UserDto>(new Linkdev.MOS.SuperApp.Business.Mapping.UserMappingModel { Account = acc, Permissions = userPermissions });
+            return _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
         }
 
         public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
@@ -85,7 +90,6 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             await SavePermissionsAsync(acc.Id, createUserDto.Permissions);
 
             // Delete from static users since they are now a dashboard user
-            await _staticUserRepo.DeleteAsync(createUserDto.StaticUserId);
             await _unitOfWork.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(acc);
@@ -135,7 +139,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         public async Task<IEnumerable<StaticUserDto>> SearchStaticUsersAsync(string term)
         {
             var termLower = term.ToLower();
-            var query = _staticUserRepo.GetQueryable();
+            var query = _unregisteredStaticUserRepo.GetQueryable();
             var staticUsers = query.Where(u => u.FullName.ToLower().Contains(termLower) || u.Email.ToLower().Contains(termLower)).ToList();
 
             return _mapper.Map<IEnumerable<StaticUserDto>>(staticUsers);

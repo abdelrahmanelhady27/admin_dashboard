@@ -121,7 +121,24 @@ export class LoginComponent {
       next: (response) => {
         console.log('Login successfull', response);
         this.toast.success('login.loginSuccess');
-        this.router.navigate(['/dashboard']);
+        if (this.auth.isSuperAdmin) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.auth.fetchPermissions().subscribe({
+            next: (perms) => {
+              const firstPerm = perms.find(p => p.canView);
+              if (firstPerm) {
+                const route = this.getRouteFromContentType(firstPerm.contentType ?? firstPerm.feature ?? '');
+                this.router.navigate([`/${route}`]);
+              } else {
+                this.router.navigate(['/settings']);
+              }
+            },
+            error: () => {
+              this.router.navigate(['/settings']);
+            }
+          });
+        }
       },
       error: (err) => {
         console.log('Login failed', err);
@@ -129,5 +146,15 @@ export class LoginComponent {
         this.toast.error('login.loginFailed');
       }
     });
+  }
+
+  private getRouteFromContentType(type: string): string {
+    switch (type) {
+      case 'ServiceIntroPage': return 'service-pages';
+      case 'QuickLinks': return 'quick-links';
+      case 'EmployeeNews': return 'employee-news';
+      case 'AuditLog': return 'audit-log';
+      default: return 'settings';
+    }
   }
 }

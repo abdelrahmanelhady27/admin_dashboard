@@ -1,6 +1,6 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.Identity.Entites;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +57,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
                 Email = email,
                 FullName = fullName,
                 IsActive = true,
-                UserPermissionId = staticUserId
+                StaticUserId = staticUserId
             };
 
             var result = await _userManager.CreateAsync(user, password);

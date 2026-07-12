@@ -1,6 +1,7 @@
-using Linkdev.MOS.SuperApp.Business.Entites;
-using Linkdev.MOS.SuperApp.Business.Entites.Common;
-using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.DataAccess.Entites;
+using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
+using Linkdev.MOS.SuperApp.Identity.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -20,6 +21,11 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
                 entity.ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
+            });
+            modelBuilder.Entity<UnregisteredStaticUser>(entity =>
+            {
+                entity.ToView("vw_UnregisteredStaticUsers");
+                entity.HasKey(e => e.Id);
             });
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AdminDbContext).Assembly);
         }
@@ -72,6 +78,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
 
         public DbSet<UserPermission> UserPermissions { get; set; }
         public DbSet<StaticUser> StaticUsers { get; set; }
+        public DbSet<UnregisteredStaticUser> UnregisteredStaticUsers { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
     }
 }

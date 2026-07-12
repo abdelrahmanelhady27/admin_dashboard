@@ -12,9 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
-using Linkdev.MOS.SuperApp.Business.Entites.Identity;
+using Linkdev.MOS.SuperApp.Identity.Entites;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
-using Linkdev.MOS.SuperApp.Business.Services;
 
 namespace LinkDev.MOS.SuperApp.Identity
 {

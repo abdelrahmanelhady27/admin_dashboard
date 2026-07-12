@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Repositories
+namespace Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories
 {
     public interface IGenericRepository<T> where T: class
     {

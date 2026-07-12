@@ -1,6 +1,6 @@
-using Linkdev.MOS.SuperApp.Business.Entites;
+using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
+using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
