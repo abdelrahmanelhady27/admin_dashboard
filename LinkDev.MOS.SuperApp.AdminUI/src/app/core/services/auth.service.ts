@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.dev';  
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
-import { isTokenExpired } from '../utils/jwt.utils';
+import { isTokenExpired, getRolesFromToken } from '../utils/jwt.utils';
 
 
 @Injectable({
@@ -36,6 +36,19 @@ export class AuthService {
   get token(): string | null {
     return this.currentUserSubject.value?.token ?? null;
   }
+
+  get roles(): string[] {
+    const token = this.token;
+    if (!token) {
+      return [];
+    }
+    return getRolesFromToken(token);
+  }
+
+  hasRole(roleName: string): boolean {
+    return this.roles.some(r => r.toLowerCase() === roleName.toLowerCase());
+  }
+
 
   // login
   login(credintials: LoginRequest):Observable<AuthResponse> {

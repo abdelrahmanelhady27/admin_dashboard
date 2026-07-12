@@ -5,6 +5,8 @@ using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Repositories;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
+using Linkdev.MOS.SuperApp.Business.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +44,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             foreach (var acc in accounts)
             {
                 var userPermissions = _permissionRepo.GetAllByUserId(acc.Id).ToList();
-                var dto = _mapper.Map<UserDto>(new Linkdev.MOS.SuperApp.Business.Mapping.UserMappingModel { Account = acc, Permissions = userPermissions });
+                var dto = _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
 
                 // Filter by status
                 if (!string.IsNullOrEmpty(status) && !dto.Status.Equals(status, StringComparison.OrdinalIgnoreCase))

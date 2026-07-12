@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LanguageService } from '../../../core/services/language.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AuthService } from '../../../core/services/auth.service';
+
 
 interface NavItem {
   route: string;
@@ -39,7 +41,7 @@ interface NavItem {
         }
       </div>
       <nav class="sidebar-nav">
-        @for (item of navItems; track item.route) {
+        @for (item of filteredNavItems; track item.route) {
           <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }" (click)="close.emit()">
             <span class="nav-icon">{{ icons[item.route] }}</span>
             @if (!collapsed) { <span class="nav-label">{{ item.labelKey | translate }}</span> }
@@ -263,6 +265,8 @@ interface NavItem {
 })
 export class SidebarComponent {
   private readonly language = inject(LanguageService);
+  private readonly auth = inject(AuthService);
+
 
   @Input() isOpen = false;
   @Input() collapsed = false;
@@ -283,6 +287,13 @@ export class SidebarComponent {
     { route: '/audit-log', labelKey: 'nav.auditLog' },
     { route: '/settings', labelKey: 'nav.settings' }
   ];
+
+  get filteredNavItems(): NavItem[] {
+    if (this.auth.hasRole('Admin')) {
+      return this.navItems.filter(item => item.route !== '/users');
+    }
+    return this.navItems;
+  }
 
   readonly icons: Record<string, string> = {
     '/dashboard': '▣',

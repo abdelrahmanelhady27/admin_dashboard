@@ -15,3 +15,17 @@ export function isTokenExpired(token: string): boolean {
     return true;
   }
 }
+
+export function getRolesFromToken(token: string): string[] {
+  try {
+    const decoded = jwtDecode<any>(token);
+    const roleClaim = decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    if (!roleClaim) {
+      return [];
+    }
+    return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+  } catch {
+    return [];
+  }
+}
+
