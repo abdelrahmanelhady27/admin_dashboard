@@ -7,6 +7,7 @@ import { QuickLinksService } from '../../core/services/quick-links.service';
 import { EmployeeNewsService } from '../../core/services/employee-news.service';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -234,6 +235,8 @@ export class DashboardComponent implements OnInit {
   private readonly news = inject(EmployeeNewsService);
   private readonly auditLog = inject(AuditLogService);
   private readonly auth = inject(MockAuthService);
+  private readonly realAuth = inject(AuthService);
+
 
   loading = true;
   today = new Date();
@@ -261,12 +264,19 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  readonly quickActions = [
+  readonly rawQuickActions = [
     { route: '/users/create', labelKey: 'common.addUser', icon: '👤' },
     { route: '/service-pages/create', labelKey: 'servicePages.createTitle', icon: '📄' },
     { route: '/quick-links', labelKey: 'nav.quickLinks', icon: '🔗' },
     { route: '/employee-news/create', labelKey: 'common.createNews', icon: '📰' }
   ];
+
+  get quickActions() {
+    if (this.realAuth.hasRole('Admin')) {
+      return this.rawQuickActions.filter(action => action.route !== '/users/create');
+    }
+    return this.rawQuickActions;
+  }
 
   ngOnInit(): void {
     setTimeout(() => {

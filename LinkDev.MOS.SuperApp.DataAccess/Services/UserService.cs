@@ -3,6 +3,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Linkdev.MOS.SuperApp.Business.Mapping;
 using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;

@@ -16,13 +16,19 @@ export function isTokenExpired(token: string): boolean {
   }
 }
 
-export function getUserRoles(token: string): string[] {
+export function getRolesFromToken(token: string): string[] {
   try {
     const decoded = jwtDecode<any>(token);
-    const roles = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
-    if (!roles) return [];
-    return Array.isArray(roles) ? roles : [roles];
+    const roleClaim = decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    if (!roleClaim) {
+      return [];
+    }
+    return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
   } catch {
     return [];
   }
+}
+
+export function getUserRoles(token: string): string[] {
+  return getRolesFromToken(token);
 }

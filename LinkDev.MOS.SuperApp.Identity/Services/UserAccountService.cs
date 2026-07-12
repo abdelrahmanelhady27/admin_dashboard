@@ -1,7 +1,7 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;

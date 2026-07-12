@@ -12,8 +12,8 @@ namespace Linkdev.MOS.SuperApp.Business.Mapping
 {
     public class UserMappingModel
     {
-        public UserAccountDto Account { get; set; } = null!;
-        public List<UserPermission> Permissions { get; set; } = new();
+        public UserAccountDto Account { get; set; }
+        public List<UserPermission> Permissions { get; set; }
     }
 
     public class MappingProfile : Profile
@@ -27,6 +27,7 @@ namespace Linkdev.MOS.SuperApp.Business.Mapping
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive ? "Active" : "Suspended"))
                 .ForMember(dest => dest.Permissions, opt => opt.Ignore());
+
 
             CreateMap<UserMappingModel, UserDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Account.Id))

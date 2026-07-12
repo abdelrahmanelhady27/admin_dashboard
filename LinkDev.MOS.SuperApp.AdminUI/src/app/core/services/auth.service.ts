@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.dev';  
 import { BehaviorSubject, Observable, tap, map } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
-import { isTokenExpired, getUserRoles } from '../utils/jwt.utils';
+import { isTokenExpired, getRolesFromToken } from '../utils/jwt.utils';
 import { PermissionSet } from '../models/permission.model';
 import { ContentType } from '../models/enums';
 
@@ -35,11 +35,7 @@ export class AuthService {
     if(!user || !user.token) {
       return false;
     }
-    if (isTokenExpired(user.token)){
-      this.logout();
-      return false;
-    }
-    return true;
+    return !isTokenExpired(user.token);
   }
 
   get currentUser(): AuthResponse | null {
@@ -52,8 +48,14 @@ export class AuthService {
 
   get roles(): string[] {
     const token = this.token;
-    if (!token) return [];
-    return getUserRoles(token);
+    if (!token) {
+      return [];
+    }
+    return getRolesFromToken(token);
+  }
+
+  hasRole(roleName: string): boolean {
+    return this.roles.some(r => r.toLowerCase() === roleName.toLowerCase());
   }
 
   get isSuperAdmin(): boolean {
