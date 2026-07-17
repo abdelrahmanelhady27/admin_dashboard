@@ -100,6 +100,8 @@
     "directorySearch": "البحث في دليل الحسابات المركزي",
     "directoryHint": "يجب اختيار المستخدمين من دليل الحسابات المركزي. لا يُسمح بالإنشاء اليدوي.",
     "searchDirectory": "بحث بالاسم أو البريد",
+    "noDirectoryResults": "لا يوجد مستخدمون مطابقون",
+    "noDirectoryResultsHint": "جرّب اسمًا أو بريدًا إلكترونيًا مختلفًا.",
     "selectedUser": "المستخدم المختار من الدليل",
     "selectContentTypes": "اختر أنواع المحتوى المسموحة",
     "permissions": "الصلاحيات",

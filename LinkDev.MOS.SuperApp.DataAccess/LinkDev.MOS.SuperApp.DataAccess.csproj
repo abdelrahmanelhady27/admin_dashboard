@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Linkdev.MOS.SuperApp.Business\Linkdev.MOS.SuperApp.Business.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Utility\LinkDev.MOS.SuperApp.Utility.csproj" />
     <ProjectReference Include="..\LinkDev.MOS.SuperApp.Identity\LinkDev.MOS.SuperApp.Identity.csproj" />
   </ItemGroup>
 

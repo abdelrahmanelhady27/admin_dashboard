@@ -100,6 +100,8 @@
     "directorySearch": "Search Central Account Directory",
     "directoryHint": "Users must be selected from the Central Account Directory. Manual user creation is not allowed.",
     "searchDirectory": "Search by name or email",
+    "noDirectoryResults": "No users found",
+    "noDirectoryResultsHint": "Try a different name or email address.",
     "selectedUser": "Selected Directory User",
     "selectContentTypes": "Select Allowed Content Types",
     "permissions": "Permissions",

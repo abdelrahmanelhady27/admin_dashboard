@@ -9,6 +9,7 @@ import { PermissionSet, createEmptyPermissionSet } from '../../../core/models/pe
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { PermissionMatrixComponent } from '../../../shared/components/permission-matrix/permission-matrix.component';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -17,7 +18,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [
     ReactiveFormsModule, FormsModule, RouterLink, PageHeaderComponent, StatusBadgeComponent,
-    PermissionMatrixComponent, TranslatePipe
+    PermissionMatrixComponent, EmptyStateComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="users.createTitle" subtitle="users.createSubtitle">
@@ -43,6 +44,8 @@ import { ToastService } from '../../../core/services/toast.service';
               </button>
             }
           </div>
+        } @else if (searchAttempted) {
+          <app-empty-state message="users.noDirectoryResults" hint="users.noDirectoryResultsHint" />
         }
 
         @if (selectedUser) {
@@ -119,6 +122,7 @@ export class UserCreateComponent {
 
   searchForm = this.fb.group({ term: ['', Validators.required] });
   searchResults: StaticUser[] = [];
+  searchAttempted = false;
   selectedUser: StaticUser | null = null;
   permissions: PermissionSet[] = Object.values(ContentType).map(createEmptyPermissionSet);
   password = '';
@@ -133,6 +137,13 @@ export class UserCreateComponent {
       this.toast.warning('validation.searchTermRequired');
       return;
     }
+
+    this.searchAttempted = true;
+    this.searchResults = [];
+    this.selectedUser = null;
+    this.permissions = Object.values(ContentType).map(createEmptyPermissionSet);
+    this.password = '';
+
     this.staticUserService.search(this.searchForm.value.term!).subscribe({
       next: (data) => this.searchResults = data,
       error: () => this.toast.error('common.error')
