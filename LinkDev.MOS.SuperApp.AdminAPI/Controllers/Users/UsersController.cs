@@ -1,5 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -108,6 +108,25 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Users
             try
             {
                 var user = await _userService.SuspendUserAsync(id);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found." });
+                }
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // PATCH: api/users/5/activate
+        [HttpPatch("{id}/activate")]
+        public async Task<ActionResult<UserDto>> Activate(int id)
+        {
+            try
+            {
+                var user = await _userService.ActivateUserAsync(id);
                 if (user == null)
                 {
                     return NotFound(new { message = "User not found." });

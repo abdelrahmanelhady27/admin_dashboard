@@ -2,7 +2,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services
+namespace Linkdev.MOS.SuperApp.Business.Interfaces.Users
 {
     public interface IUserService
     {
@@ -12,6 +12,7 @@ namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services
         Task<UserDto?> UpdateUserPermissionsAsync(int id, List<PermissionSetDto> permissions);
         Task<bool> DeleteUserAsync(int id);
         Task<UserDto?> SuspendUserAsync(int id);
+        Task<UserDto?> ActivateUserAsync(int id);
         Task<IEnumerable<StaticUserDto>> SearchStaticUsersAsync(string term);
     }
 }

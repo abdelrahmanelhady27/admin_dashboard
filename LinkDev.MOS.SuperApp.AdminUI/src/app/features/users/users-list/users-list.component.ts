@@ -98,6 +98,8 @@ import { ToastService } from '../../../core/services/toast.service';
                     <button type="button" class="btn-icon" (click)="confirmDelete(user)" [title]="'common.delete' | translate">🗑</button>
                     @if (user.status !== suspendedStatus) {
                       <button type="button" class="btn-icon" (click)="confirmSuspend(user)" [title]="'common.suspend' | translate">⏸</button>
+                    } @else {
+                      <button type="button" class="btn-icon" (click)="confirmActivate(user)" [title]="'common.activate' | translate">▶</button>
                     }
                   </div>
                 </td>
@@ -206,6 +208,22 @@ export class UsersListComponent implements OnInit {
       this.usersService.suspend(user.id).subscribe({
         next: () => {
           this.toast.success('messages.userSuspended');
+          this.loadUsers();
+        },
+        error: () => this.toast.error('common.error')
+      });
+    };
+    this.showConfirm = true;
+  }
+
+  confirmActivate(user: DashboardUser): void {
+    this.confirmTitle = 'common.confirm';
+    this.confirmMessage = 'users.confirmActivate';
+    this.confirmDanger = false;
+    this.confirmAction = () => {
+      this.usersService.activate(user.id).subscribe({
+        next: () => {
+          this.toast.success('messages.userActivated');
           this.loadUsers();
         },
         error: () => this.toast.error('common.error')

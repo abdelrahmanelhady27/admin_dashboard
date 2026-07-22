@@ -35,6 +35,8 @@ import { ToastService } from '../../../core/services/toast.service';
         <button type="button" class="btn btn-outline" (click)="showDeleteConfirm = true">{{ 'common.delete' | translate }}</button>
         @if (user.status !== suspendedStatus) {
           <button type="button" class="btn btn-outline" (click)="showSuspendConfirm = true">{{ 'common.suspend' | translate }}</button>
+        } @else {
+          <button type="button" class="btn btn-outline" (click)="showActivateConfirm = true">{{ 'common.activate' | translate }}</button>
         }
       </app-page-header>
 
@@ -60,6 +62,8 @@ import { ToastService } from '../../../core/services/toast.service';
       (confirmed)="deleteUser()" (cancelled)="showDeleteConfirm = false" />
     <app-confirm-dialog [visible]="showSuspendConfirm" title="common.confirm" message="users.confirmSuspend" variant="danger"
       (confirmed)="suspendUser()" (cancelled)="showSuspendConfirm = false" />
+    <app-confirm-dialog [visible]="showActivateConfirm" title="common.confirm" message="users.confirmActivate"
+      (confirmed)="activateUser()" (cancelled)="showActivateConfirm = false" />
   `,
   styles: [`
     .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
@@ -80,6 +84,7 @@ export class UserDetailsComponent implements OnInit {
   loading = true;
   showDeleteConfirm = false;
   showSuspendConfirm = false;
+  showActivateConfirm = false;
   readonly suspendedStatus = UserStatus.Suspended;
   readonly allContentTypes = Object.values(ContentType);
 
@@ -121,5 +126,18 @@ export class UserDetailsComponent implements OnInit {
       });
     }
     this.showSuspendConfirm = false;
+  }
+
+  activateUser(): void {
+    if (this.user) {
+      this.usersService.activate(this.user.id).subscribe({
+        next: (updatedUser) => {
+          this.toast.success('messages.userActivated');
+          this.user = updatedUser;
+        },
+        error: () => this.toast.error('common.error')
+      });
+    }
+    this.showActivateConfirm = false;
   }
 }

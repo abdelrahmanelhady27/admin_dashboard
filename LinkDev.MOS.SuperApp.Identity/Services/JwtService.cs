@@ -1,4 +1,4 @@
-﻿using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
+﻿using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 using LinkDev.MOS.SuperApp.Identity.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

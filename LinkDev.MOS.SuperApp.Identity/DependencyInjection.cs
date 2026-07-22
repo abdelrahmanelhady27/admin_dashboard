@@ -11,9 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity
 {

@@ -4,6 +4,7 @@ using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,29 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
                 entity.HasKey(e => e.Id);
             });
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AdminDbContext).Assembly);
+            ApplyUtcDateTimeConversion(modelBuilder);
+        }
+
+        private static void ApplyUtcDateTimeConversion(ModelBuilder modelBuilder)
+        {
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v,
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            var nullableUtcConverter = new ValueConverter<DateTime?, DateTime?>(
+                v => v,
+                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                        property.SetValueConverter(utcConverter);
+                    else if (property.ClrType == typeof(DateTime?))
+                        property.SetValueConverter(nullableUtcConverter);
+                }
+            }
         }
 
         public override int SaveChanges()
@@ -58,7 +82,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
                     else if (entry.State == EntityState.Modified)
                     {
                         baseEntity.ModifiedAt = DateTime.UtcNow;
-                        baseEntity.ModifiedBy = string.IsNullOrWhiteSpace(baseEntity.ModifiedBy) ? "SuperAdmin" : baseEntity.ModifiedBy;
+                        baseEntity.ModifiedBy = string.IsNullOrWhiteSpace(baseEntity.ModifiedBy) ? "Super Admin" : baseEntity.ModifiedBy;
                     }
                 }
                 else if (entry.Entity is ApplicationUser appUser)
@@ -66,12 +90,12 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
                     if (entry.State == EntityState.Added)
                     {
                         appUser.CreatedAt = DateTime.UtcNow;
-                        appUser.CreatedBy = string.IsNullOrWhiteSpace(appUser.CreatedBy) ? "SuperAdmin" : appUser.CreatedBy;
+                        appUser.CreatedBy = string.IsNullOrWhiteSpace(appUser.CreatedBy) ? "Super Admin" : appUser.CreatedBy;
                     }
                     else if (entry.State == EntityState.Modified)
                     {
                         appUser.ModifiedAt = DateTime.UtcNow;
-                        appUser.ModifiedBy = string.IsNullOrWhiteSpace(appUser.ModifiedBy) ? "SuperAdmin" : appUser.ModifiedBy;
+                        appUser.ModifiedBy = string.IsNullOrWhiteSpace(appUser.ModifiedBy) ? "Super Admin" : appUser.ModifiedBy;
                     }
                 }
             }

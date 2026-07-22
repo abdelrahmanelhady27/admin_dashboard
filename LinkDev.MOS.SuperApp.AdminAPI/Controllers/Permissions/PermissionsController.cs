@@ -1,6 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
-using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

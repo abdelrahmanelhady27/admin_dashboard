@@ -2,6 +2,7 @@ using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.Utility.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,6 +17,29 @@ namespace LinkDev.MOS.SuperApp.Identity.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            ApplyUtcDateTimeConversion(modelBuilder);
+        }
+
+        private static void ApplyUtcDateTimeConversion(ModelBuilder modelBuilder)
+        {
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v,
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            var nullableUtcConverter = new ValueConverter<DateTime?, DateTime?>(
+                v => v,
+                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                        property.SetValueConverter(utcConverter);
+                    else if (property.ClrType == typeof(DateTime?))
+                        property.SetValueConverter(nullableUtcConverter);
+                }
+            }
         }
 
         public override int SaveChanges()

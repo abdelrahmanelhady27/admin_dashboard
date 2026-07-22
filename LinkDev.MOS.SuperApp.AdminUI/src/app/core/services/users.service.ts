@@ -108,4 +108,8 @@ export class UsersService {
   suspend(id: number): Observable<DashboardUser> {
     return this.http.patch<DashboardUser>(`${this.apiUrl}/${id}/suspend`, {}).pipe(map(normalizeUser));
   }
+
+  activate(id: number): Observable<DashboardUser> {
+    return this.http.patch<DashboardUser>(`${this.apiUrl}/${id}/activate`, {}).pipe(map(normalizeUser));
+  }
 }

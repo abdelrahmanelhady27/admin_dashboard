@@ -39,6 +39,7 @@
     "edit": "تعديل",
     "delete": "حذف",
     "suspend": "إيقاف حساب",
+    "activate": "تفعيل حساب",
     "add": "إضافة",
     "addUser": "إضافة مستخدم",
     "createNews": "إنشاء خبر",
@@ -108,6 +109,7 @@
     "contentType": "نوع المحتوى",
     "confirmDelete": "هل أنت متأكد من حذف هذا المستخدم من لوحة الإدارة؟",
     "confirmSuspend": "هل أنت متأكد من إيقاف هذا الحساب؟",
+    "confirmActivate": "هل أنت متأكد من تفعيل هذا الحساب؟",
     "accountSecurity": "أمان الحساب",
     "password": "كلمة المرور"
   },
@@ -280,6 +282,7 @@
     "userUpdated": "تم تحديث صلاحيات المستخدم بنجاح",
     "userDeleted": "تم حذف المستخدم من لوحة الإدارة بنجاح",
     "userSuspended": "تم إيقاف حساب المستخدم بنجاح",
+    "userActivated": "تم تفعيل حساب المستخدم بنجاح",
     "savedAsDraft": "تم الحفظ كمسودة بنجاح",
     "publishedSuccessfully": "تم النشر بنجاح",
     "unpublishedSuccessfully": "تم إلغاء النشر بنجاح",

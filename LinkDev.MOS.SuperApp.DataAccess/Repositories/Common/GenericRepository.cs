@@ -1,5 +1,6 @@
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
+using LinkDev.MOS.SuperApp.Utility.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,17 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories.Common
         public async Task DeleteAsync(int id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
-            if (entity != null) _context.Set<T>().Remove(entity);
+            if (entity == null) return;
+
+            if (entity is IAuditableEntity auditable)
+            {
+                auditable.IsDeleted = true;
+                _context.Set<T>().Update(entity);
+            }
+            else
+            {
+                _context.Set<T>().Remove(entity);
+            }
         }
     }
 }

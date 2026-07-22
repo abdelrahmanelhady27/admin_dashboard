@@ -2,8 +2,6 @@ using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using LinkDev.MOS.SuperApp.DataAccess.Mapping;
 using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
@@ -13,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
 
 namespace Linkdev.MOS.SuperApp.Business.Services
 {
@@ -143,6 +143,15 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         public async Task<UserDto?> SuspendUserAsync(int id)
         {
             var acc = await _userAccountService.SuspendAccountAsync(id);
+            if (acc == null) return null;
+
+            var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();
+            return _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
+        }
+
+        public async Task<UserDto?> ActivateUserAsync(int id)
+        {
+            var acc = await _userAccountService.ActivateAccountAsync(id);
             if (acc == null) return null;
 
             var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();

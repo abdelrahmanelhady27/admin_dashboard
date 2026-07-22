@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services
+namespace Linkdev.MOS.SuperApp.Business.Interfaces.Permissions
 {
     public interface IPermissionService
     {

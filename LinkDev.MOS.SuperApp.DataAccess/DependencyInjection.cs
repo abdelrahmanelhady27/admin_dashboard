@@ -1,6 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using Linkdev.MOS.SuperApp.Business.Mapping;
 using Linkdev.MOS.SuperApp.Business.Services;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
@@ -12,6 +11,10 @@ using LinkDev.MOS.SuperApp.DataAccess.Mapping;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories.Common;
 using LinkDev.MOS.SuperApp.Identity.Mapping;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Common;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
+using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
 
 namespace LinkDev.MOS.SuperApp.DataAccess
 {

@@ -4,13 +4,13 @@ using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
 
 namespace Linkdev.MOS.SuperApp.Business.Services
 {

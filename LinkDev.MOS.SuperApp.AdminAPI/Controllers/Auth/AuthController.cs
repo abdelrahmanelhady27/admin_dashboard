@@ -2,11 +2,12 @@ using Azure.Core;
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
 
 namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 {
@@ -16,12 +17,12 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
     {
         private readonly IAuthService _authService;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly Linkdev.MOS.SuperApp.Business.Interfaces.Services.IUserService _userService;
+        private readonly IUserService _userService;
 
         public AuthController(
             IAuthService authService,
             SignInManager<ApplicationUser> signInManager,
-            Linkdev.MOS.SuperApp.Business.Interfaces.Services.IUserService userService)
+            IUserService userService)
         {
             _authService = authService;
             _signInManager = signInManager;

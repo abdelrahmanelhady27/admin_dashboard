@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Text;
 
-namespace LinkDev.MOS.SuperApp.DataAccess
+namespace LinkDev.MOS.SuperApp.DataAccess.Entites.Common
 {
     public class UnitOfWork : IUnitOfWork
     {

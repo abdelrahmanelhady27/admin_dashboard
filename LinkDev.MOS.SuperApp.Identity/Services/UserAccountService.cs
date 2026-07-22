@@ -1,13 +1,13 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services
 {
@@ -24,7 +24,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
 
         public async Task<IEnumerable<UserAccountDto>> GetAllAccountsAsync(string? search)
         {
-            var query = _userManager.Users.AsQueryable();
+            var query = _userManager.Users.Where(u => !u.IsDeleted);
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -39,16 +39,22 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
 
         public async Task<UserAccountDto?> GetAccountByIdAsync(int id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
             return user == null ? null : _mapper.Map<UserAccountDto>(user);
         }
 
         public async Task<UserAccountDto> CreateAccountAsync(string email, string fullName, string password, int staticUserId)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
-            if (existingUser != null)
+
+            if (existingUser != null && !existingUser.IsDeleted)
             {
                 throw new Exception("The user has already been added");
+            }
+
+            if (existingUser != null && existingUser.IsDeleted)
+            {
+                return await RestoreAccountAsync(existingUser, fullName, password, staticUserId);
             }
 
             var user = new ApplicationUser
@@ -71,18 +77,55 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
             return _mapper.Map<UserAccountDto>(user);
         }
 
+        private async Task<UserAccountDto> RestoreAccountAsync(
+            ApplicationUser existingUser,
+            string fullName,
+            string password,
+            int staticUserId)
+        {
+            existingUser.FullName = fullName;
+            existingUser.StaticUserId = staticUserId;
+            existingUser.IsDeleted = false;
+            existingUser.IsActive = true;
+
+            // Replace password so the admin sets a fresh credential on re-add.
+            await _userManager.RemovePasswordAsync(existingUser);
+            var addPwdResult = await _userManager.AddPasswordAsync(existingUser, password);
+            if (!addPwdResult.Succeeded)
+            {
+                var errors = string.Join(", ", addPwdResult.Errors.Select(e => e.Description));
+                throw new Exception($"User account restore failed: {errors}");
+            }
+
+            var updateResult = await _userManager.UpdateAsync(existingUser);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new Exception($"User account restore failed: {errors}");
+            }
+
+            if (!await _userManager.IsInRoleAsync(existingUser, "Admin"))
+            {
+                await _userManager.AddToRoleAsync(existingUser, "Admin");
+            }
+
+            return _mapper.Map<UserAccountDto>(existingUser);
+        }
+
         public async Task<bool> DeleteAccountAsync(int id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
             if (user == null) return false;
 
-            var result = await _userManager.DeleteAsync(user);
+            user.IsDeleted = true;
+            user.IsActive = false;
+            var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
 
         public async Task<UserAccountDto?> SuspendAccountAsync(int id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
             if (user == null) return null;
 
             user.IsActive = false;
@@ -91,6 +134,22 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 throw new Exception($"User account suspension failed: {errors}");
+            }
+
+            return _mapper.Map<UserAccountDto>(user);
+        }
+
+        public async Task<UserAccountDto?> ActivateAccountAsync(int id)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+            if (user == null) return null;
+
+            user.IsActive = true;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"User account activation failed: {errors}");
             }
 
             return _mapper.Map<UserAccountDto>(user);

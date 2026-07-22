@@ -1,6 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -10,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
 {
@@ -32,7 +32,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
         {
             // 1. find user by email
             var user = await _userManager.FindByEmailAsync(LogDto.Email);
-            if (user == null || !user.IsActive)
+            if (user == null || !user.IsActive || user.IsDeleted)
             {
                 throw new Exception("Invalid email or password.");
             }

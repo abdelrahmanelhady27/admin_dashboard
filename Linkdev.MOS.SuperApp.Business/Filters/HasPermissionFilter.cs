@@ -1,7 +1,6 @@
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Filters;
-using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;

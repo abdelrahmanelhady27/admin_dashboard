@@ -2,7 +2,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services
+namespace Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages
 {
     public interface IServiceIntroPageService
     {

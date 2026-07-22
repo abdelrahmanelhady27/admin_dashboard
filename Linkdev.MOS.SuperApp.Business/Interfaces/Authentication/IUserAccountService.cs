@@ -2,7 +2,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication
+namespace Linkdev.MOS.SuperApp.Business.Interfaces.Authentication
 {
     public interface IUserAccountService
     {
@@ -11,5 +11,6 @@ namespace Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication
         Task<UserAccountDto> CreateAccountAsync(string email, string fullName, string password, int staticUserId);
         Task<bool> DeleteAccountAsync(int id);
         Task<UserAccountDto?> SuspendAccountAsync(int id);
+        Task<UserAccountDto?> ActivateAccountAsync(int id);
     }
 }

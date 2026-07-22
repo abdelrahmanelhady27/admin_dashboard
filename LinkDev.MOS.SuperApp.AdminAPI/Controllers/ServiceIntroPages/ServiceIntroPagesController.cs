@@ -1,7 +1,7 @@
 ﻿using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Filters;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

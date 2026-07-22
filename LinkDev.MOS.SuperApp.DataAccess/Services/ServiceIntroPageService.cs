@@ -2,7 +2,7 @@ using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
+using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
