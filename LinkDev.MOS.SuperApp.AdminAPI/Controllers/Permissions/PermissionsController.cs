@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
 {
-    [Route("api/[controller]")]
+    [Route("api/permissions")]
     [ApiController]
     [Authorize(Roles = "SuperAdmin")]
     public class PermissionsController : ControllerBase
@@ -20,7 +20,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             _permissionService = permissionService;
         }
 
-        // GET: api/Permissions
+        // GET: api/permissions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserPermissionDto>>> GetAll()
         {
@@ -28,7 +28,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return Ok(permissions);
         }
 
-        // GET: api/Permissions/5
+        // GET: api/permissions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserPermissionDto>> GetById(int id)
         {
@@ -40,7 +40,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return Ok(permission);
         }
 
-        // GET: api/Permissions/user/5
+        // GET: api/permissions/user/5
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<IEnumerable<UserPermissionDto>>> GetByUserId(int userId)
         {
@@ -48,7 +48,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return Ok(permissions);
         }
 
-        // POST: api/Permissions
+        // POST: api/permissions
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] UserPermissionDto permissionDto)
         {
@@ -61,7 +61,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return CreatedAtAction(nameof(GetById), new { id = permissionDto.Id }, permissionDto);
         }
 
-        // PUT: api/Permissions/5
+        // PUT: api/permissions/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, [FromBody] UserPermissionDto permissionDto)
         {
@@ -85,7 +85,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
             return NoContent();
         }
 
-        // DELETE: api/Permissions/5
+        // DELETE: api/permissions/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { ServicePagesService } from '../../../core/services/service-pages.service';
+import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import { ServiceIntroPage } from '../../../core/models/service-page.model';
 import { PageStatus } from '../../../core/models/enums';
 import { LanguageService } from '../../../core/services/language.service';
@@ -93,7 +93,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class ServicePageDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly servicePages = inject(ServicePagesService);
+  private readonly servicePages = inject(ServiceIntroPagesService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
 
@@ -106,11 +106,17 @@ export class ServicePageDetailsComponent implements OnInit {
   readonly unpublishedStatus = PageStatus.Unpublished;
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    setTimeout(() => {
-      this.page = this.servicePages.getById(id) ?? null;
-      this.loading = false;
-    }, 350);
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.servicePages.getById(id).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toast.error(err.error?.message || 'common.error');
+      }
+    });
   }
 
   getServiceName(page: ServiceIntroPage): string {
@@ -118,20 +124,26 @@ export class ServicePageDetailsComponent implements OnInit {
   }
 
   publish(): void {
-    if (this.page) {
-      this.servicePages.publish(this.page.id);
-      this.page = this.servicePages.getById(this.page.id) ?? null;
-      this.toast.success('messages.publishedSuccessfully');
-    }
+    if (!this.page) return;
+    this.servicePages.publish(this.page.id).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.toast.success('messages.publishedSuccessfully');
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
     this.showPublishConfirm = false;
   }
 
   unpublish(): void {
-    if (this.page) {
-      this.servicePages.unpublish(this.page.id);
-      this.page = this.servicePages.getById(this.page.id) ?? null;
-      this.toast.success('messages.unpublishedSuccessfully');
-    }
+    if (!this.page) return;
+    this.servicePages.unpublish(this.page.id).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.toast.success('messages.unpublishedSuccessfully');
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
     this.showUnpublishConfirm = false;
   }
 }

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -28,8 +28,8 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
             _userService = userService;
         }
 
-        // GET api/auth/myPermissions
-        [HttpGet("myPermissions")]
+        // GET api/auth/my-permissions
+        [HttpGet("my-permissions")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<PermissionSetDto>>> MyPermissions()
         {
@@ -45,7 +45,7 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
             return Ok(userDto.Permissions);
         }
 
-        // POST api/auth/createAdmin
+        // POST api/auth/register
         [HttpPost("register")]
         [Authorize(Roles = "SuperAdmin")]
         public async Task<ActionResult<RegisterRequestDto>> Register([FromBody] RegisterRequestDto RegDto)

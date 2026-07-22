@@ -1,12 +1,13 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ServicePagesService } from '../../../core/services/service-pages.service';
+import { forkJoin } from 'rxjs';
+import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import {
+  AvailableLinkedService,
   MAX_DESCRIPTION_LENGTH,
   MAX_PROCESSING_DURATION_LENGTH
 } from '../../../core/models/service-page.model';
-import { PageStatus } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
 import { FaqEditorComponent } from '../../../shared/components/faq-editor/faq-editor.component';
@@ -76,14 +77,14 @@ import { ToastService } from '../../../core/services/toast.service';
 
       <div class="form-action-bar">
         <a routerLink="/service-pages" class="btn btn-outline">{{ 'common.cancel' | translate }}</a>
-        <button type="button" class="btn btn-outline" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="publish()">{{ 'common.publish' | translate }}</button>
+        <button type="button" class="btn btn-outline" [disabled]="saving" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="saving" (click)="publish()">{{ 'common.publish' | translate }}</button>
       </div>
     </form>
   `
 })
-export class ServicePageCreateComponent {
-  private readonly servicePages = inject(ServicePagesService);
+export class ServicePageCreateComponent implements OnInit {
+  private readonly servicePages = inject(ServiceIntroPagesService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
@@ -94,6 +95,9 @@ export class ServicePageCreateComponent {
 
   docsForm: FormGroup | null = null;
   faqsForm: FormGroup | null = null;
+  availableServices: AvailableLinkedService[] = [];
+  existingServiceIds = new Set<number>();
+  saving = false;
 
   form = this.fb.group({
     serviceId: ['', Validators.required],
@@ -103,12 +107,25 @@ export class ServicePageCreateComponent {
     videoFileName: ['']
   });
 
-  get availableServices() {
-    return this.servicePages.getServices().filter((s) => !this.servicePages.getByServiceId(s.id));
+  ngOnInit(): void {
+    forkJoin({
+      services: this.servicePages.getAvailableServices(),
+      pages: this.servicePages.getAll()
+    }).subscribe({
+      next: ({ services, pages }) => {
+        this.existingServiceIds = new Set(pages.map((p) => p.serviceId));
+        this.availableServices = services.filter(
+          (s) => s.isActive && !this.existingServiceIds.has(s.id)
+        );
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
   }
 
-  getServiceLabel(svc: { nameAr: string; nameEn: string }): string {
-    return this.language.currentLang === 'ar' ? svc.nameAr : svc.nameEn;
+  getServiceLabel(svc: AvailableLinkedService): string {
+    const name = this.language.currentLang === 'ar' ? svc.nameAr : svc.nameEn;
+    const system = this.language.currentLang === 'ar' ? svc.systemNameAr : svc.systemNameEn;
+    return system ? `${name} (${system})` : name;
   }
 
   onDocsReady(form: FormGroup): void { this.docsForm = form; }
@@ -122,18 +139,13 @@ export class ServicePageCreateComponent {
 
   saveDraft(): void {
     if (!this.validateService()) return;
-    this.createPage(PageStatus.Draft);
-    this.toast.success('messages.savedAsDraft');
-    this.router.navigate(['/service-pages']);
+    this.createPage(false);
   }
 
   publish(): void {
     if (!this.validateService()) return;
     if (!this.validatePublish()) return;
-    const page = this.createPage(PageStatus.Draft);
-    this.servicePages.publish(page.id);
-    this.toast.success('messages.publishedSuccessfully');
-    this.router.navigate(['/service-pages']);
+    this.createPage(true);
   }
 
   private validateService(): boolean {
@@ -141,8 +153,8 @@ export class ServicePageCreateComponent {
       this.toast.error('validation.serviceRequired');
       return false;
     }
-    const serviceId = this.form.get('serviceId')?.value;
-    if (serviceId && this.servicePages.getByServiceId(serviceId)) {
+    const serviceId = Number(this.form.get('serviceId')?.value);
+    if (this.existingServiceIds.has(serviceId)) {
       this.toast.error('validation.duplicateServicePage');
       return false;
     }
@@ -165,19 +177,27 @@ export class ServicePageCreateComponent {
     return true;
   }
 
-  private createPage(status: PageStatus) {
-    const service = this.servicePages.getServiceById(this.form.value.serviceId!)!;
-    return this.servicePages.create({
-      serviceId: service.id,
-      serviceNameAr: service.nameAr,
-      serviceNameEn: service.nameEn,
-      status,
+  private createPage(publish: boolean): void {
+    this.saving = true;
+    this.servicePages.create({
+      serviceId: Number(this.form.value.serviceId),
       description: this.form.value.description || '',
       processingDuration: this.form.value.processingDuration || '',
-      videoUrl: this.form.value.videoUrl || '',
-      videoFileName: this.form.value.videoFileName || '',
+      videoUrl: this.form.value.videoUrl || null,
+      videoFileName: this.form.value.videoFileName || null,
       documents: this.docsForm?.value.documents || [],
-      faqs: (this.faqsForm?.value.faqs || []).filter((f: { question: string; answer: string }) => f.question && f.answer)
+      faqs: this.faqsForm?.value.faqs || [],
+      publish
+    }).subscribe({
+      next: () => {
+        this.saving = false;
+        this.toast.success(publish ? 'messages.publishedSuccessfully' : 'messages.savedAsDraft');
+        this.router.navigate(['/service-pages']);
+      },
+      error: (err) => {
+        this.saving = false;
+        this.toast.error(err.error?.message || 'common.error');
+      }
     });
   }
 }

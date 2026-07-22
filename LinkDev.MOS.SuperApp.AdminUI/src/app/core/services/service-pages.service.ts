@@ -43,11 +43,11 @@ export class ServicePagesService {
     return result.sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime());
   }
 
-  getById(id: string): ServiceIntroPage | undefined {
+  getById(id: number): ServiceIntroPage | undefined {
     return this.pages.find((p) => p.id === id);
   }
 
-  getByServiceId(serviceId: string): ServiceIntroPage | undefined {
+  getByServiceId(serviceId: number): ServiceIntroPage | undefined {
     return this.pages.find((p) => p.serviceId === serviceId);
   }
 
@@ -79,7 +79,7 @@ export class ServicePagesService {
     const now = new Date().toISOString();
     const created: ServiceIntroPage = {
       ...page,
-      id: `sp-${Date.now()}`,
+      id: Date.now(),
       createdAt: now,
       modifiedAt: now,
       modifiedBy: this.auth.currentUser?.fullNameEn || 'System'
@@ -90,7 +90,7 @@ export class ServicePagesService {
     return created;
   }
 
-  update(id: string, data: Partial<ServiceIntroPage>): ServiceIntroPage | null {
+  update(id: number, data: Partial<ServiceIntroPage>): ServiceIntroPage | null {
     const index = this.pages.findIndex((p) => p.id === id);
     if (index === -1) {
       return null;
@@ -106,7 +106,7 @@ export class ServicePagesService {
     return this.pages[index];
   }
 
-  publish(id: string): ServiceIntroPage | null {
+  publish(id: number): ServiceIntroPage | null {
     const page = this.getById(id);
     if (!page) {
       return null;
@@ -120,7 +120,7 @@ export class ServicePagesService {
     return page;
   }
 
-  unpublish(id: string): ServiceIntroPage | null {
+  unpublish(id: number): ServiceIntroPage | null {
     const page = this.getById(id);
     if (!page) {
       return null;
@@ -133,7 +133,7 @@ export class ServicePagesService {
     return page;
   }
 
-  saveAsDraft(id: string, data: Partial<ServiceIntroPage>): ServiceIntroPage | null {
+  saveAsDraft(id: number, data: Partial<ServiceIntroPage>): ServiceIntroPage | null {
     return this.update(id, { ...data, status: PageStatus.Draft });
   }
 
@@ -175,8 +175,8 @@ export class ServicePagesService {
     const now = new Date().toISOString();
     return [
       {
-        id: 'sp-1',
-        serviceId: 'svc-a1',
+        id: 1,
+        serviceId: 1,
         serviceNameAr: 'خدمة أ1',
         serviceNameEn: 'Service A1',
         status: PageStatus.Published,
@@ -185,15 +185,15 @@ export class ServicePagesService {
         videoUrl: '',
         videoFileName: '',
         documents: [],
-        faqs: [{ id: 'faq-1', question: 'How to apply?', answer: 'Submit through the portal.' }],
+        faqs: [{ id: 1, question: 'How to apply?', answer: 'Submit through the portal.' }],
         publishedSnapshot: undefined,
         createdAt: now,
         modifiedAt: now,
         modifiedBy: 'System Administrator'
       },
       {
-        id: 'sp-2',
-        serviceId: 'svc-b1',
+        id: 2,
+        serviceId: 2,
         serviceNameAr: 'خدمة ب1',
         serviceNameEn: 'Service B1',
         status: PageStatus.Draft,

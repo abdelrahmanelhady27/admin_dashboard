@@ -1,21 +1,22 @@
 import { PageStatus } from './enums';
 
 export interface ServiceDocument {
-  id: string;
+  id: number | string;
   name: string;
   fileName: string;
   fileType: string;
+  fileUrl?: string;
 }
 
 export interface FaqItem {
-  id: string;
+  id: number | string;
   question: string;
   answer: string;
 }
 
 export interface ServiceIntroPage {
-  id: string;
-  serviceId: string;
+  id: number;
+  serviceId: number;
   serviceNameAr: string;
   serviceNameEn: string;
   status: PageStatus;
@@ -29,6 +30,7 @@ export interface ServiceIntroPage {
   createdAt: string;
   modifiedAt: string;
   modifiedBy: string;
+  publishedAt?: string;
 }
 
 export interface LinkedSystem {
@@ -44,6 +46,17 @@ export interface LinkedService {
   nameEn: string;
   deepLink: string;
   isActive: boolean;
+}
+
+export interface AvailableLinkedService {
+  id: number;
+  systemId: number;
+  nameAr: string;
+  nameEn: string;
+  deepLink: string;
+  isActive: boolean;
+  systemNameAr?: string;
+  systemNameEn?: string;
 }
 
 // RSD had 3 in one section and 5 in another — centralized here

@@ -2,12 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { UsersService } from '../../core/services/users.service';
-import { ServicePagesService } from '../../core/services/service-pages.service';
+import { ServiceIntroPagesService } from '../../core/services/service-intro-pages.service';
 import { QuickLinksService } from '../../core/services/quick-links.service';
 import { EmployeeNewsService } from '../../core/services/employee-news.service';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PageStatus } from '../../core/models/enums';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -230,7 +231,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 })
 export class DashboardComponent implements OnInit {
   private readonly users = inject(UsersService);
-  private readonly servicePages = inject(ServicePagesService);
+  private readonly serviceIntroPages = inject(ServiceIntroPagesService);
   private readonly quickLinks = inject(QuickLinksService);
   private readonly news = inject(EmployeeNewsService);
   private readonly auditLog = inject(AuditLogService);
@@ -279,15 +280,22 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => {
-      const counts = this.servicePages.getCounts();
-      this.publishedPages = counts.published;
-      this.draftPages = counts.draft;
-      this.publishedNews = this.news.getPublishedCount();
-      this.quickLinksCount = this.quickLinks.getCount();
-      this.recentLogs = this.auditLog.getRecent(6);
-      this.recentNews = this.news.getLatestPublished(4);
-      this.loading = false;
-    }, 450);
+    this.publishedNews = this.news.getPublishedCount();
+    this.quickLinksCount = this.quickLinks.getCount();
+    this.recentLogs = this.auditLog.getRecent(6);
+    this.recentNews = this.news.getLatestPublished(4);
+
+    this.serviceIntroPages.getAll().subscribe({
+      next: (pages) => {
+        this.publishedPages = pages.filter((p) => p.status === PageStatus.Published).length;
+        this.draftPages = pages.filter((p) => p.status === PageStatus.Draft).length;
+        this.loading = false;
+      },
+      error: () => {
+        this.publishedPages = 0;
+        this.draftPages = 0;
+        this.loading = false;
+      }
+    });
   }
 }

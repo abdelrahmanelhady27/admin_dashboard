@@ -71,7 +71,7 @@ export class AuthService {
   }
 
   fetchPermissions(): Observable<PermissionSet[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/myPermissions`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/auth/my-permissions`).pipe(
       map(rawPerms => {
         return rawPerms.map(raw => {
           const contentType = this.mapFeatureToContentType(raw.feature ?? raw.contentType);

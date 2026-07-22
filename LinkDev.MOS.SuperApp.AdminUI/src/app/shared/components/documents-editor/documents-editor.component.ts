@@ -74,7 +74,8 @@ export class DocumentsEditorComponent {
       id: [`doc-${Date.now()}`],
       name: ['', [Validators.required, Validators.maxLength(MAX_DOCUMENT_NAME_LENGTH)]],
       fileName: [''],
-      fileType: ['application/pdf']
+      fileType: ['application/pdf'],
+      fileUrl: ['']
     }));
   }
 
@@ -87,14 +88,15 @@ export class DocumentsEditorComponent {
     this.documents.at(index).patchValue({ fileName: file.name, fileType: file.type });
   }
 
-  setDocuments(items: { id: string; name: string; fileName: string; fileType: string }[]): void {
+  setDocuments(items: { id: number | string; name: string; fileName: string; fileType: string; fileUrl?: string }[]): void {
     this.documents.clear();
     items.forEach((item) => {
       this.documents.push(this.fb.group({
         id: [item.id],
         name: [item.name, [Validators.required, Validators.maxLength(MAX_DOCUMENT_NAME_LENGTH)]],
         fileName: [item.fileName],
-        fileType: [item.fileType]
+        fileType: [item.fileType],
+        fileUrl: [item.fileUrl || '']
       }));
     });
   }

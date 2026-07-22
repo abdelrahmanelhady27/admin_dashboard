@@ -1,9 +1,9 @@
-import { Component, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, inject, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ServicePagesService } from '../../../core/services/service-pages.service';
+import { switchMap } from 'rxjs/operators';
+import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import { ServiceIntroPage, MAX_DESCRIPTION_LENGTH, MAX_PROCESSING_DURATION_LENGTH } from '../../../core/models/service-page.model';
-import { PageStatus } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
 import { FaqEditorComponent } from '../../../shared/components/faq-editor/faq-editor.component';
@@ -52,8 +52,8 @@ import { ToastService } from '../../../core/services/toast.service';
         <app-faq-editor #faqEditor (formReady)="onFaqsReady($event)" />
 
         <div class="form-actions">
-          <button type="button" class="btn btn-outline" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
-          <button type="button" class="btn btn-primary" (click)="publish()">{{ 'common.publish' | translate }}</button>
+          <button type="button" class="btn btn-outline" [disabled]="saving" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
+          <button type="button" class="btn btn-primary" [disabled]="saving" (click)="publish()">{{ 'common.publish' | translate }}</button>
           <a [routerLink]="['/service-pages', page.id]" class="btn btn-outline">{{ 'common.cancel' | translate }}</a>
         </div>
       </form>
@@ -69,13 +69,13 @@ import { ToastService } from '../../../core/services/toast.service';
     .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
   `]
 })
-export class ServicePageEditComponent implements AfterViewInit {
+export class ServicePageEditComponent implements OnInit, AfterViewInit {
   @ViewChild('docsEditor') docsEditor!: DocumentsEditorComponent;
   @ViewChild('faqEditor') faqEditor!: FaqEditorComponent;
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly servicePages = inject(ServicePagesService);
+  private readonly servicePages = inject(ServiceIntroPagesService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
@@ -83,6 +83,8 @@ export class ServicePageEditComponent implements AfterViewInit {
   page: ServiceIntroPage | null = null;
   docsForm: FormGroup | null = null;
   faqsForm: FormGroup | null = null;
+  saving = false;
+  private editorsReady = false;
   readonly maxDesc = MAX_DESCRIPTION_LENGTH;
   readonly maxDuration = MAX_PROCESSING_DURATION_LENGTH;
 
@@ -94,38 +96,49 @@ export class ServicePageEditComponent implements AfterViewInit {
   });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    this.page = this.servicePages.getById(id) ?? null;
-    if (this.page) {
-      this.form.patchValue({
-        description: this.page.description,
-        processingDuration: this.page.processingDuration,
-        videoUrl: this.page.videoUrl,
-        videoFileName: this.page.videoFileName
-      });
-    }
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.servicePages.getById(id).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.form.patchValue({
+          description: page.description,
+          processingDuration: page.processingDuration,
+          videoUrl: page.videoUrl,
+          videoFileName: page.videoFileName
+        });
+        this.populateEditors();
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.docsEditor?.setDocuments(this.page?.documents || []);
-      this.faqEditor?.setFaqs(this.page?.faqs || []);
-    });
+    this.editorsReady = true;
+    this.populateEditors();
   }
 
   getServiceName(page: ServiceIntroPage): string {
     return this.language.currentLang === 'ar' ? page.serviceNameAr : page.serviceNameEn;
   }
 
-  onDocsReady(form: FormGroup): void { this.docsForm = form; this.docsEditor?.setDocuments(this.page?.documents || []); }
-  onFaqsReady(form: FormGroup): void { this.faqsForm = form; this.faqEditor?.setFaqs(this.page?.faqs || []); }
+  onDocsReady(form: FormGroup): void { this.docsForm = form; this.populateEditors(); }
+  onFaqsReady(form: FormGroup): void { this.faqsForm = form; this.populateEditors(); }
   onVideoSelected(file: File | null): void { if (file) this.form.patchValue({ videoFileName: file.name }); }
 
   saveDraft(): void {
     if (!this.page) return;
-    this.servicePages.update(this.page.id, this.buildData(PageStatus.Draft));
-    this.toast.success('messages.savedAsDraft');
-    this.router.navigate(['/service-pages', this.page.id]);
+    this.saving = true;
+    this.servicePages.update(this.page.id, this.buildPayload()).subscribe({
+      next: () => {
+        this.saving = false;
+        this.toast.success('messages.savedAsDraft');
+        this.router.navigate(['/service-pages', this.page!.id]);
+      },
+      error: (err) => {
+        this.saving = false;
+        this.toast.error(err.error?.message || 'common.error');
+      }
+    });
   }
 
   publish(): void {
@@ -135,21 +148,38 @@ export class ServicePageEditComponent implements AfterViewInit {
       this.toast.error('validation.completeRequiredFields');
       return;
     }
-    this.servicePages.update(this.page.id, this.buildData(PageStatus.Draft));
-    this.servicePages.publish(this.page.id);
-    this.toast.success('messages.publishedSuccessfully');
-    this.router.navigate(['/service-pages', this.page.id]);
+    this.saving = true;
+    this.servicePages.update(this.page.id, this.buildPayload()).pipe(
+      switchMap((updated) => this.servicePages.publish(updated.id))
+    ).subscribe({
+      next: () => {
+        this.saving = false;
+        this.toast.success('messages.publishedSuccessfully');
+        this.router.navigate(['/service-pages', this.page!.id]);
+      },
+      error: (err) => {
+        this.saving = false;
+        this.toast.error(err.error?.message || 'common.error');
+      }
+    });
   }
 
-  private buildData(status: PageStatus) {
+  private buildPayload() {
     return {
-      status: this.page!.status === PageStatus.Published ? PageStatus.Draft : status,
       description: this.form.value.description || '',
       processingDuration: this.form.value.processingDuration || '',
-      videoUrl: this.form.value.videoUrl || '',
-      videoFileName: this.form.value.videoFileName || '',
+      videoUrl: this.form.value.videoUrl || null,
+      videoFileName: this.form.value.videoFileName || null,
       documents: this.docsForm?.value.documents || [],
-      faqs: (this.faqsForm?.value.faqs || []).filter((f: { question: string; answer: string }) => f.question && f.answer)
+      faqs: this.faqsForm?.value.faqs || []
     };
+  }
+
+  private populateEditors(): void {
+    if (!this.page || !this.editorsReady) return;
+    setTimeout(() => {
+      this.docsEditor?.setDocuments(this.page?.documents || []);
+      this.faqEditor?.setFaqs(this.page?.faqs || []);
+    });
   }
 }

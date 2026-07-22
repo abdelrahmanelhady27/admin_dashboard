@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.AuditLog
 {
-    [Route("api/[controller]")]
+    [Route("api/audit-log")]
     [ApiController]
     [HasFeature(FeatureType.AuditLog)]
     public class AuditLogController : ControllerBase
     {
-        // GET: api/<AuditLogController>
+        // GET: api/audit-log
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
         public IEnumerable<string> Get()
@@ -19,7 +19,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.AuditLog
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<AuditLogController>/5
+        // GET api/audit-log/5
         [HttpGet("{id}")]
         [HasPermission(PermissionAction.Read)]
         public string Get(int id)
@@ -27,14 +27,14 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.AuditLog
             return "value";
         }
 
-        // POST api/<AuditLogController>
+        // POST api/audit-log
         [HttpPost]
         [HasPermission(PermissionAction.Add)]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<AuditLogController>/5
+        // PUT api/audit-log/5
         [HttpPut("{id}")]
         [HasPermission(PermissionAction.Edit)]
 
@@ -42,7 +42,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.AuditLog
         {
         }
 
-        // DELETE api/<AuditLogController>/5
+        // DELETE api/audit-log/5
         [HttpDelete("{id}")]
         [HasPermission(PermissionAction.Delete)]
 

@@ -59,6 +59,11 @@ dlldata.c
 
 User Stories
 
+# Local project documentation
+/README.md
+/DATABASE.md
+/AGENT.md
+
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 

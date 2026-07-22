@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { ServicePagesService } from '../../../core/services/service-pages.service';
+import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import { ServiceIntroPage } from '../../../core/models/service-page.model';
 import { PageStatus } from '../../../core/models/enums';
 import { LanguageService } from '../../../core/services/language.service';
@@ -83,7 +83,7 @@ import { ToastService } from '../../../core/services/toast.service';
   `,
 })
 export class ServicePagesListComponent implements OnInit {
-  private readonly servicePages = inject(ServicePagesService);
+  private readonly servicePages = inject(ServiceIntroPagesService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
@@ -98,29 +98,43 @@ export class ServicePagesListComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    setTimeout(() => {
-      const v = this.filterForm.value;
-      this.pages = this.servicePages.getAll({
-        search: v.search || undefined,
-        status: (v.status as PageStatus) || undefined
-      });
-      this.loading = false;
-    }, 350);
+    const v = this.filterForm.value;
+    this.servicePages.getAll({
+      search: v.search || undefined,
+      status: (v.status as PageStatus) || undefined
+    }).subscribe({
+      next: (data) => {
+        this.pages = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toast.error(err.error?.message || 'common.error');
+      }
+    });
   }
 
   getServiceName(page: ServiceIntroPage): string {
     return this.language.currentLang === 'ar' ? page.serviceNameAr : page.serviceNameEn;
   }
 
-  publish(id: string): void {
-    this.servicePages.publish(id);
-    this.toast.success('messages.publishedSuccessfully');
-    this.load();
+  publish(id: number): void {
+    this.servicePages.publish(id).subscribe({
+      next: () => {
+        this.toast.success('messages.publishedSuccessfully');
+        this.load();
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
   }
 
-  unpublish(id: string): void {
-    this.servicePages.unpublish(id);
-    this.toast.success('messages.unpublishedSuccessfully');
-    this.load();
+  unpublish(id: number): void {
+    this.servicePages.unpublish(id).subscribe({
+      next: () => {
+        this.toast.success('messages.unpublishedSuccessfully');
+        this.load();
+      },
+      error: (err) => this.toast.error(err.error?.message || 'common.error')
+    });
   }
 }

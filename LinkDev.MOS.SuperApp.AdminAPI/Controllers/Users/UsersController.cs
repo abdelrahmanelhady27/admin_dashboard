@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Users
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     [Authorize(Roles = "SuperAdmin")]
     public class UsersController : ControllerBase

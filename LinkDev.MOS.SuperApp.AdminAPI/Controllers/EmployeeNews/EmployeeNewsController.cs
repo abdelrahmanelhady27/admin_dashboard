@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
 {
-    [Route("api/[controller]")]
+    [Route("api/employee-news")]
     [ApiController]
     [Authorize]
     [HasFeature(FeatureType.EmployeeNews)]
     public class EmployeeNewsController : ControllerBase
     {
-        // GET: api/EmployeeNews
+        // GET: api/employee-news
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
         public IEnumerable<string> Get()
@@ -19,7 +19,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/EmployeeNews/5
+        // GET api/employee-news/5
         [HttpGet("{id}")]
         [HasPermission(PermissionAction.Read)]
         public string Get(int id)
@@ -27,7 +27,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
             return "value";
         }
 
-        // POST api/EmployeeNews
+        // POST api/employee-news
         [HttpPost]
         [HasPermission(PermissionAction.Add)]
 
@@ -36,14 +36,14 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
             
         }
 
-        // PUT api/EmpolyeeNews/5
+        // PUT api/employee-news/5
         [HttpPut("{id}")]
         [HasPermission(PermissionAction.Edit)]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/EmployeeNews/5
+        // DELETE api/employee-news/5
         [HttpDelete("{id}")]
         [HasPermission(PermissionAction.Delete)]
         public void Delete(int id)

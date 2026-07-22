@@ -75,7 +75,7 @@ export class FaqEditorComponent implements OnInit {
     this.faqs.removeAt(index);
   }
 
-  setFaqs(items: { id: string; question: string; answer: string }[]): void {
+  setFaqs(items: { id: number | string; question: string; answer: string }[]): void {
     this.faqs.clear();
     items.forEach((item) => {
       this.faqs.push(this.fb.group({
