@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using LinkDev.MOS.SuperApp.DataAccess.Mapping;
+using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
+using LinkDev.MOS.SuperApp.DataAccess.Repositories.Common;
+using LinkDev.MOS.SuperApp.Identity.Mapping;
 
 namespace LinkDev.MOS.SuperApp.DataAccess
 {
@@ -16,11 +19,10 @@ namespace LinkDev.MOS.SuperApp.DataAccess
     {
         public static IServiceCollection AddDataAccessServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAutoMapper(cfg => {}, new System.Reflection.Assembly[] {
-                                    typeof(MappingProfile).Assembly, 
-                                    typeof(EntityMappingProfile).Assembly,
-                                    typeof(IdentityMappingProfile).Assembly
-            });
+            services.AddAutoMapper(cfg => { },
+                typeof(UserMappingProfile).Assembly,
+                typeof(EntityMappingProfile).Assembly,
+                typeof(IdentityMappingProfile).Assembly);
 
             services.AddDbContext<AdminDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("AdminDb")));
@@ -31,6 +33,8 @@ namespace LinkDev.MOS.SuperApp.DataAccess
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IServiceIntroPageRepository, ServiceIntroPageRepository>();
+            services.AddScoped<IServiceIntroPageService, ServiceIntroPageService>();
 
 
             return services;

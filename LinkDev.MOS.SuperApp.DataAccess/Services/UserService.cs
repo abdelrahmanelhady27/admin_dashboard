@@ -4,10 +4,11 @@ using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Services.Authentication;
-using Linkdev.MOS.SuperApp.Business.Mapping;
+using LinkDev.MOS.SuperApp.DataAccess.Mapping;
 using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,6 +81,17 @@ namespace Linkdev.MOS.SuperApp.Business.Services
 
         public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
         {
+            var staticUser = await _staticUserRepo.GetByIdAsync(createUserDto.StaticUserId);
+            if (staticUser == null || staticUser.IsDeleted)
+            {
+                throw new InvalidOperationException("The selected user was not found in the ministry account.");
+            }
+
+            if (!staticUser.IsActive)
+            {
+                throw new InvalidOperationException("An inactive user cannot be added");
+            }
+
             // Create user account via Identity Service
             var acc = await _userAccountService.CreateAccountAsync(
                 createUserDto.Email,
@@ -134,7 +146,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             if (acc == null) return null;
 
             var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();
-            return _mapper.Map<UserDto>(new Linkdev.MOS.SuperApp.Business.Mapping.UserMappingModel { Account = acc, Permissions = userPermissions });
+            return _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
         }
 
         public async Task<IEnumerable<StaticUserDto>> SearchStaticUsersAsync(string term)

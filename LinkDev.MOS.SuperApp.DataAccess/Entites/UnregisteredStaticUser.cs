@@ -1,13 +1,11 @@
 using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Entites
 {
     public class UnregisteredStaticUser : BaseEntity
     {
-        public string FullName { get; set; }
-        public string Email { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
     }
 }

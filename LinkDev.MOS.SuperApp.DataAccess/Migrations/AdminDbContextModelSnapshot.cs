@@ -22,6 +22,435 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.AvailableLinkedService", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeepLink")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("SystemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SystemNameAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SystemNameEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("vw_AvailableLinkedServices", (string)null);
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeepLink")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("SystemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemId");
+
+                    b.ToTable("LinkedServices", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-a/service-a1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة أ1",
+                            NameEn = "Service A1",
+                            SystemId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-a/service-a2",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة أ2",
+                            NameEn = "Service A2",
+                            SystemId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "",
+                            IsActive = false,
+                            IsDeleted = false,
+                            NameAr = "خدمة أ3",
+                            NameEn = "Service A3",
+                            SystemId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-b/service-b1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة ب1",
+                            NameEn = "Service B1",
+                            SystemId = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-b/service-b2",
+                            IsActive = false,
+                            IsDeleted = false,
+                            NameAr = "خدمة ب2",
+                            NameEn = "Service B2",
+                            SystemId = 2
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-b/service-b3",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة ب3",
+                            NameEn = "Service B3",
+                            SystemId = 2
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-c/service-c1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة ج1",
+                            NameEn = "Service C1",
+                            SystemId = 3
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            DeepLink = "app://system-c/service-c2",
+                            IsActive = true,
+                            IsDeleted = false,
+                            NameAr = "خدمة ج2",
+                            NameEn = "Service C2",
+                            SystemId = 3
+                        });
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedSystem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LinkedSystems", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            IsDeleted = false,
+                            NameAr = "النظام أ",
+                            NameEn = "System A"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            IsDeleted = false,
+                            NameAr = "النظام ب",
+                            NameEn = "System B"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            IsDeleted = false,
+                            NameAr = "النظام ج",
+                            NameEn = "System C"
+                        });
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FileType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("ServiceIntroPageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceIntroPageId");
+
+                    b.ToTable("ServiceDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceFaq", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("ServiceIntroPageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceIntroPageId");
+
+                    b.ToTable("ServiceFaqs", (string)null);
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(190)
+                        .HasColumnType("nvarchar(190)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProcessingDuration")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PublishedSnapshotJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VideoFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ServiceIntroPages", (string)null);
+                });
+
             modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.UnregisteredStaticUser", b =>
                 {
                     b.Property<int>("Id")
@@ -40,6 +469,9 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -78,6 +510,9 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -212,6 +647,67 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", b =>
+                {
+                    b.HasOne("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedSystem", "System")
+                        .WithMany("Services")
+                        .HasForeignKey("SystemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("System");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceDocument", b =>
+                {
+                    b.HasOne("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", "ServiceIntroPage")
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceIntroPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceIntroPage");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceFaq", b =>
+                {
+                    b.HasOne("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", "ServiceIntroPage")
+                        .WithMany("Faqs")
+                        .HasForeignKey("ServiceIntroPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceIntroPage");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", b =>
+                {
+                    b.HasOne("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", "Service")
+                        .WithOne("ServiceIntroPage")
+                        .HasForeignKey("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", "ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", b =>
+                {
+                    b.Navigation("ServiceIntroPage");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedSystem", b =>
+                {
+                    b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.ServiceIntroPage", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Faqs");
                 });
 #pragma warning restore 612, 618
         }

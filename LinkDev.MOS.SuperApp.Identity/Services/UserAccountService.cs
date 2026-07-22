@@ -48,7 +48,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
             var existingUser = await _userManager.FindByEmailAsync(email);
             if (existingUser != null)
             {
-                throw new Exception("User already exists");
+                throw new Exception("The user has already been added");
             }
 
             var user = new ApplicationUser

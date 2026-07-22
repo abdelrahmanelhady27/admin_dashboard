@@ -143,9 +143,9 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Users
         [HttpGet("static/search")]
         public async Task<ActionResult<IEnumerable<StaticUserDto>>> SearchStatic([FromQuery] string term)
         {
-            if (string.IsNullOrEmpty(term))
+            if (string.IsNullOrWhiteSpace(term))
             {
-                return Ok(new List<StaticUserDto>());
+                return BadRequest(new { message = "Please enter search data" });
             }
 
             try

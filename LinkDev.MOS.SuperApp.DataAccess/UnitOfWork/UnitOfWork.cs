@@ -15,11 +15,9 @@ namespace LinkDev.MOS.SuperApp.DataAccess
     {
         private readonly AdminDbContext _context;
 
-        public IGenericRepository<UserPermission> UserPermissions { get; }
         public UnitOfWork(AdminDbContext context)
         {
             _context = context;
-            UserPermissions = new GenericRepository<UserPermission>(_context);
         }
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 

@@ -2,6 +2,7 @@ using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -80,5 +81,11 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
         public DbSet<StaticUser> StaticUsers { get; set; }
         public DbSet<UnregisteredStaticUser> UnregisteredStaticUsers { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<LinkedSystem> LinkedSystems { get; set; }
+        public DbSet<LinkedService> LinkedServices { get; set; }
+        public DbSet<ServiceIntroPage> ServiceIntroPages { get; set; }
+        public DbSet<ServiceDocument> ServiceDocuments { get; set; }
+        public DbSet<ServiceFaq> ServiceFaqs { get; set; }
+        public DbSet<AvailableLinkedService> AvailableLinkedServices { get; set; }
     }
 }
