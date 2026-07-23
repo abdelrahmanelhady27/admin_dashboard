@@ -59,7 +59,6 @@ export interface AvailableLinkedService {
   systemNameEn?: string;
 }
 
-// RSD had 3 in one section and 5 in another — centralized here
 export const MAX_SERVICE_DOCUMENTS = 5;
 export const MAX_FAQ_ITEMS = 10;
 export const MAX_DESCRIPTION_LENGTH = 190;

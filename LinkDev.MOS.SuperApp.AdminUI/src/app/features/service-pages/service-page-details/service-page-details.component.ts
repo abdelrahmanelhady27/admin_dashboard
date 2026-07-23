@@ -2,8 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ServiceIntroPage } from '../../../core/models/service-page.model';
-import { PageStatus } from '../../../core/models/enums';
+import { ContentType, PageStatus } from '../../../core/models/enums';
 import { LanguageService } from '../../../core/services/language.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
@@ -11,6 +12,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
+import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 
 @Component({
   selector: 'app-service-page-details',
@@ -28,11 +30,13 @@ import { ToastService } from '../../../core/services/toast.service';
     } @else if (page) {
       <app-page-header title="servicePages.detailsTitle">
         <a routerLink="/service-pages" class="btn btn-outline">{{ 'common.back' | translate }}</a>
-        <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
-        @if (page.status === draftStatus || page.status === unpublishedStatus) {
+        @if (canEdit) {
+          <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
+        }
+        @if (canPublish && (page.status === draftStatus || page.status === unpublishedStatus)) {
           <button type="button" class="btn btn-primary" (click)="showPublishConfirm = true">{{ 'common.publish' | translate }}</button>
         }
-        @if (page.status === publishedStatus) {
+        @if (canPublish && page.status === publishedStatus) {
           <button type="button" class="btn btn-outline" (click)="showUnpublishConfirm = true">{{ 'common.unpublish' | translate }}</button>
         }
       </app-page-header>
@@ -94,6 +98,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class ServicePageDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly servicePages = inject(ServiceIntroPagesService);
+  private readonly auth = inject(AuthService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
 
@@ -104,6 +109,8 @@ export class ServicePageDetailsComponent implements OnInit {
   readonly draftStatus = PageStatus.Draft;
   readonly publishedStatus = PageStatus.Published;
   readonly unpublishedStatus = PageStatus.Unpublished;
+  readonly canEdit = this.auth.hasPermission(ContentType.ServiceIntroPage, 'edit');
+  readonly canPublish = this.auth.hasPermission(ContentType.ServiceIntroPage, 'publish');
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -114,7 +121,7 @@ export class ServicePageDetailsComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.toast.error(err.error?.message || 'common.error');
+        this.toast.error(resolveApiErrorKey(err));
       }
     });
   }
@@ -125,25 +132,31 @@ export class ServicePageDetailsComponent implements OnInit {
 
   publish(): void {
     if (!this.page) return;
+    this.showPublishConfirm = false;
+
+    if (!this.page.description?.trim() || !this.page.processingDuration?.trim()) {
+      this.toast.error('validation.completeRequiredFields');
+      return;
+    }
+
     this.servicePages.publish(this.page.id).subscribe({
       next: (page) => {
         this.page = page;
         this.toast.success('messages.publishedSuccessfully');
       },
-      error: (err) => this.toast.error(err.error?.message || 'common.error')
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
-    this.showPublishConfirm = false;
   }
 
   unpublish(): void {
     if (!this.page) return;
+    this.showUnpublishConfirm = false;
     this.servicePages.unpublish(this.page.id).subscribe({
       next: (page) => {
         this.page = page;
         this.toast.success('messages.unpublishedSuccessfully');
       },
-      error: (err) => this.toast.error(err.error?.message || 'common.error')
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
-    this.showUnpublishConfirm = false;
   }
 }

@@ -12,22 +12,8 @@ export function permissionGuard(contentType: ContentType, action: 'view' | 'crea
       return router.createUrlTree(['/login']);
     }
 
-    if (auth.isSuperAdmin) {
-      return true;
-    }
-
-    const perm = auth.permissions.find((p) => (p.contentType ?? p.feature) === contentType);
-    if (!perm) {
-      return router.createUrlTree(['/login']);
-    }
-
-    const allowed =
-      (action === 'view' && perm.canView) ||
-      (action === 'create' && perm.canCreate) ||
-      (action === 'edit' && perm.canEdit) ||
-      (action === 'delete' && perm.canDelete) ||
-      (action === 'publish' && perm.canPublish);
-
-    return allowed ? true : router.createUrlTree(['/login']);
+    return auth.hasPermission(contentType, action)
+      ? true
+      : router.createUrlTree(['/login']);
   };
 }

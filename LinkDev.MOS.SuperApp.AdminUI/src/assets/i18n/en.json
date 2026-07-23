@@ -49,7 +49,8 @@
     "uploadFile": "Upload File",
     "loading": "Loading...",
     "dragDropHint": "Drag & drop or click to browse",
-    "clearFilters": "Clear all filters"
+    "clearFilters": "Clear all filters",
+    "error": "An error occurred. Please try again."
   },
   "sidebar": {
     "collapse": "Collapse",
@@ -141,7 +142,8 @@
     "faqAnswer": "Answer",
     "addFaq": "Add FAQ",
     "confirmPublish": "Are you sure you want to publish this service page?",
-    "confirmUnpublish": "Are you sure you want to unpublish this service page?"
+    "confirmUnpublish": "Are you sure you want to unpublish this service page?",
+    "confirmCancel": "Are you sure you want to cancel the operation?"
   },
   "quickLinks": {
     "infoAlert": "Changes apply only to users who have not customized their quick links.",

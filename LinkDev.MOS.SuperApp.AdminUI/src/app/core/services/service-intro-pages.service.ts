@@ -126,6 +126,7 @@ function serializeDocuments(documents: ServiceDocument[]) {
   return (documents ?? [])
     .filter((d) => !!d.name?.trim())
     .map((d) => ({
+      id: toEntityId(d.id),
       name: d.name.trim(),
       fileUrl: d.fileUrl || null,
       fileName: d.fileName || null,
@@ -137,7 +138,21 @@ function serializeFaqs(faqs: FaqItem[]) {
   return (faqs ?? [])
     .filter((f) => !!f.question?.trim() && !!f.answer?.trim())
     .map((f) => ({
+      id: toEntityId(f.id),
       question: f.question.trim(),
       answer: f.answer.trim()
     }));
+}
+
+function toEntityId(id: number | string | undefined): number {
+  if (typeof id === 'number' && id > 0) {
+    return id;
+  }
+  if (typeof id === 'string') {
+    const parsed = Number(id);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+  return 0;
 }

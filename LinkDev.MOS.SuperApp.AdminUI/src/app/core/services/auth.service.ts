@@ -70,6 +70,23 @@ export class AuthService {
     return this.permissionsSubject.value;
   }
 
+  hasPermission(contentType: ContentType, action: 'view' | 'create' | 'edit' | 'delete' | 'publish'): boolean {
+    if (this.isSuperAdmin) {
+      return true;
+    }
+    const perm = this.permissions.find((p) => (p.contentType ?? p.feature) === contentType);
+    if (!perm) {
+      return false;
+    }
+    switch (action) {
+      case 'view': return perm.canView;
+      case 'create': return perm.canCreate;
+      case 'edit': return perm.canEdit;
+      case 'delete': return perm.canDelete;
+      case 'publish': return perm.canPublish;
+    }
+  }
+
   fetchPermissions(): Observable<PermissionSet[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/my-permissions`).pipe(
       map(rawPerms => {

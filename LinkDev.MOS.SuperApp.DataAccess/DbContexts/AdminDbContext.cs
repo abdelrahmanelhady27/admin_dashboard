@@ -3,12 +3,11 @@ using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +15,15 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
 {
     public class AdminDbContext : DbContext
     {
-        public AdminDbContext(DbContextOptions<AdminDbContext> options) : base(options) { }
+        private readonly IHttpContextAccessor? _httpContextAccessor;
+
+        public AdminDbContext(
+            DbContextOptions<AdminDbContext> options,
+            IHttpContextAccessor? httpContextAccessor = null) : base(options)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -69,6 +76,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
 
         private void UpdateBaseEntityFields()
         {
+            var currentUser = GetCurrentUserName();
             var entries = ChangeTracker.Entries();
             foreach (var entry in entries)
             {
@@ -77,12 +85,12 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
                     if (entry.State == EntityState.Added)
                     {
                         baseEntity.CreatedAt = DateTime.UtcNow;
-                        baseEntity.CreatedBy = string.IsNullOrWhiteSpace(baseEntity.CreatedBy) ? "Super Admin" : baseEntity.CreatedBy;
+                        baseEntity.CreatedBy = string.IsNullOrWhiteSpace(baseEntity.CreatedBy) ? currentUser : baseEntity.CreatedBy;
                     }
                     else if (entry.State == EntityState.Modified)
                     {
                         baseEntity.ModifiedAt = DateTime.UtcNow;
-                        baseEntity.ModifiedBy = string.IsNullOrWhiteSpace(baseEntity.ModifiedBy) ? "Super Admin" : baseEntity.ModifiedBy;
+                        baseEntity.ModifiedBy = currentUser;
                     }
                 }
                 else if (entry.Entity is ApplicationUser appUser)
@@ -90,15 +98,40 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
                     if (entry.State == EntityState.Added)
                     {
                         appUser.CreatedAt = DateTime.UtcNow;
-                        appUser.CreatedBy = string.IsNullOrWhiteSpace(appUser.CreatedBy) ? "Super Admin" : appUser.CreatedBy;
+                        appUser.CreatedBy = string.IsNullOrWhiteSpace(appUser.CreatedBy) ? currentUser : appUser.CreatedBy;
                     }
                     else if (entry.State == EntityState.Modified)
                     {
                         appUser.ModifiedAt = DateTime.UtcNow;
-                        appUser.ModifiedBy = string.IsNullOrWhiteSpace(appUser.ModifiedBy) ? "Super Admin" : appUser.ModifiedBy;
+                        appUser.ModifiedBy = currentUser;
                     }
                 }
             }
+        }
+
+        private string GetCurrentUserName()
+        {
+            var user = _httpContextAccessor?.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated != true)
+            {
+                return "System";
+            }
+
+            var name = user.FindFirst(ClaimTypes.Name)?.Value
+                ?? user.FindFirst("name")?.Value;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+
+            var email = user.FindFirst(ClaimTypes.Email)?.Value
+                ?? user.FindFirst("email")?.Value;
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                return email;
+            }
+
+            return "System";
         }
 
         public DbSet<UserPermission> UserPermissions { get; set; }

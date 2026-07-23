@@ -3,8 +3,9 @@ import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ServiceIntroPage } from '../../../core/models/service-page.model';
-import { PageStatus } from '../../../core/models/enums';
+import { ContentType, PageStatus } from '../../../core/models/enums';
 import { LanguageService } from '../../../core/services/language.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
@@ -12,6 +13,7 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
+import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 
 @Component({
   selector: 'app-service-pages-list',
@@ -22,7 +24,9 @@ import { ToastService } from '../../../core/services/toast.service';
   ],
   template: `
     <app-page-header title="nav.servicePages" subtitle="servicePages.listSubtitle">
-      <a routerLink="/service-pages/create" class="btn btn-primary">+ {{ 'servicePages.createTitle' | translate }}</a>
+      @if (canCreate) {
+        <a routerLink="/service-pages/create" class="btn btn-primary">+ {{ 'servicePages.createTitle' | translate }}</a>
+      }
     </app-page-header>
 
     <div class="filter-bar">
@@ -66,11 +70,13 @@ import { ToastService } from '../../../core/services/toast.service';
                 <td>{{ page.modifiedAt | date:'medium' }}</td>
                 <td class="u-table__actions">
                   <a [routerLink]="['/service-pages', page.id]" class="btn-icon" title="View">👁</a>
-                  <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn-icon" title="Edit">✏</a>
-                  @if (page.status === draftStatus) {
-                    <button type="button" class="btn btn-primary btn-sm" (click)="publish(page.id)">{{ 'common.publish' | translate }}</button>
+                  @if (canEdit) {
+                    <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn-icon" title="Edit">✏</a>
                   }
-                  @if (page.status === publishedStatus) {
+                  @if (canPublish && page.status === draftStatus) {
+                    <button type="button" class="btn btn-primary btn-sm" (click)="publish(page)">{{ 'common.publish' | translate }}</button>
+                  }
+                  @if (canPublish && page.status === publishedStatus) {
                     <button type="button" class="btn btn-outline btn-sm" (click)="unpublish(page.id)">{{ 'common.unpublish' | translate }}</button>
                   }
                 </td>
@@ -84,6 +90,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class ServicePagesListComponent implements OnInit {
   private readonly servicePages = inject(ServiceIntroPagesService);
+  private readonly auth = inject(AuthService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
@@ -93,6 +100,9 @@ export class ServicePagesListComponent implements OnInit {
   filterForm = this.fb.group({ search: [''], status: [''] });
   readonly draftStatus = PageStatus.Draft;
   readonly publishedStatus = PageStatus.Published;
+  readonly canCreate = this.auth.hasPermission(ContentType.ServiceIntroPage, 'create');
+  readonly canEdit = this.auth.hasPermission(ContentType.ServiceIntroPage, 'edit');
+  readonly canPublish = this.auth.hasPermission(ContentType.ServiceIntroPage, 'publish');
 
   ngOnInit(): void { this.load(); }
 
@@ -109,7 +119,7 @@ export class ServicePagesListComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.toast.error(err.error?.message || 'common.error');
+        this.toast.error(resolveApiErrorKey(err));
       }
     });
   }
@@ -118,13 +128,17 @@ export class ServicePagesListComponent implements OnInit {
     return this.language.currentLang === 'ar' ? page.serviceNameAr : page.serviceNameEn;
   }
 
-  publish(id: number): void {
-    this.servicePages.publish(id).subscribe({
+  publish(page: ServiceIntroPage): void {
+    if (!page.description?.trim() || !page.processingDuration?.trim()) {
+      this.toast.error('validation.completeRequiredFields');
+      return;
+    }
+    this.servicePages.publish(page.id).subscribe({
       next: () => {
         this.toast.success('messages.publishedSuccessfully');
         this.load();
       },
-      error: (err) => this.toast.error(err.error?.message || 'common.error')
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
   }
 
@@ -134,7 +148,7 @@ export class ServicePagesListComponent implements OnInit {
         this.toast.success('messages.unpublishedSuccessfully');
         this.load();
       },
-      error: (err) => this.toast.error(err.error?.message || 'common.error')
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
   }
 }

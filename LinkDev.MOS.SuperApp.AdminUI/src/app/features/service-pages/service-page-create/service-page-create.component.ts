@@ -3,11 +3,14 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
+import { FilesService } from '../../../core/services/files.service';
+import { AuthService } from '../../../core/services/auth.service';
 import {
   AvailableLinkedService,
   MAX_DESCRIPTION_LENGTH,
   MAX_PROCESSING_DURATION_LENGTH
 } from '../../../core/models/service-page.model';
+import { ContentType } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
 import { FaqEditorComponent } from '../../../shared/components/faq-editor/faq-editor.component';
@@ -15,6 +18,7 @@ import { DocumentsEditorComponent } from '../../../shared/components/documents-e
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { LanguageService } from '../../../core/services/language.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 
 @Component({
   selector: 'app-service-page-create',
@@ -62,6 +66,7 @@ import { ToastService } from '../../../core/services/toast.service';
           [label]="'servicePages.uploadVideo'"
           accept=".mp4,video/mp4"
           [allowedTypes]="['mp4', 'video/mp4']"
+          [maxSizeMb]="100"
           (fileSelected)="onVideoSelected($event)" />
       </div>
 
@@ -77,14 +82,18 @@ import { ToastService } from '../../../core/services/toast.service';
 
       <div class="form-action-bar">
         <a routerLink="/service-pages" class="btn btn-outline">{{ 'common.cancel' | translate }}</a>
-        <button type="button" class="btn btn-outline" [disabled]="saving" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
-        <button type="button" class="btn btn-primary" [disabled]="saving" (click)="publish()">{{ 'common.publish' | translate }}</button>
+        <button type="button" class="btn btn-outline" [disabled]="saving || uploading" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
+        @if (canPublish) {
+          <button type="button" class="btn btn-primary" [disabled]="saving || uploading" (click)="publish()">{{ 'common.publish' | translate }}</button>
+        }
       </div>
     </form>
   `
 })
 export class ServicePageCreateComponent implements OnInit {
   private readonly servicePages = inject(ServiceIntroPagesService);
+  private readonly filesService = inject(FilesService);
+  private readonly auth = inject(AuthService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
@@ -92,12 +101,14 @@ export class ServicePageCreateComponent implements OnInit {
 
   readonly maxDesc = MAX_DESCRIPTION_LENGTH;
   readonly maxDuration = MAX_PROCESSING_DURATION_LENGTH;
+  readonly canPublish = this.auth.hasPermission(ContentType.ServiceIntroPage, 'publish');
 
   docsForm: FormGroup | null = null;
   faqsForm: FormGroup | null = null;
   availableServices: AvailableLinkedService[] = [];
   existingServiceIds = new Set<number>();
   saving = false;
+  uploading = false;
 
   form = this.fb.group({
     serviceId: ['', Validators.required],
@@ -118,7 +129,7 @@ export class ServicePageCreateComponent implements OnInit {
           (s) => s.isActive && !this.existingServiceIds.has(s.id)
         );
       },
-      error: (err) => this.toast.error(err.error?.message || 'common.error')
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
   }
 
@@ -132,9 +143,25 @@ export class ServicePageCreateComponent implements OnInit {
   onFaqsReady(form: FormGroup): void { this.faqsForm = form; }
 
   onVideoSelected(file: File | null): void {
-    if (file) {
-      this.form.patchValue({ videoFileName: file.name, videoUrl: '' });
+    if (!file) {
+      this.form.patchValue({ videoFileName: '', videoUrl: '' });
+      return;
     }
+    this.uploading = true;
+    this.filesService.upload(file, 'Video').subscribe({
+      next: (uploaded) => {
+        this.uploading = false;
+        this.form.patchValue({
+          videoFileName: uploaded.fileName,
+          videoUrl: uploaded.url
+        });
+      },
+      error: (err) => {
+        this.uploading = false;
+        this.form.patchValue({ videoFileName: '', videoUrl: '' });
+        this.toast.error(resolveApiErrorKey(err, 'validation.unsupportedFileType'));
+      }
+    });
   }
 
   saveDraft(): void {
@@ -196,7 +223,7 @@ export class ServicePageCreateComponent implements OnInit {
       },
       error: (err) => {
         this.saving = false;
-        this.toast.error(err.error?.message || 'common.error');
+        this.toast.error(resolveApiErrorKey(err));
       }
     });
   }

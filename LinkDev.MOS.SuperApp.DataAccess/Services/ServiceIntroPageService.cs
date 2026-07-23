@@ -115,7 +115,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             page.VideoUrl = dto.VideoUrl;
             page.VideoFileName = dto.VideoFileName;
 
-            if (page.Status == PageStatus.Published)
+            if (page.Status == PageStatus.Published || page.Status == PageStatus.Unpublished)
             {
                 page.Status = PageStatus.Draft;
             }
@@ -123,7 +123,6 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             ReplaceDocuments(page, dto.Documents);
             ReplaceFaqs(page, dto.Faqs);
 
-            _pageRepo.Update(page);
             await _unitOfWork.SaveChangesAsync();
 
             var updated = await _pageRepo.GetByIdWithDetailsAsync(id);
@@ -187,7 +186,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         public async Task<ServiceIntroPageDto?> GetPublishedByServiceIdAsync(int serviceId)
         {
             var page = await _pageRepo.GetByServiceIdAsync(serviceId);
-            if (page == null || page.Status != PageStatus.Published || string.IsNullOrWhiteSpace(page.PublishedSnapshotJson))
+            if (page == null || page.Status == PageStatus.Unpublished || string.IsNullOrWhiteSpace(page.PublishedSnapshotJson))
             {
                 return null;
             }
@@ -268,7 +267,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         {
             return (documents ?? new List<ServiceDocumentDto>())
                 .Where(d => !string.IsNullOrWhiteSpace(d.Name))
-                .Take(3)
+                .Take(5)
                 .Select(d => new ServiceDocument
                 {
                     Name = d.Name.Trim(),
@@ -292,19 +291,69 @@ namespace Linkdev.MOS.SuperApp.Business.Services
 
         private static void ReplaceDocuments(ServiceIntroPage page, List<ServiceDocumentDto>? documents)
         {
-            page.Documents.Clear();
-            foreach (var doc in MapDocuments(documents))
+            var incoming = (documents ?? new List<ServiceDocumentDto>())
+                .Where(d => !string.IsNullOrWhiteSpace(d.Name))
+                .Take(5)
+                .ToList();
+
+            var incomingIds = incoming.Where(d => d.Id > 0).Select(d => d.Id).ToHashSet();
+            foreach (var existing in page.Documents.Where(d => !incomingIds.Contains(d.Id)).ToList())
             {
-                page.Documents.Add(doc);
+                page.Documents.Remove(existing);
+            }
+
+            foreach (var dto in incoming)
+            {
+                var existing = dto.Id > 0 ? page.Documents.FirstOrDefault(d => d.Id == dto.Id) : null;
+                if (existing != null)
+                {
+                    existing.Name = dto.Name.Trim();
+                    existing.FileUrl = dto.FileUrl;
+                    existing.FileName = dto.FileName;
+                    existing.FileType = dto.FileType;
+                }
+                else
+                {
+                    page.Documents.Add(new ServiceDocument
+                    {
+                        Name = dto.Name.Trim(),
+                        FileUrl = dto.FileUrl,
+                        FileName = dto.FileName,
+                        FileType = dto.FileType
+                    });
+                }
             }
         }
 
         private static void ReplaceFaqs(ServiceIntroPage page, List<ServiceFaqDto>? faqs)
         {
-            page.Faqs.Clear();
-            foreach (var faq in MapFaqs(faqs))
+            var incoming = (faqs ?? new List<ServiceFaqDto>())
+                .Where(f => !string.IsNullOrWhiteSpace(f.Question) && !string.IsNullOrWhiteSpace(f.Answer))
+                .Take(10)
+                .ToList();
+
+            var incomingIds = incoming.Where(f => f.Id > 0).Select(f => f.Id).ToHashSet();
+            foreach (var existing in page.Faqs.Where(f => !incomingIds.Contains(f.Id)).ToList())
             {
-                page.Faqs.Add(faq);
+                page.Faqs.Remove(existing);
+            }
+
+            foreach (var dto in incoming)
+            {
+                var existing = dto.Id > 0 ? page.Faqs.FirstOrDefault(f => f.Id == dto.Id) : null;
+                if (existing != null)
+                {
+                    existing.Question = dto.Question.Trim();
+                    existing.Answer = dto.Answer.Trim();
+                }
+                else
+                {
+                    page.Faqs.Add(new ServiceFaq
+                    {
+                        Question = dto.Question.Trim(),
+                        Answer = dto.Answer.Trim()
+                    });
+                }
             }
         }
 

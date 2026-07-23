@@ -10,7 +10,6 @@ namespace Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage
 
         public string ProcessingDuration { get; set; } = string.Empty;
 
-        // TODO: validate file types once real upload lands (BR012)
         public string? VideoUrl { get; set; }
         public string? VideoFileName { get; set; }
 

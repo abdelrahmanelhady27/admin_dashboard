@@ -14,8 +14,8 @@ namespace Linkdev.MOS.SuperApp.Business.Validators.ServiceIntroPage
                 .MaximumLength(20);
 
             RuleFor(x => x.Documents)
-                .Must(docs => docs == null || docs.Count <= 3)
-                .WithMessage("A maximum of 3 service documents is allowed.");
+                .Must(docs => docs == null || docs.Count <= 5)
+                .WithMessage("A maximum of 5 service documents is allowed.");
 
             RuleForEach(x => x.Documents)
                 .SetValidator(new ServiceDocumentDtoValidator())

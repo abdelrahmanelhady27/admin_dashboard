@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAX_DOCUMENT_NAME_LENGTH, MAX_SERVICE_DOCUMENTS } from '../../../core/models/service-page.model';
+import { FilesService } from '../../../core/services/files.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 import { FileUploaderComponent } from '../file-uploader/file-uploader.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -22,8 +25,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
                 [label]="'servicePages.uploadPdf'"
                 accept=".pdf,application/pdf"
                 [allowedTypes]="['pdf']"
+                [maxSizeMb]="10"
                 (fileSelected)="onFileSelected(i, $event)" />
-            } @else if (doc.get('fileName')?.value) {
+            }
+            @if (doc.get('fileName')?.value) {
               <div class="file-name">{{ doc.get('fileName')?.value }}</div>
             }
             @if (!readonly) {
@@ -46,11 +51,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .form-row { margin-bottom: 0.75rem; }
     label { display: block; margin-bottom: 0.25rem; font-size: 0.8125rem; color: var(--text-muted); }
     input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
-    .file-name { font-size: 0.8125rem; color: var(--text-dark); margin-bottom: 0.5rem; }
+    .file-name { font-size: 0.8125rem; color: var(--text-muted); margin: 0.5rem 0; word-break: break-all; }
   `]
 })
-export class DocumentsEditorComponent {
+export class DocumentsEditorComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly filesService = inject(FilesService);
+  private readonly toast = inject(ToastService);
 
   @Input() readonly = false;
   @Input() maxDocs = MAX_SERVICE_DOCUMENTS;
@@ -84,8 +91,28 @@ export class DocumentsEditorComponent {
   }
 
   onFileSelected(index: number, file: File | null): void {
-    if (!file) return;
-    this.documents.at(index).patchValue({ fileName: file.name, fileType: file.type });
+    if (!file) {
+      this.documents.at(index).patchValue({ fileName: '', fileUrl: '', fileType: 'application/pdf' });
+      return;
+    }
+    this.filesService.upload(file, 'Document').subscribe({
+      next: (uploaded) => {
+        const currentName = String(this.documents.at(index).get('name')?.value || '').trim();
+        const patch: Record<string, string> = {
+          fileName: uploaded.fileName,
+          fileType: uploaded.fileType || 'application/pdf',
+          fileUrl: uploaded.url
+        };
+        if (!currentName) {
+          patch['name'] = this.deriveDocumentName(file.name);
+        }
+        this.documents.at(index).patchValue(patch);
+      },
+      error: (err) => {
+        this.documents.at(index).patchValue({ fileName: '', fileUrl: '', fileType: 'application/pdf' });
+        this.toast.error(resolveApiErrorKey(err, 'validation.unsupportedFileType'));
+      }
+    });
   }
 
   setDocuments(items: { id: number | string; name: string; fileName: string; fileType: string; fileUrl?: string }[]): void {
@@ -99,5 +126,10 @@ export class DocumentsEditorComponent {
         fileUrl: [item.fileUrl || '']
       }));
     });
+  }
+
+  private deriveDocumentName(fileName: string): string {
+    const base = fileName.replace(/\.[^/.]+$/, '').trim() || fileName.trim();
+    return base.slice(0, MAX_DOCUMENT_NAME_LENGTH);
   }
 }

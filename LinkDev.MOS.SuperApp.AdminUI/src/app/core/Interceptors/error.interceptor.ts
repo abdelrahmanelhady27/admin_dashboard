@@ -10,15 +10,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-
       if (error.status === 401) {
         console.warn('JWT token expired or unauthorized.');
         authService.logout();
         router.navigate(['/login']);
       }
 
-      const errorMessage = error.error?.message || error.statusText;
-      return throwError(() => new Error(errorMessage));
+      // Preserve HttpErrorResponse so callers can read err.error.message
+      return throwError(() => error);
     })
   );
 };
