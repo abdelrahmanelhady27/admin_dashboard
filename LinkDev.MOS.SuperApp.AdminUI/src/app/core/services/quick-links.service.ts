@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { QuickLink } from '../models/quick-link.model';
-import { AuditAction } from '../models/enums';
 import { STORAGE_KEYS } from '../constants/storage-keys';
-import { AuditLogService } from './audit-log.service';
 
 @Injectable({ providedIn: 'root' })
 export class QuickLinksService {
   private links: QuickLink[] = [];
 
-  constructor(private readonly auditLog: AuditLogService) {
+  constructor() {
     this.load();
   }
 
@@ -23,7 +21,6 @@ export class QuickLinksService {
   saveAll(links: QuickLink[]): QuickLink[] {
     this.links = links.map((link, index) => ({ ...link, order: index + 1 }));
     this.persist();
-    this.auditLog.log(AuditAction.SaveQuickLinks, 'QuickLinks', `${this.links.length} links`);
     return this.getAll();
   }
 

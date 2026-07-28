@@ -144,5 +144,6 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
         public DbSet<ServiceDocument> ServiceDocuments { get; set; }
         public DbSet<ServiceFaq> ServiceFaqs { get; set; }
         public DbSet<AvailableLinkedService> AvailableLinkedServices { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
     }
 }

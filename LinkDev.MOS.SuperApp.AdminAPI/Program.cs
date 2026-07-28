@@ -5,6 +5,7 @@ using Linkdev.MOS.SuperApp.Business;
 using Linkdev.MOS.SuperApp.Business.Options;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,28 @@ builder.Services.Configure<KestrelServerOptions>(options =>
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MOS SuperApp Admin API",
+        Version = "v1",
+        Description = "Admin dashboard API for users/permissions, service intro pages, file uploads, and audit log."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "JWT authorization. Login via POST /api/auth/login, copy the token value, and paste it here (do not include the 'Bearer ' prefix)."
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
 
 builder.Services.AddCors(options =>
 {
@@ -53,7 +75,12 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API v1");
+        options.DocumentTitle = "MOS SuperApp Admin API";
+        options.EnablePersistAuthorization();
+    });
 }
 
 app.UseCors("AllowAngularFrontend");

@@ -125,6 +125,8 @@
     "detailsTitle": "Service Page Details",
     "searchPlaceholder": "Search by service name",
     "emptyState": "No service intro pages added yet",
+    "selectSystem": "Select System",
+    "selectSystemPlaceholder": "Choose a system",
     "selectService": "Select Service",
     "selectServicePlaceholder": "Choose a service",
     "description": "Service Description",
@@ -143,7 +145,8 @@
     "addFaq": "Add FAQ",
     "confirmPublish": "Are you sure you want to publish this service page?",
     "confirmUnpublish": "Are you sure you want to unpublish this service page?",
-    "confirmCancel": "Are you sure you want to cancel the operation?"
+    "confirmCancel": "Are you sure you want to cancel the operation?",
+    "confirmDelete": "Are you sure you want to delete this service intro page?"
   },
   "quickLinks": {
     "infoAlert": "Changes apply only to users who have not customized their quick links.",
@@ -227,23 +230,25 @@
     "entityType": "Entity Type",
     "entityName": "Entity Name",
     "performedBy": "Performed By",
-    "date": "Date/Time"
+    "date": "Date/Time",
+    "searchPlaceholder": "Search by entity name or performer...",
+    "allActions": "All Actions",
+    "allEntityTypes": "All Entity Types"
   },
   "auditActions": {
-    "AddUser": "Add User",
-    "EditUserPermissions": "Edit User Permissions",
-    "DeleteUser": "Delete User",
-    "SuspendUser": "Suspend User",
-    "CreateServicePage": "Create Service Page",
-    "EditServicePage": "Edit Service Page",
-    "PublishServicePage": "Publish Service Page",
-    "UnpublishServicePage": "Unpublish Service Page",
-    "SaveQuickLinks": "Save Quick Links",
-    "CreateNews": "Create News",
-    "EditNews": "Edit News",
-    "PublishNews": "Publish News",
-    "UnpublishNews": "Unpublish News",
-    "DeleteNews": "Delete News"
+    "Create": "Create",
+    "Update": "Update",
+    "Delete": "Delete",
+    "Publish": "Publish",
+    "Unpublish": "Unpublish",
+    "Suspend": "Suspend",
+    "Activate": "Activate"
+  },
+  "entityTypes": {
+    "User": "User",
+    "ServiceIntroPage": "Service Intro Page",
+    "QuickLinks": "Quick Links",
+    "EmployeeNews": "Employee News"
   },
   "settings": {
     "subtitle": "Application preferences",
@@ -283,6 +288,7 @@
     "savedAsDraft": "Saved as draft successfully",
     "publishedSuccessfully": "Published successfully",
     "unpublishedSuccessfully": "Unpublished successfully",
+    "servicePageDeleted": "Service intro page deleted successfully",
     "quickLinkAdded": "Quick link added successfully",
     "quickLinkDeleted": "Quick link deleted successfully",
     "quickLinksSaved": "Quick links saved successfully",

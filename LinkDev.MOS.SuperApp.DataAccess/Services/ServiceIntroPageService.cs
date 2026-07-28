@@ -2,6 +2,7 @@ using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
+using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
 using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
@@ -26,19 +27,22 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         private readonly IQueryableRepository<LinkedService> _linkedServicesRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAuditLogService _auditLogService;
 
         public ServiceIntroPageService(
             IServiceIntroPageRepository pageRepo,
             IQueryableRepository<AvailableLinkedService> availableServicesRepo,
             IQueryableRepository<LinkedService> linkedServicesRepo,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IAuditLogService auditLogService)
         {
             _pageRepo = pageRepo;
             _availableServicesRepo = availableServicesRepo;
             _linkedServicesRepo = linkedServicesRepo;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _auditLogService = auditLogService;
         }
 
         public async Task<IEnumerable<ServiceIntroPageDto>> GetAllAsync(string? search, string? status)
@@ -89,6 +93,12 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             await _pageRepo.AddAsync(page);
             await _unitOfWork.SaveChangesAsync();
 
+            await _auditLogService.LogAsync(
+                AuditActionType.Create,
+                AuditEntityType.ServiceIntroPage,
+                linkedService.NameEn,
+                page.Id);
+
             if (dto.Publish)
             {
                 var published = await PublishAsync(page.Id);
@@ -125,6 +135,12 @@ namespace Linkdev.MOS.SuperApp.Business.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            await _auditLogService.LogAsync(
+                AuditActionType.Update,
+                AuditEntityType.ServiceIntroPage,
+                page.Service?.NameEn ?? id.ToString(),
+                id);
+
             var updated = await _pageRepo.GetByIdWithDetailsAsync(id);
             return MapToDto(updated);
         }
@@ -149,6 +165,12 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             _pageRepo.Update(page);
             await _unitOfWork.SaveChangesAsync();
 
+            await _auditLogService.LogAsync(
+                AuditActionType.Publish,
+                AuditEntityType.ServiceIntroPage,
+                page.Service?.NameEn ?? id.ToString(),
+                id);
+
             var published = await _pageRepo.GetByIdWithDetailsAsync(id);
             return MapToDto(published!);
         }
@@ -165,6 +187,12 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             _pageRepo.Update(page);
             await _unitOfWork.SaveChangesAsync();
 
+            await _auditLogService.LogAsync(
+                AuditActionType.Unpublish,
+                AuditEntityType.ServiceIntroPage,
+                page.Service?.NameEn ?? id.ToString(),
+                id);
+
             var unpublished = await _pageRepo.GetByIdWithDetailsAsync(id);
             return MapToDto(unpublished!);
         }
@@ -177,9 +205,18 @@ namespace Linkdev.MOS.SuperApp.Business.Services
                 return false;
             }
 
+            var entityName = page.Service?.NameEn ?? id.ToString();
+
             page.IsDeleted = true;
             _pageRepo.Update(page);
             await _unitOfWork.SaveChangesAsync();
+
+            await _auditLogService.LogAsync(
+                AuditActionType.Delete,
+                AuditEntityType.ServiceIntroPage,
+                entityName,
+                id);
+
             return true;
         }
 

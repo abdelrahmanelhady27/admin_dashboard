@@ -27,7 +27,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Files
         [HttpPost]
         [HasAnyPermission(PermissionAction.Add, PermissionAction.Edit)]
         public async Task<ActionResult<UploadedFileDto>> Upload(
-            [FromForm] IFormFile file,
+            IFormFile file,
             [FromForm] FileCategory category)
         {
             try

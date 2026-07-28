@@ -47,21 +47,21 @@ export enum ReactionType {
   Thanks = 'Thanks'
 }
 
-export enum AuditAction {
-  AddUser = 'AddUser',
-  EditUserPermissions = 'EditUserPermissions',
-  DeleteUser = 'DeleteUser',
-  SuspendUser = 'SuspendUser',
-  CreateServicePage = 'CreateServicePage',
-  EditServicePage = 'EditServicePage',
-  PublishServicePage = 'PublishServicePage',
-  UnpublishServicePage = 'UnpublishServicePage',
-  SaveQuickLinks = 'SaveQuickLinks',
-  CreateNews = 'CreateNews',
-  EditNews = 'EditNews',
-  PublishNews = 'PublishNews',
-  UnpublishNews = 'UnpublishNews',
-  DeleteNews = 'DeleteNews'
+export enum AuditActionType {
+  Create = 'Create',
+  Update = 'Update',
+  Delete = 'Delete',
+  Publish = 'Publish',
+  Unpublish = 'Unpublish',
+  Suspend = 'Suspend',
+  Activate = 'Activate'
+}
+
+export enum AuditEntityType {
+  User = 'User',
+  ServiceIntroPage = 'ServiceIntroPage',
+  QuickLinks = 'QuickLinks',
+  EmployeeNews = 'EmployeeNews'
 }
 
 export type DisplayStatus =

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
+using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
 
 namespace Linkdev.MOS.SuperApp.Business.Services
 {
@@ -24,6 +25,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         private readonly IQueryableRepository<UnregisteredStaticUser> _unregisteredStaticUserRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAuditLogService _auditLogService;
 
         public UserService(
             IUserAccountService userAccountService,
@@ -31,7 +33,8 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             IQueryableRepository<StaticUser> staticUserRepo,
             IQueryableRepository<UnregisteredStaticUser> unregisteredStaticUserRepo,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IAuditLogService auditLogService)
         {
             _userAccountService = userAccountService;
             _permissionRepo = permissionRepo;
@@ -39,6 +42,7 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             _unregisteredStaticUserRepo = unregisteredStaticUserRepo;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _auditLogService = auditLogService;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync(string? search, string? status, string? feature)
@@ -105,6 +109,13 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             // Delete from static users since they are now a dashboard user
             await _unitOfWork.SaveChangesAsync();
 
+            // Log audit
+            await _auditLogService.LogAsync(
+                AuditActionType.Create,
+                AuditEntityType.User,
+                createUserDto.FullName,
+                acc.Id);
+
             var userDto = _mapper.Map<UserDto>(acc);
             userDto.Permissions = createUserDto.Permissions;
             return userDto;
@@ -118,6 +129,13 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             // Save permissions using repository
             await SavePermissionsAsync(id, permissions);
 
+            // Log audit
+            await _auditLogService.LogAsync(
+                AuditActionType.Update,
+                AuditEntityType.User,
+                acc.FullName ?? acc.Email ?? id.ToString(),
+                id);
+
             var userDto = _mapper.Map<UserDto>(acc);
             userDto.Permissions = permissions;
             return userDto;
@@ -125,6 +143,11 @@ namespace Linkdev.MOS.SuperApp.Business.Services
 
         public async Task<bool> DeleteUserAsync(int id)
         {
+            var acc = await _userAccountService.GetAccountByIdAsync(id);
+            if (acc == null) return false;
+
+            var entityName = acc.FullName ?? acc.Email ?? id.ToString();
+
             // 1. Delete account
             var success = await _userAccountService.DeleteAccountAsync(id);
             if (!success) return false;
@@ -137,6 +160,13 @@ namespace Linkdev.MOS.SuperApp.Business.Services
             }
             await _unitOfWork.SaveChangesAsync();
 
+            // Log audit
+            await _auditLogService.LogAsync(
+                AuditActionType.Delete,
+                AuditEntityType.User,
+                entityName,
+                id);
+
             return true;
         }
 
@@ -144,6 +174,13 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         {
             var acc = await _userAccountService.SuspendAccountAsync(id);
             if (acc == null) return null;
+
+            // Log audit
+            await _auditLogService.LogAsync(
+                AuditActionType.Suspend,
+                AuditEntityType.User,
+                acc.FullName ?? acc.Email ?? id.ToString(),
+                id);
 
             var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();
             return _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
@@ -153,6 +190,13 @@ namespace Linkdev.MOS.SuperApp.Business.Services
         {
             var acc = await _userAccountService.ActivateAccountAsync(id);
             if (acc == null) return null;
+
+            // Log audit
+            await _auditLogService.LogAsync(
+                AuditActionType.Activate,
+                AuditEntityType.User,
+                acc.FullName ?? acc.Email ?? id.ToString(),
+                id);
 
             var userPermissions = _permissionRepo.GetAllByUserId(id).ToList();
             return _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });

@@ -127,6 +127,8 @@
     "detailsTitle": "تفاصيل الصفحة التعريفية",
     "searchPlaceholder": "بحث باسم الخدمة",
     "emptyState": "لا توجد صفحات تعريفية مضافة",
+    "selectSystem": "اختر النظام",
+    "selectSystemPlaceholder": "اختر نظامًا",
     "selectService": "اختر الخدمة",
     "selectServicePlaceholder": "اختر خدمة",
     "description": "وصف الخدمة",
@@ -145,7 +147,8 @@
     "addFaq": "إضافة سؤال",
     "confirmPublish": "هل أنت متأكد من نشر هذه الصفحة؟",
     "confirmUnpublish": "هل أنت متأكد من إلغاء نشر هذه الصفحة؟",
-    "confirmCancel": "هل أنت متأكد من رغبتك في إلغاء العملية؟"
+    "confirmCancel": "هل أنت متأكد من رغبتك في إلغاء العملية؟",
+    "confirmDelete": "هل أنت متأكد من حذف هذه الصفحة التعريفية للخدمة؟"
   },
   "quickLinks": {
     "infoAlert": "التعديلات تطبق فقط على المستخدمين الذين لم يقوموا بتخصيص روابطهم السريعة.",
@@ -229,23 +232,25 @@
     "entityType": "نوع الكيان",
     "entityName": "اسم الكيان",
     "performedBy": "نُفذت بواسطة",
-    "date": "التاريخ/الوقت"
+    "date": "التاريخ/الوقت",
+    "searchPlaceholder": "ابحث باسم الكيان أو المنفّذ...",
+    "allActions": "كل العمليات",
+    "allEntityTypes": "كل أنواع الكيانات"
   },
   "auditActions": {
-    "AddUser": "إضافة مستخدم",
-    "EditUserPermissions": "تعديل صلاحيات مستخدم",
-    "DeleteUser": "حذف مستخدم",
-    "SuspendUser": "إيقاف مستخدم",
-    "CreateServicePage": "إنشاء صفحة خدمة",
-    "EditServicePage": "تعديل صفحة خدمة",
-    "PublishServicePage": "نشر صفحة خدمة",
-    "UnpublishServicePage": "إلغاء نشر صفحة خدمة",
-    "SaveQuickLinks": "حفظ الروابط السريعة",
-    "CreateNews": "إنشاء خبر",
-    "EditNews": "تعديل خبر",
-    "PublishNews": "نشر خبر",
-    "UnpublishNews": "إلغاء نشر خبر",
-    "DeleteNews": "حذف خبر"
+    "Create": "إنشاء",
+    "Update": "تحديث",
+    "Delete": "حذف",
+    "Publish": "نشر",
+    "Unpublish": "إلغاء النشر",
+    "Suspend": "إيقاف",
+    "Activate": "تفعيل"
+  },
+  "entityTypes": {
+    "User": "مستخدم",
+    "ServiceIntroPage": "صفحة تعريف الخدمة",
+    "QuickLinks": "الروابط السريعة",
+    "EmployeeNews": "أخبار الموظفين"
   },
   "settings": {
     "subtitle": "تفضيلات التطبيق",
@@ -288,6 +293,7 @@
     "savedAsDraft": "تم الحفظ كمسودة بنجاح",
     "publishedSuccessfully": "تم النشر بنجاح",
     "unpublishedSuccessfully": "تم إلغاء النشر بنجاح",
+    "servicePageDeleted": "تم حذف الصفحة التعريفية للخدمة بنجاح",
     "quickLinkAdded": "تمت إضافة الرابط السريع بنجاح",
     "quickLinkDeleted": "تم حذف الرابط السريع بنجاح",
     "quickLinksSaved": "تم حفظ الروابط السريعة بنجاح",

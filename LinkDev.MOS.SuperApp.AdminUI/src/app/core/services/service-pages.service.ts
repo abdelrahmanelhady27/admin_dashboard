@@ -4,9 +4,8 @@ import {
   LinkedSystem,
   ServiceIntroPage
 } from '../models/service-page.model';
-import { AuditAction, PageStatus } from '../models/enums';
+import { PageStatus } from '../models/enums';
 import { STORAGE_KEYS } from '../constants/storage-keys';
-import { AuditLogService } from './audit-log.service';
 import { MockAuthService } from './mock-auth.service';
 
 export interface ServicePageFilter {
@@ -21,7 +20,6 @@ export class ServicePagesService {
   private services: LinkedService[] = [];
 
   constructor(
-    private readonly auditLog: AuditLogService,
     private readonly auth: MockAuthService
   ) {
     this.load();
@@ -86,7 +84,6 @@ export class ServicePagesService {
     };
     this.pages.push(created);
     this.persist();
-    this.auditLog.log(AuditAction.CreateServicePage, 'ServicePage', created.serviceNameEn);
     return created;
   }
 
@@ -102,7 +99,6 @@ export class ServicePagesService {
       modifiedBy: this.auth.currentUser?.fullNameEn || 'System'
     };
     this.persist();
-    this.auditLog.log(AuditAction.EditServicePage, 'ServicePage', this.pages[index].serviceNameEn);
     return this.pages[index];
   }
 
@@ -116,7 +112,6 @@ export class ServicePagesService {
     page.modifiedAt = new Date().toISOString();
     page.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
     this.persist();
-    this.auditLog.log(AuditAction.PublishServicePage, 'ServicePage', page.serviceNameEn);
     return page;
   }
 
@@ -129,7 +124,6 @@ export class ServicePagesService {
     page.modifiedAt = new Date().toISOString();
     page.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
     this.persist();
-    this.auditLog.log(AuditAction.UnpublishServicePage, 'ServicePage', page.serviceNameEn);
     return page;
   }
 

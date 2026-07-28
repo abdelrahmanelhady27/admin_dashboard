@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EmployeeNews } from '../models/employee-news.model';
-import { AuditAction, NewsCategory, NewsStatus, ReactionType } from '../models/enums';
+import { NewsCategory, NewsStatus, ReactionType } from '../models/enums';
 import { STORAGE_KEYS } from '../constants/storage-keys';
-import { AuditLogService } from './audit-log.service';
 import { MockAuthService } from './mock-auth.service';
 
 export interface NewsFilter {
@@ -16,7 +15,6 @@ export class EmployeeNewsService {
   private news: EmployeeNews[] = [];
 
   constructor(
-    private readonly auditLog: AuditLogService,
     private readonly auth: MockAuthService
   ) {
     this.load();
@@ -69,7 +67,6 @@ export class EmployeeNewsService {
     };
     this.news.push(created);
     this.persist();
-    this.auditLog.log(AuditAction.CreateNews, 'EmployeeNews', created.title);
     return created;
   }
 
@@ -88,7 +85,6 @@ export class EmployeeNewsService {
       modifiedBy: this.auth.currentUser?.fullNameEn || 'System'
     };
     this.persist();
-    this.auditLog.log(AuditAction.EditNews, 'EmployeeNews', this.news[index].title);
     return this.news[index];
   }
 
@@ -102,7 +98,6 @@ export class EmployeeNewsService {
     item.modifiedAt = new Date().toISOString();
     item.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
     this.persist();
-    this.auditLog.log(AuditAction.PublishNews, 'EmployeeNews', item.title);
     return item;
   }
 
@@ -115,7 +110,6 @@ export class EmployeeNewsService {
     item.modifiedAt = new Date().toISOString();
     item.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
     this.persist();
-    this.auditLog.log(AuditAction.UnpublishNews, 'EmployeeNews', item.title);
     return item;
   }
 
@@ -126,7 +120,6 @@ export class EmployeeNewsService {
     }
     this.news = this.news.filter((n) => n.id !== id);
     this.persist();
-    this.auditLog.log(AuditAction.DeleteNews, 'EmployeeNews', item.title);
     return true;
   }
 

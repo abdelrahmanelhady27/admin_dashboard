@@ -1,4 +1,5 @@
 using Linkdev.MOS.SuperApp.Business.Interfaces;
+using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Files;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
 using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
@@ -44,6 +45,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess
             services.AddScoped<IServiceIntroPageRepository, ServiceIntroPageRepository>();
             services.AddScoped<IServiceIntroPageService, ServiceIntroPageService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IAuditLogService, AuditLogService>();
 
             return services;
         }

@@ -11,6 +11,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
 import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
@@ -20,7 +21,8 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
   standalone: true,
   imports: [
     ReactiveFormsModule, RouterLink, DatePipe, PageHeaderComponent,
-    StatusBadgeComponent, EmptyStateComponent, SkeletonComponent, TranslatePipe
+    StatusBadgeComponent, EmptyStateComponent, SkeletonComponent,
+    ConfirmDialogComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="nav.servicePages" subtitle="servicePages.listSubtitle">
@@ -69,9 +71,12 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
                 <td>{{ page.modifiedBy }}</td>
                 <td>{{ page.modifiedAt | date:'medium' }}</td>
                 <td class="u-table__actions">
-                  <a [routerLink]="['/service-pages', page.id]" class="btn-icon" title="View">👁</a>
+                  <a [routerLink]="['/service-pages', page.id]" class="btn-icon" [title]="'common.view' | translate">👁</a>
                   @if (canEdit) {
-                    <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn-icon" title="Edit">✏</a>
+                    <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn-icon" [title]="'common.edit' | translate">✏</a>
+                  }
+                  @if (canDelete) {
+                    <button type="button" class="btn-icon" (click)="confirmDelete(page)" [title]="'common.delete' | translate">🗑</button>
                   }
                   @if (canPublish && page.status === draftStatus) {
                     <button type="button" class="btn btn-primary btn-sm" (click)="publish(page)">{{ 'common.publish' | translate }}</button>
@@ -86,6 +91,14 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
         </table>
       </div>
     }
+
+    <app-confirm-dialog
+      [visible]="showDeleteConfirm"
+      title="common.confirm"
+      message="servicePages.confirmDelete"
+      variant="danger"
+      (confirmed)="deleteConfirmed()"
+      (cancelled)="showDeleteConfirm = false" />
   `,
 })
 export class ServicePagesListComponent implements OnInit {
@@ -102,7 +115,11 @@ export class ServicePagesListComponent implements OnInit {
   readonly publishedStatus = PageStatus.Published;
   readonly canCreate = this.auth.hasPermission(ContentType.ServiceIntroPage, 'create');
   readonly canEdit = this.auth.hasPermission(ContentType.ServiceIntroPage, 'edit');
+  readonly canDelete = this.auth.hasPermission(ContentType.ServiceIntroPage, 'delete');
   readonly canPublish = this.auth.hasPermission(ContentType.ServiceIntroPage, 'publish');
+
+  showDeleteConfirm = false;
+  pageToDelete: ServiceIntroPage | null = null;
 
   ngOnInit(): void { this.load(); }
 
@@ -126,6 +143,28 @@ export class ServicePagesListComponent implements OnInit {
 
   getServiceName(page: ServiceIntroPage): string {
     return this.language.currentLang === 'ar' ? page.serviceNameAr : page.serviceNameEn;
+  }
+
+  confirmDelete(page: ServiceIntroPage): void {
+    this.pageToDelete = page;
+    this.showDeleteConfirm = true;
+  }
+
+  deleteConfirmed(): void {
+    if (!this.pageToDelete) {
+      this.showDeleteConfirm = false;
+      return;
+    }
+    const id = this.pageToDelete.id;
+    this.showDeleteConfirm = false;
+    this.pageToDelete = null;
+    this.servicePages.delete(id).subscribe({
+      next: () => {
+        this.toast.success('messages.servicePageDeleted');
+        this.load();
+      },
+      error: (err) => this.toast.error(resolveApiErrorKey(err))
+    });
   }
 
   publish(page: ServiceIntroPage): void {

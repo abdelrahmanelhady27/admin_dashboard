@@ -9,6 +9,7 @@ import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
 import { AuthService } from '../../core/services/auth.service';
 import { PageStatus } from '../../core/models/enums';
+import { AuditLog } from '../../core/models/audit-log.model';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -81,7 +82,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
               <div class="timeline__item">
                 <div class="timeline__dot"></div>
                 <div class="timeline__content">
-                  <strong>{{ 'auditActions.' + log.action | translate }}</strong>
+                  <strong>{{ 'auditActions.' + log.actionType | translate }}</strong>
                   <span>{{ log.entityName }}</span>
                   <small>{{ log.performedBy }} · {{ log.performedAt | date:'short' }}</small>
                 </div>
@@ -241,7 +242,7 @@ export class DashboardComponent implements OnInit {
 
   loading = true;
   today = new Date();
-  recentLogs: ReturnType<AuditLogService['getRecent']> = [];
+  recentLogs: AuditLog[] = [];
   recentNews: ReturnType<EmployeeNewsService['getLatestPublished']> = [];
   chartBars = [45, 72, 58, 90, 65, 80];
   publishedPages = 0;
@@ -282,8 +283,16 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.publishedNews = this.news.getPublishedCount();
     this.quickLinksCount = this.quickLinks.getCount();
-    this.recentLogs = this.auditLog.getRecent(6);
     this.recentNews = this.news.getLatestPublished(4);
+
+    this.auditLog.getRecent(6).subscribe({
+      next: (logs) => {
+        this.recentLogs = logs;
+      },
+      error: () => {
+        this.recentLogs = [];
+      }
+    });
 
     this.serviceIntroPages.getAll().subscribe({
       next: (pages) => {

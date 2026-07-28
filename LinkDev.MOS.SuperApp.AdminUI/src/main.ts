@@ -5,7 +5,6 @@ import { STORAGE_KEYS } from './app/core/constants/storage-keys';
 import { ServicePagesService } from './app/core/services/service-pages.service';
 import { QuickLinksService } from './app/core/services/quick-links.service';
 import { EmployeeNewsService } from './app/core/services/employee-news.service';
-import { AuditLogService } from './app/core/services/audit-log.service';
 
 function seedMockDataIfNeeded(): void {
   if (localStorage.getItem(STORAGE_KEYS.SEEDED) === 'true') {
@@ -16,7 +15,6 @@ function seedMockDataIfNeeded(): void {
   localStorage.setItem(STORAGE_KEYS.SERVICE_PAGES, JSON.stringify(ServicePagesService.seedPages()));
   localStorage.setItem(STORAGE_KEYS.QUICK_LINKS, JSON.stringify(QuickLinksService.seedData()));
   localStorage.setItem(STORAGE_KEYS.EMPLOYEE_NEWS, JSON.stringify(EmployeeNewsService.seedData()));
-  localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(AuditLogService.seedData()));
   localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
 }
 

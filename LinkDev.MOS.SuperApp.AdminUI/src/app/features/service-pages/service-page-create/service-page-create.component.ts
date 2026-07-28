@@ -20,6 +20,12 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 
+interface SystemOption {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+}
+
 @Component({
   selector: 'app-service-page-create',
   standalone: true,
@@ -35,11 +41,20 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
         <h3 class="form-section__title">{{ 'servicePages.basicInfo' | translate }}</h3>
         <p class="form-section__desc">{{ 'servicePages.basicInfoDesc' | translate }}</p>
         <div class="form-group">
+          <label class="form-label">{{ 'servicePages.selectSystem' | translate }} <span class="required">*</span></label>
+          <select class="form-select" formControlName="systemId" (change)="onSystemChange()">
+            <option value="">{{ 'servicePages.selectSystemPlaceholder' | translate }}</option>
+            @for (sys of systems; track sys.id) {
+              <option [value]="sys.id">{{ getSystemName(sys) }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
           <label class="form-label">{{ 'servicePages.selectService' | translate }} <span class="required">*</span></label>
           <select class="form-select" formControlName="serviceId">
             <option value="">{{ 'servicePages.selectServicePlaceholder' | translate }}</option>
-            @for (svc of availableServices; track svc.id) {
-              <option [value]="svc.id">{{ getServiceLabel(svc) }}</option>
+            @for (svc of filteredServices; track svc.id) {
+              <option [value]="svc.id">{{ getServiceName(svc) }}</option>
             }
           </select>
         </div>
@@ -106,12 +121,15 @@ export class ServicePageCreateComponent implements OnInit {
   docsForm: FormGroup | null = null;
   faqsForm: FormGroup | null = null;
   availableServices: AvailableLinkedService[] = [];
+  filteredServices: AvailableLinkedService[] = [];
+  systems: SystemOption[] = [];
   existingServiceIds = new Set<number>();
   saving = false;
   uploading = false;
 
   form = this.fb.group({
-    serviceId: ['', Validators.required],
+    systemId: [''],
+    serviceId: [{ value: '', disabled: true }, Validators.required],
     description: ['', Validators.maxLength(MAX_DESCRIPTION_LENGTH)],
     processingDuration: ['', Validators.maxLength(MAX_PROCESSING_DURATION_LENGTH)],
     videoUrl: [''],
@@ -128,15 +146,31 @@ export class ServicePageCreateComponent implements OnInit {
         this.availableServices = services.filter(
           (s) => s.isActive && !this.existingServiceIds.has(s.id)
         );
+        this.systems = this.deriveSystems(this.availableServices);
       },
       error: (err) => this.toast.error(resolveApiErrorKey(err))
     });
   }
 
-  getServiceLabel(svc: AvailableLinkedService): string {
-    const name = this.language.currentLang === 'ar' ? svc.nameAr : svc.nameEn;
-    const system = this.language.currentLang === 'ar' ? svc.systemNameAr : svc.systemNameEn;
-    return system ? `${name} (${system})` : name;
+  getSystemName(sys: SystemOption): string {
+    return this.language.currentLang === 'ar' ? sys.nameAr : sys.nameEn;
+  }
+
+  getServiceName(svc: AvailableLinkedService): string {
+    return this.language.currentLang === 'ar' ? svc.nameAr : svc.nameEn;
+  }
+
+  onSystemChange(): void {
+    const serviceControl = this.form.get('serviceId');
+    serviceControl?.setValue('');
+    const systemId = Number(this.form.value.systemId);
+    if (!systemId) {
+      this.filteredServices = [];
+      serviceControl?.disable();
+      return;
+    }
+    this.filteredServices = this.availableServices.filter((s) => s.systemId === systemId);
+    serviceControl?.enable();
   }
 
   onDocsReady(form: FormGroup): void { this.docsForm = form; }
@@ -175,12 +209,31 @@ export class ServicePageCreateComponent implements OnInit {
     this.createPage(true);
   }
 
+  private deriveSystems(services: AvailableLinkedService[]): SystemOption[] {
+    const byId = new Map<number, SystemOption>();
+    for (const svc of services) {
+      if (!byId.has(svc.systemId)) {
+        byId.set(svc.systemId, {
+          id: svc.systemId,
+          nameAr: svc.systemNameAr || '',
+          nameEn: svc.systemNameEn || ''
+        });
+      }
+    }
+    return Array.from(byId.values());
+  }
+
   private validateService(): boolean {
-    if (!this.form.get('serviceId')?.value) {
+    if (!this.form.get('systemId')?.value) {
+      this.toast.error('validation.systemRequired');
+      return false;
+    }
+    const serviceIdValue = this.form.get('serviceId')?.value;
+    if (!serviceIdValue) {
       this.toast.error('validation.serviceRequired');
       return false;
     }
-    const serviceId = Number(this.form.get('serviceId')?.value);
+    const serviceId = Number(serviceIdValue);
     if (this.existingServiceIds.has(serviceId)) {
       this.toast.error('validation.duplicateServicePage');
       return false;
@@ -206,12 +259,13 @@ export class ServicePageCreateComponent implements OnInit {
 
   private createPage(publish: boolean): void {
     this.saving = true;
+    const raw = this.form.getRawValue();
     this.servicePages.create({
-      serviceId: Number(this.form.value.serviceId),
-      description: this.form.value.description || '',
-      processingDuration: this.form.value.processingDuration || '',
-      videoUrl: this.form.value.videoUrl || null,
-      videoFileName: this.form.value.videoFileName || null,
+      serviceId: Number(raw.serviceId),
+      description: raw.description || '',
+      processingDuration: raw.processingDuration || '',
+      videoUrl: raw.videoUrl || null,
+      videoFileName: raw.videoFileName || null,
       documents: this.docsForm?.value.documents || [],
       faqs: this.faqsForm?.value.faqs || [],
       publish
