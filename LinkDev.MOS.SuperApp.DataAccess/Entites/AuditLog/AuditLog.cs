@@ -1,6 +1,6 @@
 using Linkdev.MOS.SuperApp.Business.Enums;
 
-namespace LinkDev.MOS.SuperApp.DataAccess.Entites
+namespace LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog
 {
     public class AuditLog
     {

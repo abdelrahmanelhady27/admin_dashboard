@@ -1,7 +1,7 @@
 using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
 using System.Collections.Generic;
 using System.Linq;
 

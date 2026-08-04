@@ -12,15 +12,23 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     @if (links.length === 0) {
       <p class="empty">{{ 'quickLinks.noLinks' | translate }}</p>
     } @else {
-      <div cdkDropList class="link-list" (cdkDropListDropped)="drop($event)">
-        @for (link of links; track link.id) {
-          <div class="link-item" cdkDrag>
-            <span class="drag-handle" cdkDragHandle aria-hidden="true">☰</span>
+      <div
+        cdkDropList
+        class="link-list"
+        [cdkDropListDisabled]="readonly"
+        (cdkDropListDropped)="drop($event)">
+        @for (link of links; track link.serviceId) {
+          <div class="link-item" cdkDrag [cdkDragDisabled]="readonly">
+            @if (!readonly) {
+              <span class="drag-handle" cdkDragHandle aria-hidden="true">☰</span>
+            }
             <div class="link-info">
               <strong>{{ getServiceName(link) }}</strong>
               <span class="deep-link">{{ link.deepLink }}</span>
             </div>
-            <button type="button" class="btn btn-outline btn-sm link-delete" (click)="deleteLink(link.id)">{{ 'common.delete' | translate }}</button>
+            @if (!readonly) {
+              <button type="button" class="btn btn-outline btn-sm link-delete" (click)="deleteLink(link.serviceId)">{{ 'common.delete' | translate }}</button>
+            }
           </div>
         }
       </div>
@@ -95,20 +103,27 @@ export class QuickLinkSortableListComponent {
   private readonly language = inject(LanguageService);
 
   @Input() links: QuickLink[] = [];
+  @Input() readonly = false;
   @Output() linksChange = new EventEmitter<QuickLink[]>();
-  @Output() linkDeleted = new EventEmitter<string>();
+  @Output() linkDeleted = new EventEmitter<number>();
 
   getServiceName(link: QuickLink): string {
     return this.language.currentLang === 'ar' ? link.serviceNameAr : link.serviceNameEn;
   }
 
   drop(event: CdkDragDrop<QuickLink[]>): void {
+    if (this.readonly) {
+      return;
+    }
     const updated = [...this.links];
     moveItemInArray(updated, event.previousIndex, event.currentIndex);
-    this.linksChange.emit(updated.map((l, i) => ({ ...l, order: i + 1 })));
+    this.linksChange.emit(updated.map((l, i) => ({ ...l, displayOrder: i + 1 })));
   }
 
-  deleteLink(id: string): void {
-    this.linkDeleted.emit(id);
+  deleteLink(serviceId: number): void {
+    if (this.readonly) {
+      return;
+    }
+    this.linkDeleted.emit(serviceId);
   }
 }

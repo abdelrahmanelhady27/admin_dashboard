@@ -282,10 +282,18 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.publishedNews = this.news.getPublishedCount();
-    this.quickLinksCount = this.quickLinks.getCount();
     this.recentNews = this.news.getLatestPublished(4);
 
-    this.auditLog.getRecent(6).subscribe({
+    this.quickLinks.getAll().subscribe({
+      next: (links) => {
+        this.quickLinksCount = links.length;
+      },
+      error: () => {
+        this.quickLinksCount = 0;
+      }
+    });
+
+    this.auditLog.getRecent(5).subscribe({
       next: (logs) => {
         this.recentLogs = logs;
       },

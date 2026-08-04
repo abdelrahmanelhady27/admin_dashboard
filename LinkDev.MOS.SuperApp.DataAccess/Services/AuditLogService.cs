@@ -2,7 +2,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.AuditLog;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
-using LinkDev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;

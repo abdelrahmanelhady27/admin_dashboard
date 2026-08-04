@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.DataAccess.Entites
+namespace LinkDev.MOS.SuperApp.DataAccess.Entites.Permission
 {
     public class UserPermission : BaseEntity
     {

@@ -1,9 +1,13 @@
 export interface QuickLink {
-  id: string;
-  serviceId: string;
-  systemId: string;
+  id: number;
+  serviceId: number;
+  systemId: number;
   serviceNameAr: string;
   serviceNameEn: string;
+  systemNameAr: string;
+  systemNameEn: string;
   deepLink: string;
-  order: number;
+  displayOrder: number;
+  modifiedAt?: string | null;
+  modifiedBy?: string | null;
 }

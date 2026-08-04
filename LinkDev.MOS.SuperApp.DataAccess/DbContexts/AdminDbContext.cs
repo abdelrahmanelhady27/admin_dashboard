@@ -1,8 +1,10 @@
-using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using LinkDev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.QuickLinks;
 using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.StaticUsers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -144,6 +146,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
         public DbSet<ServiceDocument> ServiceDocuments { get; set; }
         public DbSet<ServiceFaq> ServiceFaqs { get; set; }
         public DbSet<AvailableLinkedService> AvailableLinkedServices { get; set; }
+        public DbSet<QuickLink> QuickLinks { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
     }
 }

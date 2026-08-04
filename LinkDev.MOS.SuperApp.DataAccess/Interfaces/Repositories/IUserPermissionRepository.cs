@@ -1,4 +1,4 @@
-﻿using Linkdev.MOS.SuperApp.DataAccess.Entites;
+﻿using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
 using System;
 using System.Collections.Generic;

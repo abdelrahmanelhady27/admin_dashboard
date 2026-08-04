@@ -22,7 +22,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog", b =>
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog.AuditLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,6 +59,46 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
                     b.HasIndex("EntityType", "EntityId");
 
                     b.ToTable("AuditLogs", (string)null);
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.QuickLinks.QuickLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("ServiceId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("QuickLinks", (string)null);
                 });
 
             modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.AvailableLinkedService", b =>
@@ -686,6 +726,17 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
+                });
+
+            modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.QuickLinks.QuickLink", b =>
+                {
+                    b.HasOne("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages.LinkedService", b =>

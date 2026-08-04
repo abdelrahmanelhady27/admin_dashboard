@@ -159,7 +159,8 @@
     "deepLink": "Deep Link",
     "addLink": "Add Quick Link",
     "currentLinks": "Current Quick Links",
-    "noLinks": "No quick links added"
+    "noLinks": "No quick links added",
+    "confirmSave": "Do you want to save the changes?"
   },
   "news": {
     "title": "News Title",
@@ -292,6 +293,7 @@
     "quickLinkAdded": "Quick link added successfully",
     "quickLinkDeleted": "Quick link deleted successfully",
     "quickLinksSaved": "Quick links saved successfully",
+    "operationCancelled": "The operation has been cancelled",
     "newsUpdated": "News updated successfully",
     "newsDeleted": "News deleted successfully"
   }

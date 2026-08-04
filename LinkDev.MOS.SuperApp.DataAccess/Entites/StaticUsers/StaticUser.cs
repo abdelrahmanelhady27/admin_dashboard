@@ -1,6 +1,6 @@
 ﻿using Linkdev.MOS.SuperApp.DataAccess.Entites.Common;
 
-namespace Linkdev.MOS.SuperApp.DataAccess.Entites
+namespace LinkDev.MOS.SuperApp.DataAccess.Entites.StaticUsers
 {
     public class StaticUser : BaseEntity
     {

@@ -1,6 +1,6 @@
-using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

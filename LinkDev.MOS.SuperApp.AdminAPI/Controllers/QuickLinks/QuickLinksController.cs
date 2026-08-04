@@ -1,53 +1,80 @@
-﻿using Linkdev.MOS.SuperApp.Business.Enums;
+﻿using Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks;
+using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Filters;
+using Linkdev.MOS.SuperApp.Business.Interfaces.QuickLinks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.QuickLinks
 {
     [Route("api/quick-links")]
     [ApiController]
+    [Authorize]
     [HasFeature(FeatureType.QuickLinks)]
     public class QuickLinksController : ControllerBase
     {
+        private readonly IQuickLinkService _service;
+
+        public QuickLinksController(IQuickLinkService service)
+        {
+            _service = service;
+        }
+
         // GET: api/quick-links
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<QuickLinkDto>>> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                var links = await _service.GetAllAsync();
+                return Ok(links);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // GET api/quick-links/5
-        [HttpGet("{id}")]
+        // GET: api/quick-links/available-services
+        [HttpGet("available-services")]
         [HasPermission(PermissionAction.Read)]
-
-        public string Get(int id)
+        public async Task<ActionResult<IEnumerable<LinkedServiceDto>>> GetAvailableServices()
         {
-            return "value";
+            try
+            {
+                var services = await _service.GetAvailableServicesAsync();
+                return Ok(services);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // POST api/quick-links
-        [HttpPost]
-        [HasPermission(PermissionAction.Add)]
-
-        public void Post([FromBody] string value)
+        // PUT: api/quick-links
+        [HttpPut]
+        [HasAnyPermission(PermissionAction.Add, PermissionAction.Edit)]
+        public async Task<ActionResult<IEnumerable<QuickLinkDto>>> Save([FromBody] SaveQuickLinksDto dto)
         {
-        }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        // PUT api/quick-links/5
-        [HttpPut("{id}")]
-        [HasPermission(PermissionAction.Edit)]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/quick-links/5
-        [HttpDelete("{id}")]
-        [HasPermission(PermissionAction.Delete)]
-
-        public void Delete(int id)
-        {
+            try
+            {
+                var links = await _service.SaveAsync(dto);
+                return Ok(links);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

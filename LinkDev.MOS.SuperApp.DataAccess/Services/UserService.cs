@@ -3,9 +3,7 @@ using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Business.Enums;
 using Linkdev.MOS.SuperApp.Business.Interfaces;
 using LinkDev.MOS.SuperApp.DataAccess.Mapping;
-using Linkdev.MOS.SuperApp.DataAccess.Entites;
 using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
-using LinkDev.MOS.SuperApp.DataAccess.Entites;
 using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
 using System;
 using System.Collections.Generic;
@@ -14,6 +12,8 @@ using System.Threading.Tasks;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
 using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
 using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.StaticUsers;
 
 namespace Linkdev.MOS.SuperApp.Business.Services
 {

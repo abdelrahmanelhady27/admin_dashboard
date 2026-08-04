@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Linkdev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
-using Linkdev.MOS.SuperApp.DataAccess.Entites;
-using LinkDev.MOS.SuperApp.DataAccess.Entites;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
+using LinkDev.MOS.SuperApp.DataAccess.Entites.StaticUsers;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Mapping
 {

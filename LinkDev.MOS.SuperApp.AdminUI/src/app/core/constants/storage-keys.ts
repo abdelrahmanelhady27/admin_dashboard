@@ -6,7 +6,6 @@ export const STORAGE_KEYS = {
   SYSTEMS: 'uap_systems',
   SERVICES: 'uap_services',
   SERVICE_PAGES: 'uap_service_pages',
-  QUICK_LINKS: 'uap_quick_links',
   EMPLOYEE_NEWS: 'uap_employee_news',
   AUDIT_LOGS: 'uap_audit_logs',
   SEEDED: 'uap_data_seeded'
