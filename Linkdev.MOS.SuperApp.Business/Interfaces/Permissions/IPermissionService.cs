@@ -1,17 +1,11 @@
-using Linkdev.MOS.SuperApp.Business.Dtos;
-using Linkdev.MOS.SuperApp.Business.DTOs.UserPermission;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using LinkDev.MOS.SuperApp.Business.DTOs.UserPermission;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Permissions
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.Permissions
 {
     public interface IPermissionService
     {
-        bool HasPermission(ClaimsPrincipal user, FeatureType feature, PermissionAction action);
+        bool HasPermission(int userId, bool isSuperAdmin, FeatureType feature, PermissionAction action);
         Task<UserPermissionDto?> GetPermissionByIdAsync(int id);
         Task<IEnumerable<UserPermissionDto>> GetAllPermissionsAsync();
         Task<IEnumerable<UserPermissionDto>> GetPermissionsByUserIdAsync(int userId);

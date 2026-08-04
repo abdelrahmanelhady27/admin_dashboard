@@ -1,8 +1,8 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages
 {
     public interface IServiceIntroPageService
     {

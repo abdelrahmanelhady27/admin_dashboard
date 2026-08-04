@@ -1,7 +1,7 @@
-﻿using Linkdev.MOS.SuperApp.Business.DTOs.AuditLog;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.Business.Filters;
-using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
+using LinkDev.MOS.SuperApp.Business.DTOs.AuditLogs;
+using LinkDev.MOS.SuperApp.Domain.Enums;
+using LinkDev.MOS.SuperApp.AdminAPI.Filters;
+using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

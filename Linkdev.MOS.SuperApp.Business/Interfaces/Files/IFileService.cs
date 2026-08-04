@@ -1,12 +1,10 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.Files;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+using LinkDev.MOS.SuperApp.Business.DTOs.Files;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Files
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.Files
 {
     public interface IFileService
     {
-        Task<UploadedFileDto> UploadAsync(IFormFile file, FileCategory category);
+        Task<UploadedFileDto> UploadAsync(FileUploadRequest file, FileCategory category);
     }
 }

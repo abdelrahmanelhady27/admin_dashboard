@@ -1,7 +1,7 @@
 using FluentValidation;
-using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 
-namespace Linkdev.MOS.SuperApp.Business.Validators.ServiceIntroPage
+namespace LinkDev.MOS.SuperApp.Business.Validators.ServiceIntroPage
 {
     public class ServiceDocumentDtoValidator : AbstractValidator<ServiceDocumentDto>
     {

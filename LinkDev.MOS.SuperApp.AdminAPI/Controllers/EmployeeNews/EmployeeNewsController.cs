@@ -1,5 +1,5 @@
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.Business.Filters;
+using LinkDev.MOS.SuperApp.Domain.Enums;
+using LinkDev.MOS.SuperApp.AdminAPI.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

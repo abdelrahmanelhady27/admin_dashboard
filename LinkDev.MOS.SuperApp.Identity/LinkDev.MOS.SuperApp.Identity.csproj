@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,8 +17,8 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Linkdev.MOS.SuperApp.Business\Linkdev.MOS.SuperApp.Business.csproj" />
-		<ProjectReference Include="..\LinkDev.MOS.SuperApp.Utility\LinkDev.MOS.SuperApp.Utility.csproj" />
+		<ProjectReference Include="..\LinkDev.MOS.SuperApp.Business\LinkDev.MOS.SuperApp.Business.csproj" />
+		<ProjectReference Include="..\LinkDev.MOS.SuperApp.Domain\LinkDev.MOS.SuperApp.Domain.csproj" />
 	</ItemGroup>
 
 

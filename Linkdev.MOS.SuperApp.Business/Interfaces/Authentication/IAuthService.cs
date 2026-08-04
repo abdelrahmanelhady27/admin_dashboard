@@ -1,9 +1,9 @@
-﻿using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
+using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Authentication
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.Authentication
 {
     public interface IAuthService
     {

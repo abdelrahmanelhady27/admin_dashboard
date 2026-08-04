@@ -1,4 +1,4 @@
-using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
+using LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

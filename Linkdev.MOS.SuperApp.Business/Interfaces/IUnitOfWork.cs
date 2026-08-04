@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces
+namespace LinkDev.MOS.SuperApp.Business.Interfaces
 {
     public interface IUnitOfWork
     {

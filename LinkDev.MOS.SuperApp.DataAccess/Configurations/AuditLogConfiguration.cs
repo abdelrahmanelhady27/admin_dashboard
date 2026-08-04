@@ -1,4 +1,4 @@
-using LinkDev.MOS.SuperApp.DataAccess.Entites.AuditLog;
+using LinkDev.MOS.SuperApp.Domain.Entities.AuditLog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

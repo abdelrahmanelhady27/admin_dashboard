@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -24,10 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Linkdev.MOS.SuperApp.Business\Linkdev.MOS.SuperApp.Business.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Business\LinkDev.MOS.SuperApp.Business.csproj" />
     <ProjectReference Include="..\LinkDev.MOS.SuperApp.DataAccess\LinkDev.MOS.SuperApp.DataAccess.csproj" />
+    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Domain\LinkDev.MOS.SuperApp.Domain.csproj" />
     <ProjectReference Include="..\LinkDev.MOS.SuperApp.Identity\LinkDev.MOS.SuperApp.Identity.csproj" />
-    <ProjectReference Include="..\LinkDev.MOS.SuperApp.Utility\LinkDev.MOS.SuperApp.Utility.csproj" />
   </ItemGroup>
 
 </Project>

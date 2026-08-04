@@ -1,4 +1,4 @@
-namespace Linkdev.MOS.SuperApp.Business.Options
+namespace LinkDev.MOS.SuperApp.Business.Options
 {
     public class FileStorageOptions
     {

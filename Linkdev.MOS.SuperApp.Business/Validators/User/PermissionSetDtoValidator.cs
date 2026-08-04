@@ -1,8 +1,8 @@
 using FluentValidation;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Business.Enums;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 
-namespace Linkdev.MOS.SuperApp.Business.Validators.User
+namespace LinkDev.MOS.SuperApp.Business.Validators.User
 {
     public class PermissionSetDtoValidator : AbstractValidator<PermissionSetDto>
     {

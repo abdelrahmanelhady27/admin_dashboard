@@ -1,8 +1,10 @@
 using LinkDev.MOS.SuperApp.DataAccess;
 using LinkDev.MOS.SuperApp.Identity;
 using FluentValidation.AspNetCore;
-using Linkdev.MOS.SuperApp.Business;
-using Linkdev.MOS.SuperApp.Business.Options;
+using LinkDev.MOS.SuperApp.Business;
+using LinkDev.MOS.SuperApp.Business.Interfaces;
+using LinkDev.MOS.SuperApp.Business.Options;
+using LinkDev.MOS.SuperApp.AdminAPI.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi;
@@ -12,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddBusinessServices();
 builder.Services.AddDataAccessServices(builder.Configuration);

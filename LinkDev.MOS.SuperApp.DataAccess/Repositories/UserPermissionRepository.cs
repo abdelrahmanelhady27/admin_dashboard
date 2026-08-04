@@ -1,17 +1,14 @@
-using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
-using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
+using LinkDev.MOS.SuperApp.Domain.Entities.Permission;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
 {
     public class UserPermissionRepository : IUserPermissionRepository
     {
         private readonly AdminDbContext _context;
+
         public UserPermissionRepository(AdminDbContext context)
         {
             _context = context;
@@ -30,7 +27,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
 
         public async Task<IEnumerable<UserPermission>> GetAllAsync()
         {
-            return await _context.Set<UserPermission>().ToListAsync(); ;
+            return await _context.Set<UserPermission>().ToListAsync();
         }
 
         public IEnumerable<UserPermission> GetAllByUserId(int userId)

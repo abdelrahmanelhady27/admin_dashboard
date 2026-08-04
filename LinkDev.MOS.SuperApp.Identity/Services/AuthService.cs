@@ -1,4 +1,4 @@
-using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
+using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Options;
@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
 {

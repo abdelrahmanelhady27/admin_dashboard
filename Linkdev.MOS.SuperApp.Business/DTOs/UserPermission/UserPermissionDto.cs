@@ -1,9 +1,9 @@
-﻿using Linkdev.MOS.SuperApp.Business.Enums;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.UserPermission
+namespace LinkDev.MOS.SuperApp.Business.DTOs.UserPermission
 {
     public class UserPermissionDto
     {

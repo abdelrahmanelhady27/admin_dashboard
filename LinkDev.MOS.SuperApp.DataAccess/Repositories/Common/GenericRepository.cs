@@ -1,10 +1,7 @@
+using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories.Common;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
-using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
-using LinkDev.MOS.SuperApp.Utility.Interfaces;
+using LinkDev.MOS.SuperApp.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Repositories.Common
 {
@@ -16,11 +13,11 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories.Common
         {
             _context = context;
         }
+
         public async Task AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
         }
-
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -36,6 +33,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories.Common
         {
             _context.Set<T>().Update(entity);
         }
+
         public async Task DeleteAsync(int id)
         {
             var entity = await _context.Set<T>().FindAsync(id);

@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity
 {

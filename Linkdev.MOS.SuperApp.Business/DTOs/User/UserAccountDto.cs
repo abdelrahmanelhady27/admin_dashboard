@@ -1,6 +1,6 @@
 using System;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.User
+namespace LinkDev.MOS.SuperApp.Business.DTOs.User
 {
     public class UserAccountDto
     {

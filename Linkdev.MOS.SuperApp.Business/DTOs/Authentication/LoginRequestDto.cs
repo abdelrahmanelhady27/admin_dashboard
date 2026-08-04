@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Dtos.Authentication
+namespace LinkDev.MOS.SuperApp.Business.Dtos.Authentication
 {
     public class LoginRequestDto
     {

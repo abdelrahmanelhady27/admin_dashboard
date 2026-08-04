@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Authentication
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.Authentication
 {
     public interface IJwtService
     {

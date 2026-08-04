@@ -1,12 +1,9 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.Files;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.Business.Filters;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Files;
+using LinkDev.MOS.SuperApp.Business.DTOs.Files;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Files;
+using LinkDev.MOS.SuperApp.AdminAPI.Filters;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Files
 {
@@ -32,7 +29,21 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Files
         {
             try
             {
-                var result = await _fileService.UploadAsync(file, category);
+                if (file == null)
+                {
+                    return BadRequest(new { message = "No file was provided." });
+                }
+
+                await using var stream = file.OpenReadStream();
+                var request = new FileUploadRequest
+                {
+                    Content = stream,
+                    FileName = file.FileName,
+                    ContentType = file.ContentType ?? string.Empty,
+                    Length = file.Length
+                };
+
+                var result = await _fileService.UploadAsync(request, category);
                 result.Url = $"{Request.Scheme}://{Request.Host}{result.Url}";
                 return Ok(result);
             }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage
+namespace LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage
 {
     public class ServiceIntroPageDto
     {

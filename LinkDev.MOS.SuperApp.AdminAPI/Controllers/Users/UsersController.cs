@@ -1,5 +1,5 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

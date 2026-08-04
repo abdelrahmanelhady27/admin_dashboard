@@ -1,7 +1,7 @@
 using FluentValidation;
-using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
+using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
 
-namespace Linkdev.MOS.SuperApp.Business.Validators.Authentication
+namespace LinkDev.MOS.SuperApp.Business.Validators.Authentication
 {
     public class LoginRequestDtoValidator : AbstractValidator<LoginRequestDto>
     {

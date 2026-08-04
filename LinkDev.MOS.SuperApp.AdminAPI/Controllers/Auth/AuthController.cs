@@ -1,13 +1,13 @@
 using Azure.Core;
-using Linkdev.MOS.SuperApp.Business.Dtos.Authentication;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Users;
 
 namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 {

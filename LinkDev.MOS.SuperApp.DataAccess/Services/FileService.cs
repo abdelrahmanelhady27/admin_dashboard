@@ -1,14 +1,9 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.Files;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Files;
-using Linkdev.MOS.SuperApp.Business.Options;
+using LinkDev.MOS.SuperApp.Business.DTOs.Files;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Files;
+using LinkDev.MOS.SuperApp.Business.Options;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Services
 {
@@ -23,9 +18,9 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Services
             _options = options.Value;
         }
 
-        public async Task<UploadedFileDto> UploadAsync(IFormFile file, FileCategory category)
+        public async Task<UploadedFileDto> UploadAsync(FileUploadRequest file, FileCategory category)
         {
-            if (file == null || file.Length == 0)
+            if (file == null || file.Content == null || file.Length == 0)
             {
                 throw new InvalidOperationException("No file was provided.");
             }
@@ -48,7 +43,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Services
 
             await using (var stream = new FileStream(physicalPath, FileMode.Create))
             {
-                await file.CopyToAsync(stream);
+                await file.Content.CopyToAsync(stream);
             }
 
             var relativeUrl = $"/{_options.RootPath.Trim('/')}/{subFolder}/{storedFileName}";

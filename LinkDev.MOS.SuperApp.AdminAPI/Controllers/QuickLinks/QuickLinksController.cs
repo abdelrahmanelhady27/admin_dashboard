@@ -1,8 +1,8 @@
-﻿using Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks;
-using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.Business.Filters;
-using Linkdev.MOS.SuperApp.Business.Interfaces.QuickLinks;
+using LinkDev.MOS.SuperApp.Business.DTOs.QuickLinks;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Domain.Enums;
+using LinkDev.MOS.SuperApp.AdminAPI.Filters;
+using LinkDev.MOS.SuperApp.Business.Interfaces.QuickLinks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -1,7 +1,7 @@
 using FluentValidation;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
 
-namespace Linkdev.MOS.SuperApp.Business.Validators.User
+namespace LinkDev.MOS.SuperApp.Business.Validators.User
 {
     public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
     {

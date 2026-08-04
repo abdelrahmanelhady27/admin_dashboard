@@ -1,4 +1,4 @@
-namespace Linkdev.MOS.SuperApp.Business.DTOs.Files
+namespace LinkDev.MOS.SuperApp.Business.DTOs.Files
 {
     public class UploadedFileDto
     {

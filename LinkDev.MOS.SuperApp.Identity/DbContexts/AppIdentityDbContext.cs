@@ -1,5 +1,5 @@
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using LinkDev.MOS.SuperApp.Utility.Interfaces;
+using LinkDev.MOS.SuperApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

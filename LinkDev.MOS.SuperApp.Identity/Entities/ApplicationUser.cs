@@ -1,4 +1,4 @@
-using LinkDev.MOS.SuperApp.Utility.Interfaces;
+using LinkDev.MOS.SuperApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

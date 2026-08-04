@@ -1,6 +1,6 @@
-using Linkdev.MOS.SuperApp.Business.Enums;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.User
+namespace LinkDev.MOS.SuperApp.Business.DTOs.User
 {
     public class PermissionSetDto
     {

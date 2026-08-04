@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks
+namespace LinkDev.MOS.SuperApp.Business.DTOs.QuickLinks
 {
     public class SaveQuickLinksDto
     {

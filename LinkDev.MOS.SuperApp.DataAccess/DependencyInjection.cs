@@ -1,18 +1,11 @@
-using Linkdev.MOS.SuperApp.Business.Interfaces;
-using Linkdev.MOS.SuperApp.Business.Interfaces.AuditLog;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Files;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Permissions;
-using Linkdev.MOS.SuperApp.Business.Interfaces.QuickLinks;
-using Linkdev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Users;
-using Linkdev.MOS.SuperApp.Business.Mapping;
-using Linkdev.MOS.SuperApp.Business.Options;
-using Linkdev.MOS.SuperApp.Business.Services;
+using LinkDev.MOS.SuperApp.Business.Interfaces;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Files;
+using LinkDev.MOS.SuperApp.Business.Mapping;
+using LinkDev.MOS.SuperApp.Business.Options;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories.Common;
+using LinkDev.MOS.SuperApp.DataAccess.Common;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
-using LinkDev.MOS.SuperApp.DataAccess.Entites.Common;
-using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
-using LinkDev.MOS.SuperApp.DataAccess.Interfaces.Repositories.Common;
-using LinkDev.MOS.SuperApp.DataAccess.Mapping;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories.Common;
 using LinkDev.MOS.SuperApp.DataAccess.Services;
@@ -29,7 +22,6 @@ namespace LinkDev.MOS.SuperApp.DataAccess
         {
             services.AddAutoMapper(cfg => { },
                 typeof(UserMappingProfile).Assembly,
-                typeof(EntityMappingProfile).Assembly,
                 typeof(IdentityMappingProfile).Assembly);
 
             services.AddDbContext<AdminDbContext>(options =>
@@ -39,16 +31,12 @@ namespace LinkDev.MOS.SuperApp.DataAccess
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped(typeof(IQueryableRepository<>), typeof(QueryableRepository<>));
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
-            services.AddScoped<IPermissionService, PermissionService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IServiceIntroPageRepository, ServiceIntroPageRepository>();
-            services.AddScoped<IServiceIntroPageService, ServiceIntroPageService>();
             services.AddScoped<IQuickLinkRepository, QuickLinkRepository>();
-            services.AddScoped<IQuickLinkService, QuickLinkService>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IStaticUserRepository, StaticUserRepository>();
             services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IAuditLogService, AuditLogService>();
 
             return services;
         }

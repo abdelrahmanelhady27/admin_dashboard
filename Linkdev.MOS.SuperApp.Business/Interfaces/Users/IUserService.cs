@@ -1,8 +1,8 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.Users
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.Users
 {
     public interface IUserService
     {

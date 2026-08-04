@@ -1,9 +1,9 @@
 <Solution>
   <Folder Name="/Business/">
-    <Project Path="Linkdev.MOS.SuperApp.Business/Linkdev.MOS.SuperApp.Business.csproj" Id="6302b85d-263a-43fd-9a86-757c0da00c5e" />
+    <Project Path="LinkDev.MOS.SuperApp.Business/LinkDev.MOS.SuperApp.Business.csproj" Id="6302b85d-263a-43fd-9a86-757c0da00c5e" />
   </Folder>
-  <Folder Name="/Common/">
-    <Project Path="LinkDev.MOS.SuperApp.Utility/LinkDev.MOS.SuperApp.Utility.csproj" />
+  <Folder Name="/Domain/">
+    <Project Path="LinkDev.MOS.SuperApp.Domain/LinkDev.MOS.SuperApp.Domain.csproj" />
   </Folder>
   <Folder Name="/Data/">
     <Project Path="LinkDev.MOS.SuperApp.DataAccess/LinkDev.MOS.SuperApp.DataAccess.csproj" Id="3f9a171a-33fc-4c8b-aa16-65327a0a168c" />

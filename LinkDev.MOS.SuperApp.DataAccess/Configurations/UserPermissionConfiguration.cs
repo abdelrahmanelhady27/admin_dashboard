@@ -1,5 +1,5 @@
 using Linkdev.MOS.SuperApp.Identity.Entites;
-using LinkDev.MOS.SuperApp.DataAccess.Entites.Permission;
+using LinkDev.MOS.SuperApp.Domain.Entities.Permission;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

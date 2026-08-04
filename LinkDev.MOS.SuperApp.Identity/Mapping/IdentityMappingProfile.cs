@@ -1,5 +1,5 @@
 using AutoMapper;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 
 namespace LinkDev.MOS.SuperApp.Identity.Mapping

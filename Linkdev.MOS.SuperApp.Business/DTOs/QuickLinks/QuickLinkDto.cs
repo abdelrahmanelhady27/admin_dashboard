@@ -1,6 +1,6 @@
 using System;
 
-namespace Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks
+namespace LinkDev.MOS.SuperApp.Business.DTOs.QuickLinks
 {
     public class QuickLinkDto
     {

@@ -1,5 +1,5 @@
 using AutoMapper;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Linkdev.MOS.SuperApp.Business.Interfaces.Authentication;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services
 {

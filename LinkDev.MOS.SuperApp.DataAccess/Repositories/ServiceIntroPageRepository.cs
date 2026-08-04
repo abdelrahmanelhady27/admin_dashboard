@@ -1,13 +1,9 @@
-using Linkdev.MOS.SuperApp.Business.Enums;
-using Linkdev.MOS.SuperApp.DataAccess.Interfaces.Repositories;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
-using LinkDev.MOS.SuperApp.DataAccess.Entites.ServiceIntroPages;
 using LinkDev.MOS.SuperApp.DataAccess.Repositories.Common;
+using LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
 {
@@ -67,6 +63,20 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
                 .Include(p => p.Documents)
                 .Include(p => p.Faqs)
                 .FirstOrDefaultAsync(p => p.ServiceId == serviceId && !p.IsDeleted);
+        }
+
+        public async Task<IEnumerable<AvailableLinkedService>> GetAvailableLinkedServicesAsync()
+        {
+            return await _context.AvailableLinkedServices
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<LinkedService?> GetActiveLinkedServiceByIdAsync(int serviceId)
+        {
+            return await _context.LinkedServices
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == serviceId && !s.IsDeleted && s.IsActive);
         }
     }
 }

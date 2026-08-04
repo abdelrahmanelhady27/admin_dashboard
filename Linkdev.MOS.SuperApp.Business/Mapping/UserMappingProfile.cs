@@ -1,7 +1,8 @@
 using AutoMapper;
-using Linkdev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Domain.Entities.StaticUsers;
 
-namespace Linkdev.MOS.SuperApp.Business.Mapping
+namespace LinkDev.MOS.SuperApp.Business.Mapping
 {
     public class UserMappingProfile : Profile
     {
@@ -11,6 +12,15 @@ namespace Linkdev.MOS.SuperApp.Business.Mapping
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive ? "Active" : "Suspended"))
                 .ForMember(dest => dest.Permissions, opt => opt.Ignore());
+
+            CreateMap<StaticUser, StaticUserDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive ? "Active" : "Inactive"));
+
+            CreateMap<UnregisteredStaticUser, StaticUserDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive ? "Active" : "Inactive"));
         }
     }
 }
+

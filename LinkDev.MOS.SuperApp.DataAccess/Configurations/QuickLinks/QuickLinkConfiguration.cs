@@ -1,4 +1,4 @@
-using LinkDev.MOS.SuperApp.DataAccess.Entites.QuickLinks;
+using LinkDev.MOS.SuperApp.Domain.Entities.QuickLinks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

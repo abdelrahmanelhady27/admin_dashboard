@@ -1,8 +1,8 @@
 using FluentValidation;
-using Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks;
+using LinkDev.MOS.SuperApp.Business.DTOs.QuickLinks;
 using System.Linq;
 
-namespace Linkdev.MOS.SuperApp.Business.Validators.QuickLinks
+namespace LinkDev.MOS.SuperApp.Business.Validators.QuickLinks
 {
     public class SaveQuickLinksDtoValidator : AbstractValidator<SaveQuickLinksDto>
     {

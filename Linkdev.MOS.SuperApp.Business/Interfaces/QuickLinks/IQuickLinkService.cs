@@ -1,9 +1,9 @@
-using Linkdev.MOS.SuperApp.Business.DTOs.QuickLinks;
-using Linkdev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Business.DTOs.QuickLinks;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Linkdev.MOS.SuperApp.Business.Interfaces.QuickLinks
+namespace LinkDev.MOS.SuperApp.Business.Interfaces.QuickLinks
 {
     public interface IQuickLinkService
     {
