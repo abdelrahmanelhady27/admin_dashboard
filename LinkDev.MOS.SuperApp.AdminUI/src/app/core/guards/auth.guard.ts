@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { AppRoles } from '../models/enums';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -23,7 +24,7 @@ export const guestGuard: CanActivateFn = () => {
 export const adminRoleGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  if (auth.hasRole('Admin')) {
+  if (auth.hasRole(AppRoles.Admin)) {
     return router.createUrlTree(['/dashboard']);
   }
   return true;

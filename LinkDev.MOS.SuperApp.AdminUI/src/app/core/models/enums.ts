@@ -6,6 +6,13 @@ export enum PermissionType {
   Publish = 'Publish'
 }
 
+export const AppRoles = {
+  SuperAdmin: 'SuperAdmin',
+  Admin: 'Admin'
+} as const;
+
+export type AppRole = (typeof AppRoles)[keyof typeof AppRoles];
+
 export enum ContentType {
   ServiceIntroPage = 'ServiceIntroPage',
   QuickLinks = 'QuickLinks',

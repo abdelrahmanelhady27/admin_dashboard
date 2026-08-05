@@ -1,13 +1,10 @@
-using Azure.Core;
 using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
 using LinkDev.MOS.SuperApp.Business.DTOs.User;
-using Linkdev.MOS.SuperApp.Identity.Entites;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Users;
+using LinkDev.MOS.SuperApp.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 {
@@ -16,16 +13,13 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
 
         public AuthController(
             IAuthService authService,
-            SignInManager<ApplicationUser> signInManager,
             IUserService userService)
         {
             _authService = authService;
-            _signInManager = signInManager;
             _userService = userService;
         }
 
@@ -48,10 +42,9 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 
         // POST api/auth/register
         [HttpPost("register")]
-        [Authorize(Roles = "SuperAdmin")]
-        public async Task<ActionResult<RegisterRequestDto>> Register([FromBody] RegisterRequestDto RegDto)
+        [Authorize(Roles = AppRoles.SuperAdmin)]
+        public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterRequestDto RegDto)
         {
-
             try
             {
                 var result = await _authService.RegisterAsync(RegDto);
@@ -69,9 +62,8 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
 
         // POST api/auth/login
         [HttpPost("login")]
-        public async Task<ActionResult<LoginRequestDto>> Login([FromBody] LoginRequestDto LoginDto)
+        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto LoginDto)
         {
-
             try
             {
                 var result = await _authService.LoginAsync(LoginDto);
@@ -84,6 +76,40 @@ namespace Linkdev.MOS.SuperApp.AdminAPI.Controllers.Auth
             catch (Exception)
             {
                 return StatusCode(500, "An error occurred while logging in.");
+            }
+        }
+
+        // POST api/auth/refresh-token
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<AuthResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        {
+            try
+            {
+                var result = await _authService.RefreshTokenAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex) when (ex.Message == "Invalid refresh token.")
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while refreshing the token.");
+            }
+        }
+
+        // POST api/auth/logout
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto dto)
+        {
+            try
+            {
+                await _authService.LogoutAsync(dto);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while logging out.");
             }
         }
     }

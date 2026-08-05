@@ -1,16 +1,14 @@
 using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Users;
+using LinkDev.MOS.SuperApp.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Users
 {
     [Route("api/users")]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;

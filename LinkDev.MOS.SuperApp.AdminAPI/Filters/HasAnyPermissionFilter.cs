@@ -1,4 +1,5 @@
 using LinkDev.MOS.SuperApp.Business.Interfaces.Permissions;
+using LinkDev.MOS.SuperApp.Domain.Constants;
 using LinkDev.MOS.SuperApp.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -43,7 +44,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
                 return Task.CompletedTask;
             }
 
-            var isSuperAdmin = user.IsInRole("SuperAdmin");
+            var isSuperAdmin = user.IsInRole(AppRoles.SuperAdmin);
             if (_permissions.Length == 0
                 || !_permissions.Any(p => _permissionService.HasPermission(userId, isSuperAdmin, featureAttribute.Feature, p)))
             {

@@ -1,15 +1,14 @@
 using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 using Linkdev.MOS.SuperApp.Identity.Entites;
+using LinkDev.MOS.SuperApp.Domain.Constants;
 using LinkDev.MOS.SuperApp.Identity.DbContexts;
 using LinkDev.MOS.SuperApp.Identity.Options;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
-using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
 {
@@ -18,60 +17,49 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IJwtService _jwtService;
+        private readonly AppIdentityDbContext _dbContext;
+        private readonly JwtOptions _jwtOptions;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            AppIdentityDbContext dbContext,
+            IOptions<JwtOptions> jwtOptions)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwtService = jwtService;
+            _dbContext = dbContext;
+            _jwtOptions = jwtOptions.Value;
         }
+
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto LogDto)
         {
-            // 1. find user by email
             var user = await _userManager.FindByEmailAsync(LogDto.Email);
             if (user == null || !user.IsActive || user.IsDeleted)
             {
                 throw new Exception("Invalid email or password.");
             }
 
-            // 2. validate pass
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, LogDto.Password);
-            if(!isPasswordValid)
+            if (!isPasswordValid)
             {
                 throw new Exception("Invalid email or password.");
             }
 
-            // 3. get user roles
             var roles = await _userManager.GetRolesAsync(user);
-
-            // 4. generate token
-            var token = _jwtService.GenerateAccessToken(
-                user.Id,
-                user.Email,
-                user.FullName ?? "",
-                roles.ToList());
-
-            // 5. return response
-            return new AuthResponseDto
-            {
-                Email = user.Email,
-                FullName = user.FullName ?? "",
-                Token = token,
-            };
+            return await CreateAuthResponseAsync(user, roles.ToList());
         }
-        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto RegDto)
+
+        public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto RegDto)
         {
-            // 1. check if user exists
             var existingUser = await _userManager.FindByEmailAsync(RegDto.Email);
-            if(existingUser != null)
+            if (existingUser != null)
             {
                 throw new Exception("User already exists");
             }
 
-            // 2. create user
             var user = new ApplicationUser
             {
                 UserName = RegDto.Email,
@@ -80,40 +68,155 @@ namespace LinkDev.MOS.SuperApp.Identity.Services.Authentication
                 IsActive = true
             };
 
-            // 3. register user in db
             var res = await _userManager.CreateAsync(user, RegDto.Password);
             if (!res.Succeeded)
             {
                 throw new Exception("User registration failed");
             }
 
-            // 4. assign admin role to the created user
-            if (!await _roleManager.RoleExistsAsync("Admin"))
+            if (!await _roleManager.RoleExistsAsync(AppRoles.Admin))
             {
-                await _roleManager.CreateAsync(new ApplicationRole { Name = "Admin" });
+                await _roleManager.CreateAsync(new ApplicationRole { Name = AppRoles.Admin });
             }
-            await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.AddToRoleAsync(user, AppRoles.Admin);
 
-            // 4. generate token
-            var token = _jwtService.GenerateAccessToken(
-                user.Id,
-                user.Email,
-                user.FullName ?? "",
-                new List<string> { "Admin" });
-
-            // 5. return response
-            return new AuthResponseDto
+            return new RegisterResponseDto
             {
-                Email = user.Email,
                 FullName = user.FullName ?? "",
-                Token = token,
+                Email = user.Email,
+                Role = AppRoles.Admin
             };
         }
 
-        public Task LogoutAsync(int userId)
+        public async Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequestDto dto)
         {
-            throw new NotImplementedException();
+            var tokenHash = HashToken(dto.RefreshToken);
+            var storedToken = await _dbContext.RefreshTokens
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
+
+            if (storedToken == null)
+            {
+                throw new Exception("Invalid refresh token.");
+            }
+
+            if (storedToken.IsRevoked)
+            {
+                await RevokeAllUserTokensAsync(storedToken.UserId);
+                throw new Exception("Invalid refresh token.");
+            }
+
+            if (storedToken.IsExpired)
+            {
+                throw new Exception("Invalid refresh token.");
+            }
+
+            var user = storedToken.User;
+            if (user == null || !user.IsActive || user.IsDeleted)
+            {
+                throw new Exception("Invalid refresh token.");
+            }
+
+            var refreshToken = _jwtService.GenerateRefreshToken();
+            var newTokenHash = HashToken(refreshToken);
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+            storedToken.ReplacedByTokenHash = newTokenHash;
+
+            _dbContext.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = user.Id,
+                TokenHash = newTokenHash,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryInDays)
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var accessToken = _jwtService.GenerateAccessToken(
+                user.Id,
+                user.Email!,
+                user.FullName ?? "",
+                roles.ToList());
+
+            return new AuthResponseDto
+            {
+                Email = user.Email!,
+                FullName = user.FullName ?? "",
+                Token = accessToken,
+                RefreshToken = refreshToken
+            };
         }
 
+        public async Task LogoutAsync(RefreshTokenRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.RefreshToken))
+            {
+                return;
+            }
+
+            var tokenHash = HashToken(dto.RefreshToken);
+            var storedToken = await _dbContext.RefreshTokens
+                .FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
+
+            if (storedToken == null || !storedToken.IsActive)
+            {
+                return;
+            }
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<AuthResponseDto> CreateAuthResponseAsync(ApplicationUser user, List<string> roles)
+        {
+            var accessToken = _jwtService.GenerateAccessToken(
+                user.Id,
+                user.Email!,
+                user.FullName ?? "",
+                roles);
+
+            var refreshToken = _jwtService.GenerateRefreshToken();
+            var tokenHash = HashToken(refreshToken);
+
+            _dbContext.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = user.Id,
+                TokenHash = tokenHash,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryInDays)
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return new AuthResponseDto
+            {
+                Email = user.Email!,
+                FullName = user.FullName ?? "",
+                Token = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+        private async Task RevokeAllUserTokensAsync(int userId)
+        {
+            var activeTokens = await _dbContext.RefreshTokens
+                .Where(x => x.UserId == userId && x.RevokedAt == null && x.ExpiresAt > DateTime.UtcNow)
+                .ToListAsync();
+
+            foreach (var token in activeTokens)
+            {
+                token.RevokedAt = DateTime.UtcNow;
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private static string HashToken(string token)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToHexString(bytes);
+        }
     }
 }

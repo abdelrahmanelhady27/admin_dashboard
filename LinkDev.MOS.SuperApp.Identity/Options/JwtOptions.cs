@@ -10,5 +10,6 @@ namespace LinkDev.MOS.SuperApp.Identity.Options
         public string Issuer { get; set; }
         public string Audience { get; set; }
         public double ExpiryInMinutes { get; set; }
+        public int RefreshTokenExpiryInDays { get; set; }
     }
 }

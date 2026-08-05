@@ -1,13 +1,10 @@
 using AutoMapper;
 using LinkDev.MOS.SuperApp.Business.DTOs.User;
+using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
+using LinkDev.MOS.SuperApp.Domain.Constants;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using LinkDev.MOS.SuperApp.Business.Interfaces.Authentication;
 
 namespace LinkDev.MOS.SuperApp.Identity.Services
 {
@@ -73,7 +70,7 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
                 throw new Exception($"User account creation failed: {errors}");
             }
 
-            await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.AddToRoleAsync(user, AppRoles.Admin);
             return _mapper.Map<UserAccountDto>(user);
         }
 
@@ -104,9 +101,9 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
                 throw new Exception($"User account restore failed: {errors}");
             }
 
-            if (!await _userManager.IsInRoleAsync(existingUser, "Admin"))
+            if (!await _userManager.IsInRoleAsync(existingUser, AppRoles.Admin))
             {
-                await _userManager.AddToRoleAsync(existingUser, "Admin");
+                await _userManager.AddToRoleAsync(existingUser, AppRoles.Admin);
             }
 
             return _mapper.Map<UserAccountDto>(existingUser);

@@ -8,7 +8,7 @@ import { EmployeeNewsService } from '../../core/services/employee-news.service';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
 import { AuthService } from '../../core/services/auth.service';
-import { PageStatus } from '../../core/models/enums';
+import { PageStatus, AppRoles } from '../../core/models/enums';
 import { AuditLog } from '../../core/models/audit-log.model';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
@@ -274,7 +274,7 @@ export class DashboardComponent implements OnInit {
   ];
 
   get quickActions() {
-    if (this.realAuth.hasRole('Admin')) {
+    if (this.realAuth.hasRole(AppRoles.Admin)) {
       return this.rawQuickActions.filter(action => action.route !== '/users/create');
     }
     return this.rawQuickActions;

@@ -1,5 +1,6 @@
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.Domain.Interfaces;
+using LinkDev.MOS.SuperApp.Identity.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,12 @@ namespace LinkDev.MOS.SuperApp.Identity.DbContexts
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
             ApplyUtcDateTimeConversion(modelBuilder);
         }
 

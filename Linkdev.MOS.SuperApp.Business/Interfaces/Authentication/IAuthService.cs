@@ -1,14 +1,12 @@
 using LinkDev.MOS.SuperApp.Business.Dtos.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LinkDev.MOS.SuperApp.Business.Interfaces.Authentication
 {
     public interface IAuthService
     {
-        Task<AuthResponseDto> RegisterAsync(RegisterRequestDto RegDto);
+        Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto RegDto);
         Task<AuthResponseDto> LoginAsync(LoginRequestDto LogDto);
-        Task LogoutAsync(int userId);
+        Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequestDto dto);
+        Task LogoutAsync(RefreshTokenRequestDto dto);
     }
 }

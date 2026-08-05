@@ -1,15 +1,14 @@
 using LinkDev.MOS.SuperApp.Business.DTOs.UserPermission;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Permissions;
+using LinkDev.MOS.SuperApp.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Permissions
 {
     [Route("api/permissions")]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public class PermissionsController : ControllerBase
     {
         private readonly IPermissionService _permissionService;

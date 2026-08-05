@@ -9,8 +9,19 @@ export interface RegisterRequest {
   password: string
 }
 
+export interface RegisterResponse {
+  fullName: string,
+  email: string,
+  role: string
+}
+
 export interface AuthResponse {
   fullName: string,
   email: string,
-  token: string
+  token: string,
+  refreshToken: string
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string
 }
