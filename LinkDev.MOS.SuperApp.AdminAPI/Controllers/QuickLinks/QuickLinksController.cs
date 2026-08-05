@@ -58,7 +58,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.QuickLinks
 
         // PUT: api/quick-links
         [HttpPut]
-        [HasAnyPermission(PermissionAction.Add, PermissionAction.Edit)]
+        [HasAnyPermission(PermissionAction.Add, PermissionAction.Edit, PermissionAction.Delete)]
         public async Task<ActionResult<IEnumerable<QuickLinkDto>>> Save([FromBody] SaveQuickLinksDto dto)
         {
             if (!ModelState.IsValid)

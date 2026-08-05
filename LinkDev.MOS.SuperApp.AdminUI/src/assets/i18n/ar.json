@@ -283,6 +283,8 @@
     "invalidDeepLink": "يجب أن تحتوي الخدمة على رابط عميق صالح.",
     "duplicateQuickLink": "لا يمكن إضافة نفس الخدمة أكثر من مرة.",
     "noQuickLinks": "لا توجد روابط سريعة مضافة.",
+    "noAddEditPermissionQuickLinks": "ليس لديك صلاحية إضافة أو إعادة ترتيب الروابط السريعة.",
+    "noDeletePermissionQuickLinks": "ليس لديك صلاحية حذف الروابط السريعة.",
     "titleRequired": "العنوان مطلوب."
   },
   "messages": {

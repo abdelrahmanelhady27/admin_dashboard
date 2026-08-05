@@ -15,18 +15,18 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <div
         cdkDropList
         class="link-list"
-        [cdkDropListDisabled]="readonly"
+        [cdkDropListDisabled]="readonly || !canReorder"
         (cdkDropListDropped)="drop($event)">
         @for (link of links; track link.serviceId) {
-          <div class="link-item" cdkDrag [cdkDragDisabled]="readonly">
-            @if (!readonly) {
+          <div class="link-item" cdkDrag [cdkDragDisabled]="readonly || !canReorder">
+            @if (!readonly && canReorder) {
               <span class="drag-handle" cdkDragHandle aria-hidden="true">☰</span>
             }
             <div class="link-info">
               <strong>{{ getServiceName(link) }}</strong>
               <span class="deep-link">{{ link.deepLink }}</span>
             </div>
-            @if (!readonly) {
+            @if (!readonly && canDelete) {
               <button type="button" class="btn btn-outline btn-sm link-delete" (click)="deleteLink(link.serviceId)">{{ 'common.delete' | translate }}</button>
             }
           </div>
@@ -104,6 +104,8 @@ export class QuickLinkSortableListComponent {
 
   @Input() links: QuickLink[] = [];
   @Input() readonly = false;
+  @Input() canReorder = true;
+  @Input() canDelete = true;
   @Output() linksChange = new EventEmitter<QuickLink[]>();
   @Output() linkDeleted = new EventEmitter<number>();
 
@@ -112,7 +114,7 @@ export class QuickLinkSortableListComponent {
   }
 
   drop(event: CdkDragDrop<QuickLink[]>): void {
-    if (this.readonly) {
+    if (this.readonly || !this.canReorder) {
       return;
     }
     const updated = [...this.links];
@@ -121,7 +123,7 @@ export class QuickLinkSortableListComponent {
   }
 
   deleteLink(serviceId: number): void {
-    if (this.readonly) {
+    if (this.readonly || !this.canDelete) {
       return;
     }
     this.linkDeleted.emit(serviceId);

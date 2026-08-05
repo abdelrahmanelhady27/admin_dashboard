@@ -2,8 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { QuickLinksService } from '../../../core/services/quick-links.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { QuickLink } from '../../../core/models/quick-link.model';
 import { AvailableLinkedService } from '../../../core/models/service-page.model';
+import { ContentType } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { QuickLinkSortableListComponent } from '../../../shared/components/quick-link-sortable-list/quick-link-sortable-list.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
@@ -32,7 +34,7 @@ interface SystemOption {
     <div class="alert alert-info">{{ 'quickLinks.infoAlert' | translate }}</div>
 
     <div class="u-card" style="padding:1.5rem">
-      @if (isEditing) {
+      @if (isEditing && canAddOrEdit) {
         <div class="form-section" style="margin-bottom:0;box-shadow:none;border:none;padding:0 0 1.5rem">
           <h3 class="form-section__title">{{ 'quickLinks.addLink' | translate }}</h3>
           <p class="form-section__desc">{{ 'quickLinks.addHint' | translate }}</p>
@@ -68,7 +70,7 @@ interface SystemOption {
 
       <div class="section-header">
         <h3 class="form-section__title" style="margin:0">{{ 'quickLinks.currentLinks' | translate }}</h3>
-        @if (!loading && !isEditing) {
+        @if (!loading && !isEditing && canManage) {
           <button type="button" class="btn btn-primary" (click)="startEditing()">{{ 'common.edit' | translate }}</button>
         }
       </div>
@@ -82,6 +84,8 @@ interface SystemOption {
         <app-quick-link-sortable-list
           [links]="links"
           [readonly]="!isEditing"
+          [canReorder]="canAddOrEdit"
+          [canDelete]="canDelete"
           (linksChange)="links = $event"
           (linkDeleted)="deleteLink($event)" />
       }
@@ -129,9 +133,16 @@ interface SystemOption {
 })
 export class QuickLinksManageComponent implements OnInit {
   private readonly quickLinksService = inject(QuickLinksService);
+  private readonly auth = inject(AuthService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+
+  readonly canAddOrEdit =
+    this.auth.hasPermission(ContentType.QuickLinks, 'create') ||
+    this.auth.hasPermission(ContentType.QuickLinks, 'edit');
+  readonly canDelete = this.auth.hasPermission(ContentType.QuickLinks, 'delete');
+  readonly canManage = this.canAddOrEdit || this.canDelete;
 
   loading = true;
   saving = false;
@@ -165,6 +176,9 @@ export class QuickLinksManageComponent implements OnInit {
   }
 
   startEditing(): void {
+    if (!this.canManage) {
+      return;
+    }
     this.isEditing = true;
   }
 
@@ -197,6 +211,10 @@ export class QuickLinksManageComponent implements OnInit {
   }
 
   addLink(): void {
+    if (!this.canAddOrEdit) {
+      this.toast.error('validation.noAddEditPermissionQuickLinks');
+      return;
+    }
     const systemId = Number(this.addForm.value.systemId);
     const serviceId = Number(this.addForm.value.serviceId);
     if (!systemId) {
@@ -248,6 +266,10 @@ export class QuickLinksManageComponent implements OnInit {
   }
 
   deleteLink(serviceId: number): void {
+    if (!this.canDelete) {
+      this.toast.error('validation.noDeletePermissionQuickLinks');
+      return;
+    }
     const removed = this.links.find((l) => l.serviceId === serviceId);
     this.links = this.links
       .filter((l) => l.serviceId !== serviceId)

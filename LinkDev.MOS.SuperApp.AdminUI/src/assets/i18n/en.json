@@ -278,6 +278,8 @@
     "invalidDeepLink": "Service must have a valid deep link.",
     "duplicateQuickLink": "Cannot add the same service more than once.",
     "noQuickLinks": "No quick links added.",
+    "noAddEditPermissionQuickLinks": "You do not have permission to add or reorder quick links.",
+    "noDeletePermissionQuickLinks": "You do not have permission to delete quick links.",
     "titleRequired": "Title is required."
   },
   "messages": {
