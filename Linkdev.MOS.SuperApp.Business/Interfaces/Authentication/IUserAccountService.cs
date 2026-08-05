@@ -12,5 +12,6 @@ namespace LinkDev.MOS.SuperApp.Business.Interfaces.Authentication
         Task<bool> DeleteAccountAsync(int id);
         Task<UserAccountDto?> SuspendAccountAsync(int id);
         Task<UserAccountDto?> ActivateAccountAsync(int id);
+        Task<UserAccountDto?> TouchAccountAsync(int id);
     }
 }

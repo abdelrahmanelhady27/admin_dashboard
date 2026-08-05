@@ -31,7 +31,7 @@ import { ToastService } from '../../../core/services/toast.service';
     } @else if (user) {
       <app-page-header title="users.detailsTitle">
         <a routerLink="/users" class="btn btn-outline">{{ 'common.back' | translate }}</a>
-        <a [routerLink]="['/users', user.id, 'edit']" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
+        <a [routerLink]="['/users', user.id, 'edit']" [queryParams]="{ returnTo: 'details' }" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
         <button type="button" class="btn btn-outline" (click)="showDeleteConfirm = true">{{ 'common.delete' | translate }}</button>
         @if (user.status !== suspendedStatus) {
           <button type="button" class="btn btn-outline" (click)="showSuspendConfirm = true">{{ 'common.suspend' | translate }}</button>

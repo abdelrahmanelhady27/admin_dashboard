@@ -112,7 +112,9 @@
     "confirmSuspend": "هل أنت متأكد من إيقاف هذا الحساب؟",
     "confirmActivate": "هل أنت متأكد من تفعيل هذا الحساب؟",
     "accountSecurity": "أمان الحساب",
-    "password": "كلمة المرور"
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة مرور المستخدم...",
+    "generatePassword": "توليد"
   },
   "servicePages": {
     "serviceName": "اسم الخدمة",

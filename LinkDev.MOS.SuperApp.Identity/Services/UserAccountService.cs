@@ -151,5 +151,20 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
 
             return _mapper.Map<UserAccountDto>(user);
         }
+
+        public async Task<UserAccountDto?> TouchAccountAsync(int id)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+            if (user == null) return null;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"User account touch failed: {errors}");
+            }
+
+            return _mapper.Map<UserAccountDto>(user);
+        }
     }
 }

@@ -114,6 +114,7 @@ export class ServicePageEditComponent implements OnInit {
   uploading = false;
   showCancelConfirm = false;
   private initialEditorsBound = false;
+  private readonly returnTo = this.route.snapshot.queryParamMap.get('returnTo') ?? 'details';
   readonly maxDesc = MAX_DESCRIPTION_LENGTH;
   readonly maxDuration = MAX_PROCESSING_DURATION_LENGTH;
   readonly canPublish = this.auth.hasPermission(ContentType.ServiceIntroPage, 'publish');
@@ -184,7 +185,7 @@ export class ServicePageEditComponent implements OnInit {
       next: () => {
         this.saving = false;
         this.toast.success('messages.savedAsDraft');
-        this.router.navigate(['/service-pages', this.page!.id]);
+        this.navigateBack();
       },
       error: (err) => {
         this.saving = false;
@@ -207,7 +208,7 @@ export class ServicePageEditComponent implements OnInit {
       next: () => {
         this.saving = false;
         this.toast.success('messages.publishedSuccessfully');
-        this.router.navigate(['/service-pages', this.page!.id]);
+        this.navigateBack();
       },
       error: (err) => {
         this.saving = false;
@@ -218,7 +219,15 @@ export class ServicePageEditComponent implements OnInit {
 
   confirmCancel(): void {
     this.showCancelConfirm = false;
+    this.navigateBack();
+  }
+
+  private navigateBack(): void {
     if (!this.page) return;
+    if (this.returnTo === 'list') {
+      this.router.navigate(['/service-pages']);
+      return;
+    }
     this.router.navigate(['/service-pages', this.page.id]);
   }
 

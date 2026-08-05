@@ -110,7 +110,11 @@
     "contentType": "Content Type",
     "confirmDelete": "Are you sure you want to remove this user from the dashboard?",
     "confirmSuspend": "Are you sure you want to suspend this user account?",
-    "confirmActivate": "Are you sure you want to activate this user account?"
+    "confirmActivate": "Are you sure you want to activate this user account?",
+    "accountSecurity": "Account Security",
+    "password": "Password",
+    "passwordPlaceholder": "Enter user password...",
+    "generatePassword": "Generate"
   },
   "servicePages": {
     "serviceName": "Service Name",

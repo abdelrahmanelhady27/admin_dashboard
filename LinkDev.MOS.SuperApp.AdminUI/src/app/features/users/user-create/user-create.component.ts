@@ -77,9 +77,19 @@ import { ToastService } from '../../../core/services/toast.service';
       @if (selectedUser && selectedUser.status === activeStatus) {
         <div class="form-section">
           <h4 class="form-section__title">{{ 'users.accountSecurity' | translate }}</h4>
-          <div style="margin-bottom:1rem; max-width:400px">
+          <div style="margin-bottom:1rem; max-width:480px">
             <label>{{ 'users.password' | translate }}</label>
-            <input type="password" class="form-input" [(ngModel)]="password" placeholder="Enter user password..." style="width:100%" />
+            <div class="password-row">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-input"
+                [(ngModel)]="password"
+                [placeholder]="'users.passwordPlaceholder' | translate"
+                style="flex:1; width:auto" />
+              <button type="button" class="btn btn-outline" (click)="generatePassword()">
+                {{ 'users.generatePassword' | translate }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -111,6 +121,7 @@ import { ToastService } from '../../../core/services/toast.service';
     label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
     .alert-error { background: var(--danger-light); color: var(--danger-color); padding: 0.75rem; border-radius: var(--radius-md); margin-top: 1rem; }
     .checkbox-label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; }
+    .password-row { display: flex; gap: 0.75rem; align-items: center; }
   `]
 })
 export class UserCreateComponent {
@@ -126,6 +137,7 @@ export class UserCreateComponent {
   selectedUser: StaticUser | null = null;
   permissions: PermissionSet[] = Object.values(ContentType).map(createEmptyPermissionSet);
   password = '';
+  showPassword = false;
 
   readonly allContentTypes = Object.values(ContentType);
   readonly contentTypes = Object.values(ContentType);
@@ -143,6 +155,7 @@ export class UserCreateComponent {
     this.selectedUser = null;
     this.permissions = Object.values(ContentType).map(createEmptyPermissionSet);
     this.password = '';
+    this.showPassword = false;
 
     this.staticUserService.search(this.searchForm.value.term!).subscribe({
       next: (data) => this.searchResults = data,
@@ -154,6 +167,28 @@ export class UserCreateComponent {
     this.selectedUser = user;
     this.permissions = Object.values(ContentType).map(createEmptyPermissionSet);
     this.password = '';
+    this.showPassword = false;
+  }
+
+  generatePassword(): void {
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lower = 'abcdefghijkmnopqrstuvwxyz';
+    const digits = '23456789';
+    const special = '!@#$%&*?';
+    const all = upper + lower + digits + special;
+    const pick = (chars: string) => chars[Math.floor(Math.random() * chars.length)];
+
+    const required = [pick(upper), pick(lower), pick(digits), pick(special)];
+    const rest = Array.from({ length: 8 }, () => pick(all));
+    const chars = [...required, ...rest];
+
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+
+    this.password = chars.join('');
+    this.showPassword = true;
   }
 
   onPermissionsChange(perms: PermissionSet[]): void {

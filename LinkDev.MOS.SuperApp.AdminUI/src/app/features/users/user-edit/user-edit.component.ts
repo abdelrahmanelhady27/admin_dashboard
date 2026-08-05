@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../../../core/services/users.service';
 import { DashboardUser } from '../../../core/models/user.model';
 import { ContentType } from '../../../core/models/enums';
@@ -14,7 +14,7 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'app-user-edit',
   standalone: true,
   imports: [
-    RouterLink, PageHeaderComponent, StatusBadgeComponent,
+    PageHeaderComponent, StatusBadgeComponent,
     PermissionMatrixComponent, TranslatePipe
   ],
   template: `
@@ -35,7 +35,7 @@ import { ToastService } from '../../../core/services/toast.service';
 
         <div class="form-actions">
           <button type="button" class="btn btn-primary" (click)="save()">{{ 'common.save' | translate }}</button>
-          <a [routerLink]="['/users', user.id]" class="btn btn-outline">{{ 'common.cancel' | translate }}</a>
+          <button type="button" class="btn btn-outline" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
         </div>
       </div>
     }
@@ -44,7 +44,6 @@ import { ToastService } from '../../../core/services/toast.service';
     .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-color); }
     .readonly-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
     label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
-    h4 { margin: 0 0 0.75rem; }
     .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
   `]
 })
@@ -57,6 +56,7 @@ export class UserEditComponent {
   user: DashboardUser | null = null;
   permissions: PermissionSet[] = [];
   readonly allContentTypes = Object.values(ContentType);
+  private readonly returnTo = this.route.snapshot.queryParamMap.get('returnTo') ?? 'details';
 
   ngOnInit(): void {
     const id = +this.route.snapshot.paramMap.get('id')!;
@@ -79,9 +79,22 @@ export class UserEditComponent {
     this.usersService.update(this.user.id, this.permissions).subscribe({
       next: () => {
         this.toast.success('messages.userUpdated');
-        this.router.navigate(['/users', this.user?.id]);
+        this.navigateBack();
       },
       error: () => this.toast.error('common.error')
     });
+  }
+
+  cancel(): void {
+    this.navigateBack();
+  }
+
+  private navigateBack(): void {
+    if (!this.user) return;
+    if (this.returnTo === 'list') {
+      this.router.navigate(['/users']);
+      return;
+    }
+    this.router.navigate(['/users', this.user.id]);
   }
 }

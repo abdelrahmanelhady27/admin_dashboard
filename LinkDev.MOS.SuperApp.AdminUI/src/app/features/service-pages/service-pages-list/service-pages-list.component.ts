@@ -73,7 +73,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
                 <td class="u-table__actions">
                   <a [routerLink]="['/service-pages', page.id]" class="btn-icon" [title]="'common.view' | translate">👁</a>
                   @if (canEdit) {
-                    <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn-icon" [title]="'common.edit' | translate">✏</a>
+                    <a [routerLink]="['/service-pages', page.id, 'edit']" [queryParams]="{ returnTo: 'list' }" class="btn-icon" [title]="'common.edit' | translate">✏</a>
                   }
                   @if (canDelete) {
                     <button type="button" class="btn-icon" (click)="confirmDelete(page)" [title]="'common.delete' | translate">🗑</button>

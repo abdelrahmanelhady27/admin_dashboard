@@ -94,7 +94,7 @@ import { ToastService } from '../../../core/services/toast.service';
                 <td>
                   <div class="u-table__actions">
                     <a [routerLink]="['/users', user.id]" class="btn-icon" [title]="'common.view' | translate">👁</a>
-                    <a [routerLink]="['/users', user.id, 'edit']" class="btn-icon" [title]="'common.edit' | translate">✏</a>
+                    <a [routerLink]="['/users', user.id, 'edit']" [queryParams]="{ returnTo: 'list' }" class="btn-icon" [title]="'common.edit' | translate">✏</a>
                     <button type="button" class="btn-icon" (click)="confirmDelete(user)" [title]="'common.delete' | translate">🗑</button>
                     @if (user.status !== suspendedStatus) {
                       <button type="button" class="btn-icon" (click)="confirmSuspend(user)" [title]="'common.suspend' | translate">⏸</button>

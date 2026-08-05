@@ -31,7 +31,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
       <app-page-header title="servicePages.detailsTitle">
         <a routerLink="/service-pages" class="btn btn-outline">{{ 'common.back' | translate }}</a>
         @if (canEdit) {
-          <a [routerLink]="['/service-pages', page.id, 'edit']" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
+          <a [routerLink]="['/service-pages', page.id, 'edit']" [queryParams]="{ returnTo: 'details' }" class="btn btn-primary">{{ 'common.edit' | translate }}</a>
         }
         @if (canPublish && (page.status === draftStatus || page.status === unpublishedStatus)) {
           <button type="button" class="btn btn-primary" (click)="showPublishConfirm = true">{{ 'common.publish' | translate }}</button>

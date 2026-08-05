@@ -113,13 +113,15 @@ namespace LinkDev.MOS.SuperApp.Business.Services.Users
 
             await SavePermissionsAsync(id, permissions);
 
+            var updatedAcc = await _userAccountService.TouchAccountAsync(id) ?? acc;
+
             await _auditLogService.LogAsync(
                 AuditActionType.Update,
                 AuditEntityType.User,
-                acc.FullName ?? acc.Email ?? id.ToString(),
+                updatedAcc.FullName ?? updatedAcc.Email ?? id.ToString(),
                 id);
 
-            var userDto = _mapper.Map<UserDto>(acc);
+            var userDto = _mapper.Map<UserDto>(updatedAcc);
             userDto.Permissions = permissions;
             return userDto;
         }
