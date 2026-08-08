@@ -52,6 +52,14 @@
     "clearFilters": "مسح جميع الفلاتر",
     "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
   },
+  "pagination": {
+    "showing": "عرض",
+    "of": "من",
+    "rowsPerPage": "صفوف لكل صفحة",
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة"
+  },
   "sidebar": {
     "collapse": "طي",
     "expand": "توسيع"
@@ -238,7 +246,9 @@
     "date": "التاريخ/الوقت",
     "searchPlaceholder": "ابحث باسم الكيان أو المنفّذ...",
     "allActions": "كل العمليات",
-    "allEntityTypes": "كل أنواع الكيانات"
+    "allEntityTypes": "كل أنواع الكيانات",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ"
   },
   "auditActions": {
     "Create": "إنشاء",

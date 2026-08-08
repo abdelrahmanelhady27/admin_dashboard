@@ -12,6 +12,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
 import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
@@ -22,7 +23,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
   imports: [
     ReactiveFormsModule, RouterLink, DatePipe, PageHeaderComponent,
     StatusBadgeComponent, EmptyStateComponent, SkeletonComponent,
-    ConfirmDialogComponent, TranslatePipe
+    ConfirmDialogComponent, PaginatorComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="nav.servicePages" subtitle="servicePages.listSubtitle">
@@ -32,17 +33,27 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
     </app-page-header>
 
     <div class="filter-bar">
-      <form [formGroup]="filterForm" (ngSubmit)="load()">
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
         <div class="filter-grid">
           <input class="form-input" formControlName="search" [placeholder]="'servicePages.searchPlaceholder' | translate" />
-          <select formControlName="status">
+          <select class="form-select" formControlName="status">
             <option value="">{{ 'common.allStatuses' | translate }}</option>
-            <option value="Draft">{{ 'status.Draft' | translate }}</option>
-            <option value="Published">{{ 'status.Published' | translate }}</option>
+            @for (s of statuses; track s) {
+              <option [value]="s">{{ 'status.' + s | translate }}</option>
+            }
           </select>
           <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
+          <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
       </form>
+      @if (activeFilters.length) {
+        <div class="filter-chips">
+          @for (chip of activeFilters; track chip.key) {
+            <span class="filter-chip">{{ chip.label }} <button type="button" class="filter-chip__remove" (click)="removeFilter(chip.key)">✕</button></span>
+          }
+          <button type="button" class="btn btn-outline btn-sm" (click)="resetFilters()">{{ 'common.clearFilters' | translate }}</button>
+        </div>
+      }
     </div>
 
     @if (loading) {
@@ -90,6 +101,14 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
           </tbody>
         </table>
       </div>
+
+      <app-paginator
+        [pageNumber]="pageNumber"
+        [pageSize]="pageSize"
+        [totalCount]="totalCount"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
     }
 
     <app-confirm-dialog
@@ -110,7 +129,11 @@ export class ServicePagesListComponent implements OnInit {
 
   pages: ServiceIntroPage[] = [];
   loading = true;
+  pageNumber = 1;
+  pageSize = 10;
+  totalCount = 0;
   filterForm = this.fb.group({ search: [''], status: [''] });
+  readonly statuses = Object.values(PageStatus);
   readonly draftStatus = PageStatus.Draft;
   readonly publishedStatus = PageStatus.Published;
   readonly canCreate = this.auth.hasPermission(ContentType.ServiceIntroPage, 'create');
@@ -121,17 +144,47 @@ export class ServicePagesListComponent implements OnInit {
   showDeleteConfirm = false;
   pageToDelete: ServiceIntroPage | null = null;
 
+  get activeFilters(): { key: string; label: string }[] {
+    const chips: { key: string; label: string }[] = [];
+    const v = this.filterForm.value;
+    if (v.search) chips.push({ key: 'search', label: v.search });
+    if (v.status) chips.push({ key: 'status', label: v.status });
+    return chips;
+  }
+
   ngOnInit(): void { this.load(); }
+
+  applyFilters(): void {
+    this.pageNumber = 1;
+    this.load();
+  }
+
+  resetFilters(): void {
+    this.filterForm.reset({ search: '', status: '' });
+    this.pageNumber = 1;
+    this.load();
+  }
+
+  removeFilter(key: string): void {
+    this.filterForm.patchValue({ [key]: '' });
+    this.pageNumber = 1;
+    this.load();
+  }
 
   load(): void {
     this.loading = true;
     const v = this.filterForm.value;
     this.servicePages.getAll({
       search: v.search || undefined,
-      status: (v.status as PageStatus) || undefined
+      status: (v.status as PageStatus) || undefined,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize
     }).subscribe({
-      next: (data) => {
-        this.pages = data;
+      next: (result) => {
+        this.pages = result.items;
+        this.totalCount = result.totalCount;
+        this.pageNumber = result.pageNumber;
+        this.pageSize = result.pageSize;
         this.loading = false;
       },
       error: (err) => {
@@ -139,6 +192,17 @@ export class ServicePagesListComponent implements OnInit {
         this.toast.error(resolveApiErrorKey(err));
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber = page;
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageNumber = 1;
+    this.load();
   }
 
   getServiceName(page: ServiceIntroPage): string {

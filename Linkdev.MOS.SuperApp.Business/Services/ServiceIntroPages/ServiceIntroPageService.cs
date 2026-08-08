@@ -1,4 +1,5 @@
 using AutoMapper;
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using LinkDev.MOS.SuperApp.Business.Interfaces;
 using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
@@ -34,10 +35,23 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
             _auditLogService = auditLogService;
         }
 
-        public async Task<IEnumerable<ServiceIntroPageDto>> GetAllAsync(string? search, string? status)
+        public async Task<PagedResult<ServiceIntroPageDto>> GetAllAsync(ServiceIntroPageSearchDto request)
         {
-            var pages = await _pageRepo.GetAllWithDetailsAsync(search, status);
-            return pages.Select(MapToDto).ToList();
+            var (items, totalCount) = await _pageRepo.GetAllWithDetailsAsync(
+                request.Search,
+                request.Status,
+                request.PageNumber,
+                request.PageSize,
+                request.SortBy,
+                request.SortDescending);
+
+            return new PagedResult<ServiceIntroPageDto>
+            {
+                Items = items.Select(MapToDto).ToList(),
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
 
         public async Task<ServiceIntroPageDto?> GetByIdAsync(int id)

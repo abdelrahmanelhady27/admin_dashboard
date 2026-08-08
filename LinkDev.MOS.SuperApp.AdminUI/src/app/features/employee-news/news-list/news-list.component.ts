@@ -9,6 +9,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
 
@@ -17,7 +18,7 @@ import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
   standalone: true,
   imports: [
     ReactiveFormsModule, RouterLink, DatePipe, PageHeaderComponent,
-    StatusBadgeComponent, EmptyStateComponent, SkeletonComponent, TranslatePipe, TruncatePipe
+    StatusBadgeComponent, EmptyStateComponent, SkeletonComponent, PaginatorComponent, TranslatePipe, TruncatePipe
   ],
   template: `
     <app-page-header title="nav.employeeNews" subtitle="news.listSubtitle">
@@ -25,20 +26,29 @@ import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
     </app-page-header>
 
     <div class="filter-bar">
-      <form [formGroup]="filterForm" (ngSubmit)="load()">
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
         <div class="filter-grid">
           <input class="form-input" formControlName="search" [placeholder]="'news.searchPlaceholder' | translate" />
-          <select formControlName="status">
+          <select class="form-select" formControlName="status">
             <option value="">{{ 'common.allStatuses' | translate }}</option>
             @for (s of statuses; track s) { <option [value]="s">{{ 'status.' + s | translate }}</option> }
           </select>
-          <select formControlName="category">
+          <select class="form-select" formControlName="category">
             <option value="">{{ 'news.allCategories' | translate }}</option>
             @for (c of categories; track c) { <option [value]="c">{{ 'newsCategories.' + c | translate }}</option> }
           </select>
           <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
+          <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
       </form>
+      @if (activeFilters.length) {
+        <div class="filter-chips">
+          @for (chip of activeFilters; track chip.key) {
+            <span class="filter-chip">{{ chip.label }} <button type="button" class="filter-chip__remove" (click)="removeFilter(chip.key)">✕</button></span>
+          }
+          <button type="button" class="btn btn-outline btn-sm" (click)="resetFilters()">{{ 'common.clearFilters' | translate }}</button>
+        </div>
+      }
     </div>
 
     @if (loading) {
@@ -80,6 +90,14 @@ import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
           </tbody>
         </table>
       </div>
+
+      <app-paginator
+        [pageNumber]="pageNumber"
+        [pageSize]="pageSize"
+        [totalCount]="totalCount"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
     }
   `,
 })
@@ -89,21 +107,68 @@ export class NewsListComponent implements OnInit {
 
   loading = true;
   newsItems: EmployeeNews[] = [];
+  pageNumber = 1;
+  pageSize = 10;
+  totalCount = 0;
   readonly statuses = Object.values(NewsStatus);
   readonly categories = Object.values(NewsCategory);
   filterForm = this.fb.group({ search: [''], status: [''], category: [''] });
 
+  get activeFilters(): { key: string; label: string }[] {
+    const chips: { key: string; label: string }[] = [];
+    const v = this.filterForm.value;
+    if (v.search) chips.push({ key: 'search', label: v.search });
+    if (v.status) chips.push({ key: 'status', label: v.status });
+    if (v.category) chips.push({ key: 'category', label: v.category });
+    return chips;
+  }
+
   ngOnInit(): void { this.load(); }
+
+  applyFilters(): void {
+    this.pageNumber = 1;
+    this.load();
+  }
+
+  resetFilters(): void {
+    this.filterForm.reset({ search: '', status: '', category: '' });
+    this.pageNumber = 1;
+    this.load();
+  }
+
+  removeFilter(key: string): void {
+    this.filterForm.patchValue({ [key]: '' });
+    this.pageNumber = 1;
+    this.load();
+  }
+
   load(): void {
     this.loading = true;
     setTimeout(() => {
       const v = this.filterForm.value;
-      this.newsItems = this.newsService.getAll({
+      const result = this.newsService.getPaged({
         search: v.search || undefined,
         status: (v.status as NewsStatus) || undefined,
-        category: (v.category as NewsCategory) || undefined
+        category: (v.category as NewsCategory) || undefined,
+        pageNumber: this.pageNumber,
+        pageSize: this.pageSize
       });
+      this.newsItems = result.items;
+      this.totalCount = result.totalCount;
+      this.pageNumber = result.pageNumber;
+      this.pageSize = result.pageSize;
       this.loading = false;
     }, 350);
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber = page;
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageNumber = 1;
+    this.load();
   }
 }

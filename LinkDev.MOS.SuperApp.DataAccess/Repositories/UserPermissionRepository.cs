@@ -1,6 +1,7 @@
 using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories;
 using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using LinkDev.MOS.SuperApp.Domain.Entities.Permission;
+using LinkDev.MOS.SuperApp.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
@@ -33,6 +34,16 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
         public IEnumerable<UserPermission> GetAllByUserId(int userId)
         {
             return _context.UserPermissions.Where(p => p.UserId == userId).ToList();
+        }
+
+        public async Task<IReadOnlyList<int>> GetUserIdsWithFeatureReadAsync(FeatureType feature)
+        {
+            return await _context.UserPermissions
+                .AsNoTracking()
+                .Where(p => p.Feature == feature && p.Permission == PermissionAction.Read)
+                .Select(p => p.UserId)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<UserPermission> GetByIdAsync(int id)

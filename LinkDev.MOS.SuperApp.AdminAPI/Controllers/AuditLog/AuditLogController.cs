@@ -1,4 +1,5 @@
 using LinkDev.MOS.SuperApp.Business.DTOs.AuditLogs;
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Domain.Enums;
 using LinkDev.MOS.SuperApp.AdminAPI.Filters;
 using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
@@ -22,16 +23,12 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.AuditLog
 
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
-        public async Task<ActionResult<IEnumerable<AuditLogDto>>> GetAll(
-            [FromQuery] string? search,
-            [FromQuery] string? actionType,
-            [FromQuery] string? entityType,
-            [FromQuery] DateTime? from,
-            [FromQuery] DateTime? to)
+        public async Task<ActionResult<PagedResult<AuditLogDto>>> GetAll(
+            [FromQuery] AuditLogSearchDto request)
         {
             try
             {
-                var logs = await _auditLogService.GetAllAsync(search, actionType, entityType, from, to);
+                var logs = await _auditLogService.GetAllAsync(request);
                 return Ok(logs);
             }
             catch (Exception ex)

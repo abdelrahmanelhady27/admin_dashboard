@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { DashboardUser } from '../models/user.model';
 import { ContentType, UserStatus } from '../models/enums';
 import { PermissionSet } from '../models/permission.model';
+import { PagedRequest, PagedResult } from '../models/paged-result.model';
 import { environment } from '../../../environments/environment.dev';
 
 const FEATURE_TYPE_MAP: Record<number, ContentType> = {
@@ -48,7 +49,7 @@ function normalizeUser(user: DashboardUser): DashboardUser {
   };
 }
 
-export interface UserFilter {
+export interface UserFilter extends PagedRequest {
   search?: string;
   status?: UserStatus | '';
   contentType?: ContentType | '';
@@ -63,7 +64,7 @@ export class UsersService {
     return 0;
   }
 
-  getAll(filter?: UserFilter): Observable<DashboardUser[]> {
+  getAll(filter?: UserFilter): Observable<PagedResult<DashboardUser>> {
     let params = new HttpParams();
     if (filter?.search) {
       params = params.set('search', filter.search);
@@ -74,8 +75,19 @@ export class UsersService {
     if (filter?.contentType) {
       params = params.set('contentType', filter.contentType);
     }
-    return this.http.get<DashboardUser[]>(this.apiUrl, { params }).pipe(
-      map((users) => users.map(normalizeUser))
+    params = params.set('pageNumber', String(filter?.pageNumber ?? 1));
+    params = params.set('pageSize', String(filter?.pageSize ?? 10));
+    if (filter?.sortBy) {
+      params = params.set('sortBy', filter.sortBy);
+    }
+    if (filter?.sortDescending !== undefined) {
+      params = params.set('sortDescending', String(filter.sortDescending));
+    }
+    return this.http.get<PagedResult<DashboardUser>>(this.apiUrl, { params }).pipe(
+      map((result) => ({
+        ...result,
+        items: (result.items ?? []).map(normalizeUser)
+      }))
     );
   }
 

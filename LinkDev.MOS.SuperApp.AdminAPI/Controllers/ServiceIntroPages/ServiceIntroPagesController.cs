@@ -1,3 +1,4 @@
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using LinkDev.MOS.SuperApp.Domain.Enums;
 using LinkDev.MOS.SuperApp.AdminAPI.Filters;
@@ -26,13 +27,12 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.ServiceIntroPages
         // GET: api/service-intro-pages
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
-        public async Task<ActionResult<IEnumerable<ServiceIntroPageDto>>> GetAll(
-            [FromQuery] string? search,
-            [FromQuery] string? status)
+        public async Task<ActionResult<PagedResult<ServiceIntroPageDto>>> GetAll(
+            [FromQuery] ServiceIntroPageSearchDto request)
         {
             try
             {
-                var pages = await _service.GetAllAsync(search, status);
+                var pages = await _service.GetAllAsync(request);
                 return Ok(pages);
             }
             catch (Exception ex)

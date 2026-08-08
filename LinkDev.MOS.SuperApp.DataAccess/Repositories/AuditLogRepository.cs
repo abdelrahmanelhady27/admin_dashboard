@@ -13,12 +13,16 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
         {
         }
 
-        public async Task<IEnumerable<AuditLog>> SearchAsync(
+        public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> SearchAsync(
             string? search,
             string? actionType,
             string? entityType,
             DateTime? from,
-            DateTime? to)
+            DateTime? to,
+            int pageNumber,
+            int pageSize,
+            string? sortBy,
+            bool sortDescending)
         {
             var query = _context.AuditLogs.AsQueryable();
 
@@ -52,9 +56,38 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
                 query = query.Where(x => x.PerformedAt <= to.Value);
             }
 
-            return await query
-                .OrderByDescending(x => x.PerformedAt)
+            var totalCount = await query.CountAsync();
+
+            query = ApplySort(query, sortBy, sortDescending);
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return (items, totalCount);
+        }
+
+        private static IQueryable<AuditLog> ApplySort(
+            IQueryable<AuditLog> query,
+            string? sortBy,
+            bool sortDescending)
+        {
+            return (sortBy?.Trim().ToLowerInvariant()) switch
+            {
+                "entityname" => sortDescending
+                    ? query.OrderByDescending(x => x.EntityName)
+                    : query.OrderBy(x => x.EntityName),
+                "performedby" => sortDescending
+                    ? query.OrderByDescending(x => x.PerformedBy)
+                    : query.OrderBy(x => x.PerformedBy),
+                "performedat" => sortDescending
+                    ? query.OrderByDescending(x => x.PerformedAt)
+                    : query.OrderBy(x => x.PerformedAt),
+                _ => sortDescending
+                    ? query.OrderByDescending(x => x.PerformedAt)
+                    : query.OrderBy(x => x.PerformedAt)
+            };
         }
     }
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import { FilesService } from '../../../core/services/files.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -123,7 +122,6 @@ export class ServicePageCreateComponent implements OnInit {
   availableServices: AvailableLinkedService[] = [];
   filteredServices: AvailableLinkedService[] = [];
   systems: SystemOption[] = [];
-  existingServiceIds = new Set<number>();
   saving = false;
   uploading = false;
 
@@ -137,15 +135,9 @@ export class ServicePageCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    forkJoin({
-      services: this.servicePages.getAvailableServices(),
-      pages: this.servicePages.getAll()
-    }).subscribe({
-      next: ({ services, pages }) => {
-        this.existingServiceIds = new Set(pages.map((p) => p.serviceId));
-        this.availableServices = services.filter(
-          (s) => s.isActive && !this.existingServiceIds.has(s.id)
-        );
+    this.servicePages.getAvailableServices().subscribe({
+      next: (services) => {
+        this.availableServices = services.filter((s) => s.isActive);
         this.systems = this.deriveSystems(this.availableServices);
       },
       error: (err) => this.toast.error(resolveApiErrorKey(err))
@@ -231,11 +223,6 @@ export class ServicePageCreateComponent implements OnInit {
     const serviceIdValue = this.form.get('serviceId')?.value;
     if (!serviceIdValue) {
       this.toast.error('validation.serviceRequired');
-      return false;
-    }
-    const serviceId = Number(serviceIdValue);
-    if (this.existingServiceIds.has(serviceId)) {
-      this.toast.error('validation.duplicateServicePage');
       return false;
     }
     return true;

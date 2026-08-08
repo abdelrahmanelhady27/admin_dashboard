@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { UsersService } from '../../core/services/users.service';
 import { ServiceIntroPagesService } from '../../core/services/service-intro-pages.service';
 import { QuickLinksService } from '../../core/services/quick-links.service';
@@ -302,10 +303,13 @@ export class DashboardComponent implements OnInit {
       }
     });
 
-    this.serviceIntroPages.getAll().subscribe({
-      next: (pages) => {
-        this.publishedPages = pages.filter((p) => p.status === PageStatus.Published).length;
-        this.draftPages = pages.filter((p) => p.status === PageStatus.Draft).length;
+    forkJoin({
+      published: this.serviceIntroPages.getAll({ status: PageStatus.Published, pageNumber: 1, pageSize: 1 }),
+      draft: this.serviceIntroPages.getAll({ status: PageStatus.Draft, pageNumber: 1, pageSize: 1 })
+    }).subscribe({
+      next: ({ published, draft }) => {
+        this.publishedPages = published.totalCount;
+        this.draftPages = draft.totalCount;
         this.loading = false;
       },
       error: () => {

@@ -10,6 +10,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -18,7 +19,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [
     ReactiveFormsModule, RouterLink, DatePipe, PageHeaderComponent, StatusBadgeComponent,
-    EmptyStateComponent, ConfirmDialogComponent, SkeletonComponent, TranslatePipe
+    EmptyStateComponent, ConfirmDialogComponent, SkeletonComponent, PaginatorComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="nav.users" subtitle="users.listSubtitle">
@@ -108,6 +109,14 @@ import { ToastService } from '../../../core/services/toast.service';
           </tbody>
         </table>
       </div>
+
+      <app-paginator
+        [pageNumber]="pageNumber"
+        [pageSize]="pageSize"
+        [totalCount]="totalCount"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
     }
 
     <app-confirm-dialog [visible]="showConfirm" [title]="confirmTitle" [message]="confirmMessage"
@@ -122,7 +131,10 @@ export class UsersListComponent implements OnInit {
 
   loading = true;
   users: DashboardUser[] = [];
-  readonly statuses = Object.values(UserStatus);
+  pageNumber = 1;
+  pageSize = 10;
+  totalCount = 0;
+  readonly statuses = [UserStatus.Active, UserStatus.Suspended];
   readonly contentTypes = Object.values(ContentType);
   readonly suspendedStatus = UserStatus.Suspended;
 
@@ -151,10 +163,15 @@ export class UsersListComponent implements OnInit {
     this.usersService.getAll({
       search: v.search || undefined,
       status: (v.status as UserStatus) || undefined,
-      contentType: (v.contentType as ContentType) || undefined
+      contentType: (v.contentType as ContentType) || undefined,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize
     }).subscribe({
-      next: (data) => {
-        this.users = data;
+      next: (result) => {
+        this.users = result.items;
+        this.totalCount = result.totalCount;
+        this.pageNumber = result.pageNumber;
+        this.pageSize = result.pageSize;
         this.loading = false;
       },
       error: () => {
@@ -164,15 +181,31 @@ export class UsersListComponent implements OnInit {
     });
   }
 
-  applyFilters(): void { this.loadUsers(); }
+  applyFilters(): void {
+    this.pageNumber = 1;
+    this.loadUsers();
+  }
 
   resetFilters(): void {
     this.filterForm.reset({ search: '', status: '', contentType: '' });
+    this.pageNumber = 1;
     this.loadUsers();
   }
 
   removeFilter(key: string): void {
     this.filterForm.patchValue({ [key]: '' });
+    this.pageNumber = 1;
+    this.loadUsers();
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber = page;
+    this.loadUsers();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageNumber = 1;
     this.loadUsers();
   }
 

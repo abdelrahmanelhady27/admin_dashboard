@@ -8,6 +8,7 @@ import { AuditActionType, AuditEntityType } from '../../core/models/enums';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
+import { PaginatorComponent } from '../../shared/components/paginator/paginator.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -15,7 +16,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   standalone: true,
   imports: [
     ReactiveFormsModule, DatePipe, PageHeaderComponent,
-    EmptyStateComponent, SkeletonComponent, TranslatePipe
+    EmptyStateComponent, SkeletonComponent, PaginatorComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="nav.auditLog" subtitle="auditLog.subtitle" />
@@ -40,6 +41,18 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
               <option [value]="e">{{ 'entityTypes.' + e | translate }}</option>
             }
           </select>
+          <input
+            class="form-input"
+            type="date"
+            formControlName="from"
+            [attr.aria-label]="'auditLog.fromDate' | translate"
+          />
+          <input
+            class="form-input"
+            type="date"
+            formControlName="to"
+            [attr.aria-label]="'auditLog.toDate' | translate"
+          />
           <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
           <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
@@ -88,6 +101,14 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
           </tbody>
         </table>
       </div>
+
+      <app-paginator
+        [pageNumber]="pageNumber"
+        [pageSize]="pageSize"
+        [totalCount]="totalCount"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
     }
   `
 })
@@ -98,13 +119,18 @@ export class AuditLogComponent implements OnInit {
 
   loading = true;
   logs: AuditLog[] = [];
+  pageNumber = 1;
+  pageSize = 10;
+  totalCount = 0;
   readonly actionTypes = Object.values(AuditActionType);
   readonly entityTypes = Object.values(AuditEntityType);
 
   filterForm = this.fb.group({
     search: [''],
     actionType: [''],
-    entityType: ['']
+    entityType: [''],
+    from: [''],
+    to: ['']
   });
 
   get activeFilters(): { key: string; label: string }[] {
@@ -113,6 +139,8 @@ export class AuditLogComponent implements OnInit {
     if (v.search) chips.push({ key: 'search', label: v.search });
     if (v.actionType) chips.push({ key: 'actionType', label: v.actionType });
     if (v.entityType) chips.push({ key: 'entityType', label: v.entityType });
+    if (v.from) chips.push({ key: 'from', label: v.from });
+    if (v.to) chips.push({ key: 'to', label: v.to });
     return chips;
   }
 
@@ -126,10 +154,17 @@ export class AuditLogComponent implements OnInit {
     this.auditLogService.getAll({
       search: v.search || undefined,
       actionType: v.actionType || undefined,
-      entityType: v.entityType || undefined
+      entityType: v.entityType || undefined,
+      from: v.from ? `${v.from}T00:00:00.000Z` : undefined,
+      to: v.to ? `${v.to}T23:59:59.999Z` : undefined,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize
     }).subscribe({
-      next: (logs) => {
-        this.logs = logs;
+      next: (result) => {
+        this.logs = result.items;
+        this.totalCount = result.totalCount;
+        this.pageNumber = result.pageNumber;
+        this.pageSize = result.pageSize;
         this.loading = false;
       },
       error: () => {
@@ -141,16 +176,30 @@ export class AuditLogComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.pageNumber = 1;
     this.load();
   }
 
   resetFilters(): void {
-    this.filterForm.reset({ search: '', actionType: '', entityType: '' });
+    this.filterForm.reset({ search: '', actionType: '', entityType: '', from: '', to: '' });
+    this.pageNumber = 1;
     this.load();
   }
 
   removeFilter(key: string): void {
     this.filterForm.patchValue({ [key]: '' });
+    this.pageNumber = 1;
+    this.load();
+  }
+
+  onPageChange(page: number): void {
+    this.pageNumber = page;
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageNumber = 1;
     this.load();
   }
 }

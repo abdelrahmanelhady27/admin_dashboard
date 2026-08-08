@@ -5,7 +5,13 @@ namespace LinkDev.MOS.SuperApp.Business.Interfaces.Repositories
 {
     public interface IServiceIntroPageRepository : IGenericRepository<ServiceIntroPage>
     {
-        Task<IEnumerable<ServiceIntroPage>> GetAllWithDetailsAsync(string? search, string? status);
+        Task<(IEnumerable<ServiceIntroPage> Items, int TotalCount)> GetAllWithDetailsAsync(
+            string? search,
+            string? status,
+            int pageNumber,
+            int pageSize,
+            string? sortBy,
+            bool sortDescending);
         Task<ServiceIntroPage?> GetByIdWithDetailsAsync(int id);
         Task<ServiceIntroPage?> GetByServiceIdAsync(int serviceId);
         Task<IEnumerable<AvailableLinkedService>> GetAvailableLinkedServicesAsync();

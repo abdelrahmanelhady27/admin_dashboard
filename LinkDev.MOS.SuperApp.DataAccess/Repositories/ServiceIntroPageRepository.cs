@@ -13,7 +13,13 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
         {
         }
 
-        public async Task<IEnumerable<ServiceIntroPage>> GetAllWithDetailsAsync(string? search, string? status)
+        public async Task<(IEnumerable<ServiceIntroPage> Items, int TotalCount)> GetAllWithDetailsAsync(
+            string? search,
+            string? status,
+            int pageNumber,
+            int pageSize,
+            string? sortBy,
+            bool sortDescending)
         {
             var query = _context.ServiceIntroPages
                 .AsNoTracking()
@@ -42,9 +48,38 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
                 query = query.Where(p => p.Status == pageStatus);
             }
 
-            return await query
-                .OrderByDescending(p => p.ModifiedAt ?? p.CreatedAt)
+            var totalCount = await query.CountAsync();
+
+            query = ApplySort(query, sortBy, sortDescending);
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return (items, totalCount);
+        }
+
+        private static IQueryable<ServiceIntroPage> ApplySort(
+            IQueryable<ServiceIntroPage> query,
+            string? sortBy,
+            bool sortDescending)
+        {
+            return (sortBy?.Trim().ToLowerInvariant()) switch
+            {
+                "createdat" => sortDescending
+                    ? query.OrderByDescending(p => p.CreatedAt)
+                    : query.OrderBy(p => p.CreatedAt),
+                "status" => sortDescending
+                    ? query.OrderByDescending(p => p.Status)
+                    : query.OrderBy(p => p.Status),
+                "modifiedat" => sortDescending
+                    ? query.OrderByDescending(p => p.ModifiedAt ?? p.CreatedAt)
+                    : query.OrderBy(p => p.ModifiedAt ?? p.CreatedAt),
+                _ => sortDescending
+                    ? query.OrderByDescending(p => p.ModifiedAt ?? p.CreatedAt)
+                    : query.OrderBy(p => p.ModifiedAt ?? p.CreatedAt)
+            };
         }
 
         public async Task<ServiceIntroPage?> GetByIdWithDetailsAsync(int id)

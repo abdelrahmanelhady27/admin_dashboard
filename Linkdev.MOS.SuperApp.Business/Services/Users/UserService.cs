@@ -1,4 +1,5 @@
 using AutoMapper;
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using LinkDev.MOS.SuperApp.Business.Interfaces;
 using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
@@ -36,31 +37,65 @@ namespace LinkDev.MOS.SuperApp.Business.Services.Users
             _auditLogService = auditLogService;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUsersAsync(string? search, string? status, string? feature)
+        public async Task<PagedResult<UserDto>> GetAllUsersAsync(UserSearchDto request)
         {
-            var accounts = await _userAccountService.GetAllAccountsAsync(search);
-            var dtos = new List<UserDto>();
+            var accounts = (await _userAccountService.GetAllAccountsAsync(request.Search, request.Status)).ToList();
 
-            foreach (var acc in accounts)
+            if (!string.IsNullOrWhiteSpace(request.ContentType) &&
+                Enum.TryParse<FeatureType>(request.ContentType, true, out var filterFeat))
             {
-                var userPermissions = _permissionRepo.GetAllByUserId(acc.Id).ToList();
-                var dto = _mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions });
-
-                if (!string.IsNullOrEmpty(status) && !dto.Status.Equals(status, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                if (!string.IsNullOrEmpty(feature) && Enum.TryParse<FeatureType>(feature, true, out var filterFeat))
-                {
-                    var hasPerm = dto.Permissions.Any(p => p.Feature == filterFeat && p.CanView);
-                    if (!hasPerm) continue;
-                }
-
-                dtos.Add(dto);
+                var userIdsWithFeature = await _permissionRepo.GetUserIdsWithFeatureReadAsync(filterFeat);
+                var allowedIds = userIdsWithFeature.ToHashSet();
+                accounts = accounts.Where(a => allowedIds.Contains(a.Id)).ToList();
             }
 
-            return dtos;
+            accounts = ApplySort(accounts, request.SortBy, request.SortDescending);
+
+            var totalCount = accounts.Count;
+            var pageAccounts = accounts
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var dtos = new List<UserDto>(pageAccounts.Count);
+            foreach (var acc in pageAccounts)
+            {
+                var userPermissions = _permissionRepo.GetAllByUserId(acc.Id).ToList();
+                dtos.Add(_mapper.Map<UserDto>(new UserMappingModel { Account = acc, Permissions = userPermissions }));
+            }
+
+            return new PagedResult<UserDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        private static List<UserAccountDto> ApplySort(
+            List<UserAccountDto> accounts,
+            string? sortBy,
+            bool sortDescending)
+        {
+            return (sortBy?.Trim().ToLowerInvariant()) switch
+            {
+                "fullname" => sortDescending
+                    ? accounts.OrderByDescending(a => a.FullName).ToList()
+                    : accounts.OrderBy(a => a.FullName).ToList(),
+                "email" => sortDescending
+                    ? accounts.OrderByDescending(a => a.Email).ToList()
+                    : accounts.OrderBy(a => a.Email).ToList(),
+                "modifiedat" => sortDescending
+                    ? accounts.OrderByDescending(a => a.ModifiedAt ?? a.CreatedAt).ToList()
+                    : accounts.OrderBy(a => a.ModifiedAt ?? a.CreatedAt).ToList(),
+                "createdat" => sortDescending
+                    ? accounts.OrderByDescending(a => a.CreatedAt).ToList()
+                    : accounts.OrderBy(a => a.CreatedAt).ToList(),
+                _ => sortDescending
+                    ? accounts.OrderByDescending(a => a.CreatedAt).ToList()
+                    : accounts.OrderBy(a => a.CreatedAt).ToList()
+            };
         }
 
         public async Task<UserDto?> GetUserByIdAsync(int id)

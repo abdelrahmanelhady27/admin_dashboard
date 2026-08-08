@@ -1,3 +1,4 @@
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ namespace LinkDev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages
 {
     public interface IServiceIntroPageService
     {
-        Task<IEnumerable<ServiceIntroPageDto>> GetAllAsync(string? search, string? status);
+        Task<PagedResult<ServiceIntroPageDto>> GetAllAsync(ServiceIntroPageSearchDto request);
         Task<ServiceIntroPageDto?> GetByIdAsync(int id);
         Task<IEnumerable<LinkedServiceDto>> GetAvailableServicesAsync();
         Task<ServiceIntroPageDto> CreateAsync(CreateServiceIntroPageDto dto);

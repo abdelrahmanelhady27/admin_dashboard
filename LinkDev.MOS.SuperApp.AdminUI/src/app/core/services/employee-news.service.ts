@@ -3,8 +3,9 @@ import { EmployeeNews } from '../models/employee-news.model';
 import { NewsCategory, NewsStatus, ReactionType } from '../models/enums';
 import { STORAGE_KEYS } from '../constants/storage-keys';
 import { MockAuthService } from './mock-auth.service';
+import { PagedRequest, PagedResult } from '../models/paged-result.model';
 
-export interface NewsFilter {
+export interface NewsFilter extends PagedRequest {
   search?: string;
   status?: NewsStatus | '';
   category?: NewsCategory | '';
@@ -35,6 +36,23 @@ export class EmployeeNewsService {
       result = result.filter((n) => n.category === filter.category);
     }
     return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  getPaged(filter?: NewsFilter): PagedResult<EmployeeNews> {
+    const pageNumber = filter?.pageNumber ?? 1;
+    const pageSize = filter?.pageSize ?? 10;
+    const filtered = this.getAll(filter);
+    const totalCount = filtered.length;
+    const start = (pageNumber - 1) * pageSize;
+    const items = filtered.slice(start, start + pageSize);
+
+    return {
+      items,
+      totalCount,
+      pageNumber,
+      pageSize,
+      totalPages: pageSize === 0 ? 0 : Math.ceil(totalCount / pageSize)
+    };
   }
 
   getById(id: string): EmployeeNews | undefined {

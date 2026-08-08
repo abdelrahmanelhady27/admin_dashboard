@@ -1,4 +1,5 @@
 using LinkDev.MOS.SuperApp.Business.DTOs.AuditLogs;
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.Interfaces;
 using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Repositories;
@@ -43,24 +44,34 @@ namespace LinkDev.MOS.SuperApp.Business.Services.AuditLogs
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<AuditLogDto>> GetAllAsync(
-            string? search,
-            string? actionType,
-            string? entityType,
-            DateTime? from,
-            DateTime? to)
+        public async Task<PagedResult<AuditLogDto>> GetAllAsync(AuditLogSearchDto request)
         {
-            var items = await _repo.SearchAsync(search, actionType, entityType, from, to);
+            var (items, totalCount) = await _repo.SearchAsync(
+                request.Search,
+                request.ActionType,
+                request.EntityType,
+                request.From,
+                request.To,
+                request.PageNumber,
+                request.PageSize,
+                request.SortBy,
+                request.SortDescending);
 
-            return items.Select(x => new AuditLogDto
+            return new PagedResult<AuditLogDto>
             {
-                Id = x.Id,
-                ActionType = x.ActionType.ToString(),
-                EntityType = x.EntityType.ToString(),
-                EntityName = x.EntityName,
-                PerformedBy = x.PerformedBy,
-                PerformedAt = x.PerformedAt
-            });
+                Items = items.Select(x => new AuditLogDto
+                {
+                    Id = x.Id,
+                    ActionType = x.ActionType.ToString(),
+                    EntityType = x.EntityType.ToString(),
+                    EntityName = x.EntityName,
+                    PerformedBy = x.PerformedBy,
+                    PerformedAt = x.PerformedAt
+                }).ToList(),
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
     }
 }

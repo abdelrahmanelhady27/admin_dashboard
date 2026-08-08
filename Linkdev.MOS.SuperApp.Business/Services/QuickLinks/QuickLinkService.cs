@@ -58,7 +58,7 @@ namespace LinkDev.MOS.SuperApp.Business.Services.QuickLinks
             var allLinks = (await _quickLinkRepo.GetAllIncludingDeletedAsync()).ToList();
             var activeLinks = allLinks.Where(q => !q.IsDeleted).ToList();
 
-            EnsureCallerMayApplyChanges(submittedServiceIds, activeLinks);
+            EnsureUserHasPermissions(submittedServiceIds, activeLinks);
             await ApplyReplaceAllAsync(submittedServiceIds, allLinks);
 
             await _unitOfWork.SaveChangesAsync();
@@ -90,7 +90,7 @@ namespace LinkDev.MOS.SuperApp.Business.Services.QuickLinks
             }
         }
 
-        private void EnsureCallerMayApplyChanges(
+        private void EnsureUserHasPermissions(
             IReadOnlyList<int> submittedServiceIds,
             IReadOnlyList<QuickLink> activeLinks)
         {

@@ -52,6 +52,14 @@
     "clearFilters": "Clear all filters",
     "error": "An error occurred. Please try again."
   },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "rowsPerPage": "Rows per page",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
   "sidebar": {
     "collapse": "Collapse",
     "expand": "Expand"
@@ -238,7 +246,9 @@
     "date": "Date/Time",
     "searchPlaceholder": "Search by entity name or performer...",
     "allActions": "All Actions",
-    "allEntityTypes": "All Entity Types"
+    "allEntityTypes": "All Entity Types",
+    "fromDate": "From date",
+    "toDate": "To date"
   },
   "auditActions": {
     "Create": "Create",

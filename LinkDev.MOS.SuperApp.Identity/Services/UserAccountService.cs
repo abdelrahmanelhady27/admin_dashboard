@@ -19,15 +19,29 @@ namespace LinkDev.MOS.SuperApp.Identity.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserAccountDto>> GetAllAccountsAsync(string? search)
+        public async Task<IEnumerable<UserAccountDto>> GetAllAccountsAsync(string? search, string? status = null)
         {
             var query = _userManager.Users.Where(u => !u.IsDeleted);
 
             if (!string.IsNullOrEmpty(search))
             {
                 var searchLower = search.ToLower();
-                query = query.Where(u => u.FullName != null && u.FullName.ToLower().Contains(searchLower) ||
-                                         u.Email != null && u.Email.ToLower().Contains(searchLower));
+                query = query.Where(u =>
+                    (u.FullName != null && u.FullName.ToLower().Contains(searchLower)) ||
+                    (u.Email != null && u.Email.ToLower().Contains(searchLower)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(u => u.IsActive);
+                }
+                else if (status.Equals("Suspended", StringComparison.OrdinalIgnoreCase)
+                      || status.Equals("Inactive", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(u => !u.IsActive);
+                }
             }
 
             var users = await query.ToListAsync();

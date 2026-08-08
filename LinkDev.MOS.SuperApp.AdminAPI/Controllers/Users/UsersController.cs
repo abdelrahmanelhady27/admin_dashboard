@@ -1,3 +1,4 @@
+using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.User;
 using LinkDev.MOS.SuperApp.Business.Interfaces.Users;
 using LinkDev.MOS.SuperApp.Domain.Constants;
@@ -20,14 +21,12 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Users
 
         // GET: api/users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAll(
-            [FromQuery] string? search,
-            [FromQuery] string? status,
-            [FromQuery] string? contentType)
+        public async Task<ActionResult<PagedResult<UserDto>>> GetAll(
+            [FromQuery] UserSearchDto request)
         {
             try
             {
-                var users = await _userService.GetAllUsersAsync(search, status, contentType);
+                var users = await _userService.GetAllUsersAsync(request);
                 return Ok(users);
             }
             catch (Exception ex)

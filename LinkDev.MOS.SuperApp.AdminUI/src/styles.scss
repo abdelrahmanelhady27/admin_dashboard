@@ -53,6 +53,7 @@ a:hover { color: var(--primary-hover); }
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
+  color: #fff;
   box-shadow: 0 4px 12px rgba(1, 170, 78, 0.25);
   transform: translateY(-1px);
 }
