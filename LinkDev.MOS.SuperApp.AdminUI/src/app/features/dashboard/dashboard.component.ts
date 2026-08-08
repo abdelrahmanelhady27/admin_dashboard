@@ -9,8 +9,9 @@ import { EmployeeNewsService } from '../../core/services/employee-news.service';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
 import { AuthService } from '../../core/services/auth.service';
-import { PageStatus, AppRoles } from '../../core/models/enums';
+import { PageStatus, AppRoles, NewsStatus } from '../../core/models/enums';
 import { AuditLog } from '../../core/models/audit-log.model';
+import { EmployeeNews } from '../../core/models/employee-news.model';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -244,7 +245,7 @@ export class DashboardComponent implements OnInit {
   loading = true;
   today = new Date();
   recentLogs: AuditLog[] = [];
-  recentNews: ReturnType<EmployeeNewsService['getLatestPublished']> = [];
+  recentNews: EmployeeNews[] = [];
   chartBars = [45, 72, 58, 90, 65, 80];
   publishedPages = 0;
   draftPages = 0;
@@ -282,8 +283,16 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.publishedNews = this.news.getPublishedCount();
-    this.recentNews = this.news.getLatestPublished(4);
+    this.news.getAll({ status: NewsStatus.Published, pageNumber: 1, pageSize: 4 }).subscribe({
+      next: (result) => {
+        this.recentNews = result.items;
+        this.publishedNews = result.totalCount;
+      },
+      error: () => {
+        this.recentNews = [];
+        this.publishedNews = 0;
+      }
+    });
 
     this.quickLinks.getAll().subscribe({
       next: (links) => {
@@ -296,7 +305,7 @@ export class DashboardComponent implements OnInit {
 
     this.auditLog.getRecent(5).subscribe({
       next: (logs) => {
-        this.recentLogs = logs;
+        this.recentLogs = logs.slice(0, 5);
       },
       error: () => {
         this.recentLogs = [];

@@ -2,14 +2,14 @@ using LinkDev.MOS.SuperApp.Domain.Enums;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public class HasFeatureAttribute : Attribute
     {
-        public FeatureType Feature { get; }
+        public FeatureType[] Features { get; }
 
-        public HasFeatureAttribute(FeatureType feature)
+        public HasFeatureAttribute(params FeatureType[] features)
         {
-            Feature = feature;
+            Features = features ?? [];
         }
     }
 }

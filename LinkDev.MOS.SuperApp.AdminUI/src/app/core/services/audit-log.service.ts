@@ -46,9 +46,10 @@ export class AuditLogService {
     return this.http.get<PagedResult<AuditLog>>(this.apiUrl, { params });
   }
 
-  getRecent(limit = 10): Observable<AuditLog[]> {
-    return this.getAll({ pageNumber: 1, pageSize: limit }).pipe(
-      map((result) => result.items ?? [])
+  getRecent(limit = 5): Observable<AuditLog[]> {
+    const size = Math.max(1, limit);
+    return this.getAll({ pageNumber: 1, pageSize: size }).pipe(
+      map((result) => (result.items ?? []).slice(0, size))
     );
   }
 }

@@ -40,7 +40,10 @@
     "delete": "حذف",
     "suspend": "إيقاف حساب",
     "activate": "تفعيل حساب",
+    "deactivate": "إلغاء التفعيل",
+    "activateItem": "تفعيل",
     "add": "إضافة",
+    "create": "إنشاء",
     "addUser": "إضافة مستخدم",
     "createNews": "إنشاء خبر",
     "confirm": "تأكيد",
@@ -50,7 +53,12 @@
     "loading": "جاري التحميل...",
     "dragDropHint": "اسحب وأفلت أو انقر للتصفح",
     "clearFilters": "مسح جميع الفلاتر",
-    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "none": "لا يوجد",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "status": "الحالة",
+    "remove": "إزالة"
   },
   "pagination": {
     "showing": "عرض",
@@ -199,7 +207,38 @@
     "emptyState": "لا توجد أخبار حاليًا",
     "confirmPublish": "هل أنت متأكد من رغبتك في نشر الخبر؟",
     "confirmUnpublish": "هل أنت متأكد من رغبتك في إلغاء نشر الخبر؟",
-    "confirmDelete": "هل أنت متأكد من حذف هذا الخبر؟"
+    "confirmDelete": "هل أنت متأكد من حذف هذا الخبر؟",
+    "confirmCancel": "هل أنت متأكد من الإلغاء؟ سيتم فقدان التغييرات غير المحفوظة.",
+    "manageCategories": "إدارة التصنيفات",
+    "manageEmojis": "إدارة الرموز التعبيرية",
+    "categoriesSubtitle": "إنشاء التصنيفات وتعيين الرموز المسموحة",
+    "emojisSubtitle": "إنشاء وإدارة رموز التفاعل",
+    "categoryName": "اسم التصنيف",
+    "displayOrder": "ترتيب العرض",
+    "displayOrderHint": "اختيار ترتيب موجود يدرجه هنا ويزيح العناصر التالية للأسفل.",
+    "assignedEmojis": "الرموز المعيّنة",
+    "selectEmoji": "اختر رمزاً",
+    "emojiName": "اسم الرمز",
+    "emojiCode": "كود الرمز",
+    "createCategory": "إنشاء تصنيف",
+    "editCategory": "تعديل التصنيف",
+    "categoryDetailsTitle": "تفاصيل التصنيف",
+    "createEmoji": "إنشاء رمز",
+    "editEmoji": "تعديل الرمز",
+    "emojiDetailsTitle": "تفاصيل الرمز",
+    "coverImage": "صورة الغلاف",
+    "attachmentName": "اسم المرفق",
+    "editSubtitle": "تحديث محتوى الخبر والمرفقات",
+    "noCategories": "لا توجد تصنيفات",
+    "noEmojis": "لا توجد رموز تعبيرية",
+    "categorySearchPlaceholder": "بحث باسم التصنيف",
+    "emojiSearchPlaceholder": "بحث باسم الرمز أو الكود",
+    "confirmDeleteCategory": "هل أنت متأكد من حذف هذا التصنيف؟",
+    "confirmDeleteEmoji": "هل أنت متأكد من حذف هذا الرمز؟",
+    "confirmActivateCategory": "هل أنت متأكد من تفعيل هذا التصنيف؟",
+    "confirmDeactivateCategory": "هل أنت متأكد من إلغاء تفعيل هذا التصنيف؟",
+    "confirmActivateEmoji": "هل أنت متأكد من تفعيل هذا الرمز؟",
+    "confirmDeactivateEmoji": "هل أنت متأكد من إلغاء تفعيل هذا الرمز؟"
   },
   "newsCategories": {
     "CongratulationsHonoring": "التهاني والتكريم",
@@ -263,7 +302,9 @@
     "User": "مستخدم",
     "ServiceIntroPage": "صفحة تعريف الخدمة",
     "QuickLinks": "الروابط السريعة",
-    "EmployeeNews": "أخبار الموظفين"
+    "EmployeeNews": "أخبار الموظفين",
+    "NewsCategory": "تصنيف الأخبار",
+    "NewsEmoji": "رمز الأخبار"
   },
   "settings": {
     "subtitle": "تفضيلات التطبيق",
@@ -297,7 +338,12 @@
     "noQuickLinks": "لا توجد روابط سريعة مضافة.",
     "noAddEditPermissionQuickLinks": "ليس لديك صلاحية إضافة أو إعادة ترتيب الروابط السريعة.",
     "noDeletePermissionQuickLinks": "ليس لديك صلاحية حذف الروابط السريعة.",
-    "titleRequired": "العنوان مطلوب."
+    "titleRequired": "العنوان مطلوب.",
+    "maxAttachments": "الحد الأقصى للمرفقات هو 5.",
+    "attachmentNameRequired": "يجب إدخال اسم لكل مرفق (بحد أقصى 30 حرفاً).",
+    "categoryHasPublishedNews": "لا يمكن إلغاء تفعيل أو حذف تصنيف مستخدم في أخبار منشورة.",
+    "emojiAssignedToPublishedCategory": "لا يمكن إلغاء تفعيل أو حذف رمز معيّن لتصنيف يحتوي على أخبار منشورة.",
+    "categoryRequiredForPublish": "يرجى اختيار تصنيف نشط قبل النشر."
   },
   "messages": {
     "userAdded": "تم إضافة المستخدم وتحديد صلاحياته بنجاح",
@@ -306,6 +352,7 @@
     "userSuspended": "تم إيقاف حساب المستخدم بنجاح",
     "userActivated": "تم تفعيل حساب المستخدم بنجاح",
     "savedAsDraft": "تم الحفظ كمسودة بنجاح",
+    "savedSuccessfully": "تم الحفظ بنجاح",
     "publishedSuccessfully": "تم النشر بنجاح",
     "unpublishedSuccessfully": "تم إلغاء النشر بنجاح",
     "servicePageDeleted": "تم حذف الصفحة التعريفية للخدمة بنجاح",
@@ -314,6 +361,12 @@
     "quickLinksSaved": "تم حفظ الروابط السريعة بنجاح",
     "operationCancelled": "تم إلغاء العملية",
     "newsUpdated": "تم تحديث الخبر بنجاح",
-    "newsDeleted": "تم حذف الخبر بنجاح"
+    "newsDeleted": "تم حذف الخبر بنجاح",
+    "categoryDeleted": "تم حذف التصنيف بنجاح",
+    "categoryActivated": "تم تفعيل التصنيف بنجاح",
+    "categoryDeactivated": "تم إلغاء تفعيل التصنيف بنجاح",
+    "emojiDeleted": "تم حذف الرمز بنجاح",
+    "emojiActivated": "تم تفعيل الرمز بنجاح",
+    "emojiDeactivated": "تم إلغاء تفعيل الرمز بنجاح"
   }
 }

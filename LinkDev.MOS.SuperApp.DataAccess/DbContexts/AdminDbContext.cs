@@ -1,6 +1,7 @@
 using LinkDev.MOS.SuperApp.Domain.Common;
 using Linkdev.MOS.SuperApp.Identity.Entites;
 using LinkDev.MOS.SuperApp.Domain.Entities.AuditLog;
+using LinkDev.MOS.SuperApp.Domain.Entities.EmployeeNews;
 using LinkDev.MOS.SuperApp.Domain.Entities.Permission;
 using LinkDev.MOS.SuperApp.Domain.Entities.QuickLinks;
 using LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages;
@@ -148,5 +149,10 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
         public DbSet<AvailableLinkedService> AvailableLinkedServices { get; set; }
         public DbSet<QuickLink> QuickLinks { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<EmployeeNewsItem> EmployeeNewsItems { get; set; }
+        public DbSet<NewsAttachment> NewsAttachments { get; set; }
+        public DbSet<NewsCategory> NewsCategories { get; set; }
+        public DbSet<NewsEmoji> NewsEmojis { get; set; }
+        public DbSet<NewsCategoryEmoji> NewsCategoryEmojis { get; set; }
     }
 }

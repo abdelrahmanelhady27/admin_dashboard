@@ -3,7 +3,6 @@ import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import { STORAGE_KEYS } from './app/core/constants/storage-keys';
 import { ServicePagesService } from './app/core/services/service-pages.service';
-import { EmployeeNewsService } from './app/core/services/employee-news.service';
 
 function seedMockDataIfNeeded(): void {
   if (localStorage.getItem(STORAGE_KEYS.SEEDED) === 'true') {
@@ -12,7 +11,6 @@ function seedMockDataIfNeeded(): void {
   localStorage.setItem(STORAGE_KEYS.SYSTEMS, JSON.stringify(ServicePagesService.seedSystems()));
   localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(ServicePagesService.seedServices()));
   localStorage.setItem(STORAGE_KEYS.SERVICE_PAGES, JSON.stringify(ServicePagesService.seedPages()));
-  localStorage.setItem(STORAGE_KEYS.EMPLOYEE_NEWS, JSON.stringify(EmployeeNewsService.seedData()));
   localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
 }
 

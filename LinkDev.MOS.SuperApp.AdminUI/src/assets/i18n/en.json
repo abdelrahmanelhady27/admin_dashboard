@@ -40,7 +40,10 @@
     "delete": "Delete",
     "suspend": "Suspend Account",
     "activate": "Activate Account",
+    "deactivate": "Deactivate",
+    "activateItem": "Activate",
     "add": "Add",
+    "create": "Create",
     "addUser": "Add User",
     "createNews": "Create News",
     "confirm": "Confirm",
@@ -50,7 +53,12 @@
     "loading": "Loading...",
     "dragDropHint": "Drag & drop or click to browse",
     "clearFilters": "Clear all filters",
-    "error": "An error occurred. Please try again."
+    "error": "An error occurred. Please try again.",
+    "none": "None",
+    "active": "Active",
+    "inactive": "Inactive",
+    "status": "Status",
+    "remove": "Remove"
   },
   "pagination": {
     "showing": "Showing",
@@ -199,7 +207,38 @@
     "emptyState": "No news found",
     "confirmPublish": "Are you sure you want to publish this news item?",
     "confirmUnpublish": "Are you sure you want to unpublish this news item?",
-    "confirmDelete": "Are you sure you want to delete this news item?"
+    "confirmDelete": "Are you sure you want to delete this news item?",
+    "confirmCancel": "Are you sure you want to cancel? Unsaved changes will be lost.",
+    "manageCategories": "Manage Categories",
+    "manageEmojis": "Manage Emojis",
+    "categoriesSubtitle": "Create categories and assign allowed emojis",
+    "emojisSubtitle": "Create and manage reaction emojis",
+    "categoryName": "Category name",
+    "displayOrder": "Display order",
+    "displayOrderHint": "Choosing an existing order inserts here and shifts later items down.",
+    "assignedEmojis": "Assigned emojis",
+    "selectEmoji": "Select emoji",
+    "emojiName": "Emoji name",
+    "emojiCode": "Emoji code",
+    "createCategory": "Create Category",
+    "editCategory": "Edit Category",
+    "categoryDetailsTitle": "Category Details",
+    "createEmoji": "Create Emoji",
+    "editEmoji": "Edit Emoji",
+    "emojiDetailsTitle": "Emoji Details",
+    "coverImage": "Cover image",
+    "attachmentName": "Attachment name",
+    "editSubtitle": "Update news content and attachments",
+    "noCategories": "No categories found",
+    "noEmojis": "No emojis found",
+    "categorySearchPlaceholder": "Search by category name",
+    "emojiSearchPlaceholder": "Search by emoji name or code",
+    "confirmDeleteCategory": "Are you sure you want to delete this category?",
+    "confirmDeleteEmoji": "Are you sure you want to delete this emoji?",
+    "confirmActivateCategory": "Are you sure you want to activate this category?",
+    "confirmDeactivateCategory": "Are you sure you want to deactivate this category?",
+    "confirmActivateEmoji": "Are you sure you want to activate this emoji?",
+    "confirmDeactivateEmoji": "Are you sure you want to deactivate this emoji?"
   },
   "newsCategories": {
     "CongratulationsHonoring": "Congratulations and Honoring",
@@ -263,7 +302,9 @@
     "User": "User",
     "ServiceIntroPage": "Service Intro Page",
     "QuickLinks": "Quick Links",
-    "EmployeeNews": "Employee News"
+    "EmployeeNews": "Employee News",
+    "NewsCategory": "News Category",
+    "NewsEmoji": "News Emoji"
   },
   "settings": {
     "subtitle": "Application preferences",
@@ -294,7 +335,12 @@
     "noQuickLinks": "No quick links added.",
     "noAddEditPermissionQuickLinks": "You do not have permission to add or reorder quick links.",
     "noDeletePermissionQuickLinks": "You do not have permission to delete quick links.",
-    "titleRequired": "Title is required."
+    "titleRequired": "Title is required.",
+    "maxAttachments": "A maximum of 5 attachments is allowed.",
+    "attachmentNameRequired": "Each attachment must have a name (max 30 characters).",
+    "categoryHasPublishedNews": "Cannot deactivate or delete a category that is used by published news.",
+    "emojiAssignedToPublishedCategory": "Cannot deactivate or delete an emoji assigned to a category that has published news.",
+    "categoryRequiredForPublish": "Please select an active category before publishing."
   },
   "messages": {
     "userAdded": "User and permissions added successfully",
@@ -303,6 +349,7 @@
     "userSuspended": "User account suspended successfully",
     "userActivated": "User account activated successfully",
     "savedAsDraft": "Saved as draft successfully",
+    "savedSuccessfully": "Saved successfully",
     "publishedSuccessfully": "Published successfully",
     "unpublishedSuccessfully": "Unpublished successfully",
     "servicePageDeleted": "Service intro page deleted successfully",
@@ -311,6 +358,12 @@
     "quickLinksSaved": "Quick links saved successfully",
     "operationCancelled": "The operation has been cancelled",
     "newsUpdated": "News updated successfully",
-    "newsDeleted": "News deleted successfully"
+    "newsDeleted": "News deleted successfully",
+    "categoryDeleted": "Category deleted successfully",
+    "categoryActivated": "Category activated successfully",
+    "categoryDeactivated": "Category deactivated successfully",
+    "emojiDeleted": "Emoji deleted successfully",
+    "emojiActivated": "Emoji activated successfully",
+    "emojiDeactivated": "Emoji deactivated successfully"
   }
 }

@@ -7,12 +7,12 @@ using System.Security.Claims;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
 {
-    public class HasAnyPermissionFilter : IAsyncAuthorizationFilter
+    public class PermissionAuthorizationFilter : IAsyncAuthorizationFilter
     {
         private readonly PermissionAction[] _permissions;
         private readonly IPermissionService _permissionService;
 
-        public HasAnyPermissionFilter(PermissionAction[] permissions, IPermissionService permissionService)
+        public PermissionAuthorizationFilter(PermissionAction[] permissions, IPermissionService permissionService)
         {
             _permissions = permissions ?? [];
             _permissionService = permissionService;
@@ -27,11 +27,8 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
                 return Task.CompletedTask;
             }
 
-            var featureAttribute = context.ActionDescriptor.EndpointMetadata
-                .OfType<HasFeatureAttribute>()
-                .FirstOrDefault();
-
-            if (featureAttribute == null)
+            var features = ResolveFeatures(context);
+            if (features.Length == 0)
             {
                 context.Result = new ForbidResult();
                 return Task.CompletedTask;
@@ -46,12 +43,21 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
 
             var isSuperAdmin = user.IsInRole(AppRoles.SuperAdmin);
             if (_permissions.Length == 0
-                || !_permissions.Any(p => _permissionService.HasPermission(userId, isSuperAdmin, featureAttribute.Feature, p)))
+                || !features.Any(feature =>
+                    _permissions.Any(p => _permissionService.HasPermission(userId, isSuperAdmin, feature, p))))
             {
                 context.Result = new ForbidResult();
             }
 
             return Task.CompletedTask;
+        }
+
+        private static FeatureType[] ResolveFeatures(AuthorizationFilterContext context)
+        {
+            var featureAttr = context.ActionDescriptor.EndpointMetadata
+                .OfType<HasFeatureAttribute>()
+                .FirstOrDefault();
+            return featureAttr?.Features is { Length: > 0 } features ? features : [];
         }
     }
 }

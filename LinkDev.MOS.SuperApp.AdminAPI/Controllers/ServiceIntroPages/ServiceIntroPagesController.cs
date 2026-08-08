@@ -57,26 +57,6 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.ServiceIntroPages
             }
         }
 
-        // GET: api/service-intro-pages/published/{serviceId}
-        [HttpGet("published/{serviceId:int}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<ServiceIntroPageDto>> GetPublishedByServiceId(int serviceId)
-        {
-            try
-            {
-                var page = await _service.GetPublishedByServiceIdAsync(serviceId);
-                if (page == null)
-                {
-                    return NotFound(new { message = "Published service details page not found." });
-                }
-                return Ok(page);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
         // GET: api/service-intro-pages/5
         [HttpGet("{id:int}")]
         [HasPermission(PermissionAction.Read)]

@@ -30,7 +30,12 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Services
 
             ValidateCategory(category, extension, contentType, file.Length);
 
-            var subFolder = category == FileCategory.Video ? "videos" : "documents";
+            var subFolder = category switch
+            {
+                FileCategory.Video => "videos",
+                FileCategory.Image => "images",
+                _ => "documents"
+            };
             var webRoot = string.IsNullOrWhiteSpace(_environment.WebRootPath)
                 ? Path.Combine(_environment.ContentRootPath, "wwwroot")
                 : _environment.WebRootPath;
@@ -82,6 +87,19 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Services
                     }
 
                     if (size > _options.MaxDocumentSizeBytes)
+                    {
+                        throw new InvalidOperationException(FileStorageOptions.FileSizeExceededMessage);
+                    }
+                    break;
+
+                case FileCategory.Image:
+                    if (!_options.ImageExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase)
+                        || !_options.ImageMimeTypes.Any(m => string.Equals(m, contentType, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        throw new InvalidOperationException("The image format is not supported");
+                    }
+
+                    if (size > _options.MaxImageSizeBytes)
                     {
                         throw new InvalidOperationException(FileStorageOptions.FileSizeExceededMessage);
                     }

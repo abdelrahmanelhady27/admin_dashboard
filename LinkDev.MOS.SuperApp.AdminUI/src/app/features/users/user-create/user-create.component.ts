@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { StaticUserService } from '../../../core/services/static-user.service';
 import { UsersService } from '../../../core/services/users.service';
 import { StaticUser } from '../../../core/models/user.model';
@@ -29,9 +31,8 @@ import { ToastService } from '../../../core/services/toast.service';
       <div class="form-section">
         <h3 class="form-section__title">{{ 'users.directorySearch' | translate }}</h3>
         <p class="form-helper" style="margin-bottom:1rem">{{ 'users.directoryHint' | translate }}</p>
-        <form [formGroup]="searchForm" (ngSubmit)="search()" class="search-row">
+        <form [formGroup]="searchForm" (ngSubmit)="$event.preventDefault()" class="search-row">
           <input class="form-input" formControlName="term" [placeholder]="'users.searchDirectory' | translate" />
-          <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
         </form>
 
         @if (searchResults.length) {
@@ -124,14 +125,15 @@ import { ToastService } from '../../../core/services/toast.service';
     .password-row { display: flex; gap: 0.75rem; align-items: center; }
   `]
 })
-export class UserCreateComponent {
+export class UserCreateComponent implements OnInit {
   private readonly staticUserService = inject(StaticUserService);
   private readonly usersService = inject(UsersService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
-  searchForm = this.fb.group({ term: ['', Validators.required] });
+  searchForm = this.fb.group({ term: [''] });
   searchResults: StaticUser[] = [];
   searchAttempted = false;
   selectedUser: StaticUser | null = null;
@@ -144,20 +146,31 @@ export class UserCreateComponent {
   readonly activeStatus = UserStatus.Active;
   readonly inactiveStatus = UserStatus.Inactive;
 
-  search(): void {
-    if (this.searchForm.invalid) {
-      this.toast.warning('validation.searchTermRequired');
-      return;
-    }
+  ngOnInit(): void {
+    this.searchForm.controls.term.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((term) => this.search(term ?? ''));
+  }
 
-    this.searchAttempted = true;
-    this.searchResults = [];
+  search(term: string): void {
+    const trimmed = term.trim();
     this.selectedUser = null;
     this.permissions = Object.values(ContentType).map(createEmptyPermissionSet);
     this.password = '';
     this.showPassword = false;
 
-    this.staticUserService.search(this.searchForm.value.term!).subscribe({
+    if (!trimmed) {
+      this.searchAttempted = false;
+      this.searchResults = [];
+      return;
+    }
+
+    this.searchAttempted = true;
+    this.searchResults = [];
+
+    this.staticUserService.search(trimmed).subscribe({
       next: (data) => this.searchResults = data,
       error: () => this.toast.error('common.error')
     });

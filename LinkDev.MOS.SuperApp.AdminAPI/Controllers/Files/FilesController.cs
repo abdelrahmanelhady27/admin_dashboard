@@ -10,7 +10,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Files
     [Route("api/files")]
     [ApiController]
     [Authorize]
-    [HasFeature(FeatureType.ServiceIntroPage)]
+    [HasFeature(FeatureType.ServiceIntroPage, FeatureType.EmployeeNews)]
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
@@ -22,7 +22,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.Files
 
         // POST: api/files
         [HttpPost]
-        [HasAnyPermission(PermissionAction.Add, PermissionAction.Edit)]
+        [HasPermission(PermissionAction.Add, PermissionAction.Edit)]
         public async Task<ActionResult<UploadedFileDto>> Upload(
             IFormFile file,
             [FromForm] FileCategory category)

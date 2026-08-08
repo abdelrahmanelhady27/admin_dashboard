@@ -1,273 +1,131 @@
-import { Injectable } from '@angular/core';
-import { EmployeeNews } from '../models/employee-news.model';
-import { NewsCategory, NewsStatus, ReactionType } from '../models/enums';
-import { STORAGE_KEYS } from '../constants/storage-keys';
-import { MockAuthService } from './mock-auth.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { EmployeeNews, NewsAttachment } from '../models/employee-news.model';
+import { NewsStatus } from '../models/enums';
 import { PagedRequest, PagedResult } from '../models/paged-result.model';
+import { environment } from '../../../environments/environment.dev';
 
 export interface NewsFilter extends PagedRequest {
   search?: string;
   status?: NewsStatus | '';
-  category?: NewsCategory | '';
+  categoryId?: number | null;
+}
+
+export interface CreateEmployeeNewsRequest {
+  title: string;
+  content: string;
+  categoryId?: number | null;
+  imageUrl?: string | null;
+  imageFileName?: string | null;
+  attachments: NewsAttachment[];
+  publish: boolean;
+}
+
+export interface UpdateEmployeeNewsRequest {
+  title: string;
+  content: string;
+  categoryId?: number | null;
+  imageUrl?: string | null;
+  imageFileName?: string | null;
+  attachments: NewsAttachment[];
+  saveAsDraft?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeNewsService {
-  private news: EmployeeNews[] = [];
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/employee-news`;
 
-  constructor(
-    private readonly auth: MockAuthService
-  ) {
-    this.load();
-  }
-
-  getAll(filter?: NewsFilter): EmployeeNews[] {
-    let result = [...this.news];
+  getAll(filter?: NewsFilter): Observable<PagedResult<EmployeeNews>> {
+    let params = new HttpParams();
     if (filter?.search) {
-      const term = filter.search.toLowerCase();
-      result = result.filter(
-        (n) => n.title.toLowerCase().includes(term) || n.content.toLowerCase().includes(term)
-      );
+      params = params.set('search', filter.search);
     }
     if (filter?.status) {
-      result = result.filter((n) => n.status === filter.status);
+      params = params.set('status', filter.status);
     }
-    if (filter?.category) {
-      result = result.filter((n) => n.category === filter.category);
+    if (filter?.categoryId) {
+      params = params.set('categoryId', String(filter.categoryId));
     }
-    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
-  getPaged(filter?: NewsFilter): PagedResult<EmployeeNews> {
-    const pageNumber = filter?.pageNumber ?? 1;
-    const pageSize = filter?.pageSize ?? 10;
-    const filtered = this.getAll(filter);
-    const totalCount = filtered.length;
-    const start = (pageNumber - 1) * pageSize;
-    const items = filtered.slice(start, start + pageSize);
-
-    return {
-      items,
-      totalCount,
-      pageNumber,
-      pageSize,
-      totalPages: pageSize === 0 ? 0 : Math.ceil(totalCount / pageSize)
-    };
-  }
-
-  getById(id: string): EmployeeNews | undefined {
-    return this.news.find((n) => n.id === id);
-  }
-
-  getPublishedCount(): number {
-    return this.news.filter((n) => n.status === NewsStatus.Published).length;
-  }
-
-  getLatestPublished(limit = 3): EmployeeNews[] {
-    return this.news
-      .filter((n) => n.status === NewsStatus.Published)
-      .sort((a, b) => new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime())
-      .slice(0, limit);
-  }
-
-  create(item: Omit<EmployeeNews, 'id' | 'createdAt' | 'createdBy' | 'modifiedAt' | 'modifiedBy' | 'viewsCount' | 'reactions' | 'publishedAt'> & { publishedAt?: string | null }): EmployeeNews {
-    const now = new Date().toISOString();
-    const created: EmployeeNews = {
-      ...item,
-      id: `news-${Date.now()}`,
-      publishedAt: item.publishedAt ?? null,
-      createdAt: now,
-      createdBy: this.auth.currentUser?.fullNameEn || 'System',
-      modifiedAt: now,
-      modifiedBy: this.auth.currentUser?.fullNameEn || 'System',
-      viewsCount: 0,
-      reactions: this.defaultReactions()
-    };
-    this.news.push(created);
-    this.persist();
-    return created;
-  }
-
-  update(id: string, data: Partial<EmployeeNews>): EmployeeNews | null {
-    const index = this.news.findIndex((n) => n.id === id);
-    if (index === -1) {
-      return null;
+    params = params.set('pageNumber', String(filter?.pageNumber ?? 1));
+    params = params.set('pageSize', String(filter?.pageSize ?? 10));
+    if (filter?.sortBy) {
+      params = params.set('sortBy', filter.sortBy);
     }
-    const existing = this.news[index];
-    this.news[index] = {
-      ...existing,
-      ...data,
-      viewsCount: existing.viewsCount,
-      reactions: existing.reactions,
-      modifiedAt: new Date().toISOString(),
-      modifiedBy: this.auth.currentUser?.fullNameEn || 'System'
-    };
-    this.persist();
-    return this.news[index];
-  }
-
-  publish(id: string): EmployeeNews | null {
-    const item = this.getById(id);
-    if (!item) {
-      return null;
+    if (filter?.sortDescending !== undefined) {
+      params = params.set('sortDescending', String(filter.sortDescending));
     }
-    item.status = NewsStatus.Published;
-    item.publishedAt = new Date().toISOString();
-    item.modifiedAt = new Date().toISOString();
-    item.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
-    this.persist();
-    return item;
+    return this.http.get<PagedResult<EmployeeNews>>(this.apiUrl, { params }).pipe(
+      map((result) => ({
+        ...result,
+        items: (result.items ?? []).map(normalizeNews)
+      }))
+    );
   }
 
-  unpublish(id: string): EmployeeNews | null {
-    const item = this.getById(id);
-    if (!item) {
-      return null;
-    }
-    item.status = NewsStatus.Unpublished;
-    item.modifiedAt = new Date().toISOString();
-    item.modifiedBy = this.auth.currentUser?.fullNameEn || 'System';
-    this.persist();
-    return item;
+  getById(id: number): Observable<EmployeeNews> {
+    return this.http.get<EmployeeNews>(`${this.apiUrl}/${id}`).pipe(map(normalizeNews));
   }
 
-  delete(id: string): boolean {
-    const item = this.getById(id);
-    if (!item) {
-      return false;
-    }
-    this.news = this.news.filter((n) => n.id !== id);
-    this.persist();
-    return true;
+  create(dto: CreateEmployeeNewsRequest): Observable<EmployeeNews> {
+    return this.http
+      .post<EmployeeNews>(this.apiUrl, {
+        title: dto.title,
+        content: dto.content,
+        categoryId: dto.categoryId ?? null,
+        imageUrl: dto.imageUrl || null,
+        imageFileName: dto.imageFileName || null,
+        attachments: serializeAttachments(dto.attachments),
+        publish: dto.publish
+      })
+      .pipe(map(normalizeNews));
   }
 
-  private defaultReactions() {
-    return [
-      { type: ReactionType.Like, count: 12 },
-      { type: ReactionType.Celebrate, count: 5 },
-      { type: ReactionType.Support, count: 3 },
-      { type: ReactionType.Sad, count: 0 },
-      { type: ReactionType.Thanks, count: 2 }
-    ];
+  update(id: number, dto: UpdateEmployeeNewsRequest): Observable<EmployeeNews> {
+    return this.http
+      .put<EmployeeNews>(`${this.apiUrl}/${id}`, {
+        title: dto.title,
+        content: dto.content,
+        categoryId: dto.categoryId ?? null,
+        imageUrl: dto.imageUrl || null,
+        imageFileName: dto.imageFileName || null,
+        attachments: serializeAttachments(dto.attachments),
+        saveAsDraft: !!dto.saveAsDraft
+      })
+      .pipe(map(normalizeNews));
   }
 
-  private load(): void {
-    const raw = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_NEWS);
-    this.news = raw ? JSON.parse(raw) : [];
+  publish(id: number): Observable<EmployeeNews> {
+    return this.http.post<EmployeeNews>(`${this.apiUrl}/${id}/publish`, {}).pipe(map(normalizeNews));
   }
 
-  private persist(): void {
-    localStorage.setItem(STORAGE_KEYS.EMPLOYEE_NEWS, JSON.stringify(this.news));
+  unpublish(id: number): Observable<EmployeeNews> {
+    return this.http.post<EmployeeNews>(`${this.apiUrl}/${id}/unpublish`, {}).pipe(map(normalizeNews));
   }
 
-  static seedData(): EmployeeNews[] {
-    const now = Date.now();
-    return [
-      {
-        id: 'news-1',
-        title: 'Team Achievement Update',
-        content: 'The team completed a major project milestone successfully.',
-        category: NewsCategory.AchievementsProjects,
-        status: NewsStatus.Published,
-        attachments: [],
-        publishedAt: new Date(now - 86400000 * 2).toISOString(),
-        createdAt: new Date(now - 86400000 * 3).toISOString(),
-        createdBy: 'System Administrator',
-        modifiedAt: new Date(now - 86400000 * 2).toISOString(),
-        modifiedBy: 'System Administrator',
-        viewsCount: 145,
-        reactions: [
-          { type: ReactionType.Like, count: 24 },
-          { type: ReactionType.Celebrate, count: 18 },
-          { type: ReactionType.Support, count: 6 },
-          { type: ReactionType.Sad, count: 0 },
-          { type: ReactionType.Thanks, count: 4 }
-        ]
-      },
-      {
-        id: 'news-2',
-        title: 'Social Gathering Announcement',
-        content: 'Join us for the upcoming social event next week.',
-        category: NewsCategory.SocialEvents,
-        status: NewsStatus.Published,
-        attachments: [],
-        publishedAt: new Date(now - 86400000 * 5).toISOString(),
-        createdAt: new Date(now - 86400000 * 6).toISOString(),
-        createdBy: 'System Administrator',
-        modifiedAt: new Date(now - 86400000 * 5).toISOString(),
-        modifiedBy: 'System Administrator',
-        viewsCount: 89,
-        reactions: [
-          { type: ReactionType.Like, count: 15 },
-          { type: ReactionType.Celebrate, count: 8 },
-          { type: ReactionType.Support, count: 2 },
-          { type: ReactionType.Sad, count: 0 },
-          { type: ReactionType.Thanks, count: 1 }
-        ]
-      },
-      {
-        id: 'news-3',
-        title: 'Congratulations to Top Performers',
-        content: 'Recognizing outstanding contributions this quarter.',
-        category: NewsCategory.CongratulationsHonoring,
-        status: NewsStatus.Draft,
-        attachments: [],
-        publishedAt: null,
-        createdAt: new Date(now - 86400000).toISOString(),
-        createdBy: 'System Administrator',
-        modifiedAt: new Date(now - 86400000).toISOString(),
-        modifiedBy: 'System Administrator',
-        viewsCount: 0,
-        reactions: [
-          { type: ReactionType.Like, count: 0 },
-          { type: ReactionType.Celebrate, count: 0 },
-          { type: ReactionType.Support, count: 0 },
-          { type: ReactionType.Sad, count: 0 },
-          { type: ReactionType.Thanks, count: 0 }
-        ]
-      },
-      {
-        id: 'news-4',
-        title: 'General Policy Update',
-        content: 'Updated guidelines for remote work arrangements.',
-        category: NewsCategory.GeneralNews,
-        status: NewsStatus.Unpublished,
-        attachments: [],
-        publishedAt: new Date(now - 86400000 * 10).toISOString(),
-        createdAt: new Date(now - 86400000 * 12).toISOString(),
-        createdBy: 'System Administrator',
-        modifiedAt: new Date(now - 86400000 * 4).toISOString(),
-        modifiedBy: 'System Administrator',
-        viewsCount: 56,
-        reactions: [
-          { type: ReactionType.Like, count: 8 },
-          { type: ReactionType.Celebrate, count: 0 },
-          { type: ReactionType.Support, count: 3 },
-          { type: ReactionType.Sad, count: 1 },
-          { type: ReactionType.Thanks, count: 2 }
-        ]
-      },
-      {
-        id: 'news-5',
-        title: 'Personal Milestone Celebration',
-        content: 'Celebrating a team member personal achievement.',
-        category: NewsCategory.PersonalEvents,
-        status: NewsStatus.Published,
-        attachments: [],
-        publishedAt: new Date(now - 86400000 * 1).toISOString(),
-        createdAt: new Date(now - 86400000 * 1).toISOString(),
-        createdBy: 'System Administrator',
-        modifiedAt: new Date(now - 86400000 * 1).toISOString(),
-        modifiedBy: 'System Administrator',
-        viewsCount: 34,
-        reactions: [
-          { type: ReactionType.Like, count: 10 },
-          { type: ReactionType.Celebrate, count: 7 },
-          { type: ReactionType.Support, count: 4 },
-          { type: ReactionType.Sad, count: 0 },
-          { type: ReactionType.Thanks, count: 3 }
-        ]
-      }
-    ];
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+}
+
+function normalizeNews(item: EmployeeNews): EmployeeNews {
+  return {
+    ...item,
+    attachments: item.attachments ?? [],
+    status: item.status as NewsStatus
+  };
+}
+
+function serializeAttachments(attachments: NewsAttachment[]) {
+  return (attachments ?? [])
+    .filter((a) => !!a.name?.trim())
+    .map((a) => ({
+      id: typeof a.id === 'number' && a.id > 0 ? a.id : 0,
+      name: a.name.trim(),
+      fileUrl: a.fileUrl || null,
+      fileName: a.fileName || null,
+      fileType: a.fileType || null
+    }));
 }

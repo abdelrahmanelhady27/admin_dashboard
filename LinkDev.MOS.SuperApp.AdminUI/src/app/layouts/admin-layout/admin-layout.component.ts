@@ -89,6 +89,10 @@ export class AdminLayoutComponent implements OnDestroy {
     '/quick-links': 'nav.quickLinks',
     '/employee-news': 'nav.employeeNews',
     '/employee-news/create': 'news.createTitle',
+    '/employee-news/categories': 'news.manageCategories',
+    '/employee-news/categories/create': 'news.createCategory',
+    '/employee-news/emojis': 'news.manageEmojis',
+    '/employee-news/emojis/create': 'news.createEmoji',
     '/audit-log': 'nav.auditLog',
     '/settings': 'nav.settings'
   };
@@ -156,6 +160,10 @@ export class AdminLayoutComponent implements OnDestroy {
     if (url.match(/\/users\/[^/]+/)) return 'users.detailsTitle';
     if (url.match(/\/service-pages\/[^/]+\/edit/)) return 'servicePages.editTitle';
     if (url.match(/\/service-pages\/[^/]+/)) return 'servicePages.detailsTitle';
+    if (url.match(/\/employee-news\/categories\/[^/]+\/edit/)) return 'news.editCategory';
+    if (url.match(/\/employee-news\/categories\/[^/]+/)) return 'news.categoryDetailsTitle';
+    if (url.match(/\/employee-news\/emojis\/[^/]+\/edit/)) return 'news.editEmoji';
+    if (url.match(/\/employee-news\/emojis\/[^/]+/)) return 'news.emojiDetailsTitle';
     if (url.match(/\/employee-news\/[^/]+\/edit/)) return 'news.editTitle';
     if (url.match(/\/employee-news\/[^/]+/)) return 'news.detailsTitle';
     return 'nav.dashboard';

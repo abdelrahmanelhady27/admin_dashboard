@@ -8,7 +8,12 @@ const API_MESSAGE_TO_I18N: Record<string, string> = {
   'The file size exceeds the allowed limit': 'validation.fileSizeExceeded',
   'Please enter the question and answer': 'validation.faqIncomplete',
   'You do not have permission to add or reorder quick links.': 'validation.noAddEditPermissionQuickLinks',
-  'You do not have permission to delete quick links.': 'validation.noDeletePermissionQuickLinks'
+  'You do not have permission to delete quick links.': 'validation.noDeletePermissionQuickLinks',
+  'Cannot deactivate or delete a category that has published news': 'validation.categoryHasPublishedNews',
+  'Cannot deactivate an emoji assigned to a category that has published news': 'validation.emojiAssignedToPublishedCategory',
+  'Cannot delete an emoji assigned to a category that has published news': 'validation.emojiAssignedToPublishedCategory',
+  'Please complete the required data before publishing the news item': 'validation.completeRequiredFields',
+  'Please select an active category before publishing': 'validation.categoryRequiredForPublish'
 };
 
 /**

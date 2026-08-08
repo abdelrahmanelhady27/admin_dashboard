@@ -12,6 +12,8 @@ namespace LinkDev.MOS.SuperApp.Business.Options
 
         public long MaxDocumentSizeBytes { get; set; } = 10L * 1024 * 1024;
 
+        public long MaxImageSizeBytes { get; set; } = 3L * 1024 * 1024;
+
         public string[] VideoExtensions { get; set; } = [".mp4"];
 
         public string[] VideoMimeTypes { get; set; } = ["video/mp4"];
@@ -19,5 +21,9 @@ namespace LinkDev.MOS.SuperApp.Business.Options
         public string[] DocumentExtensions { get; set; } = [".pdf"];
 
         public string[] DocumentMimeTypes { get; set; } = ["application/pdf"];
+
+        public string[] ImageExtensions { get; set; } = [".jpg", ".jpeg", ".png", ".webp"];
+
+        public string[] ImageMimeTypes { get; set; } = ["image/jpeg", "image/png", "image/webp"];
     }
 }

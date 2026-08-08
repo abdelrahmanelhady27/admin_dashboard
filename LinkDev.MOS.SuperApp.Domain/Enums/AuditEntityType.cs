@@ -5,6 +5,8 @@ namespace LinkDev.MOS.SuperApp.Domain.Enums
         User = 1,
         ServiceIntroPage,
         QuickLinks,
-        EmployeeNews
+        EmployeeNews,
+        NewsCategory,
+        NewsEmoji
     }
 }

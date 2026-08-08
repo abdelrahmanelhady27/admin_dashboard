@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.dev';
 
-export type FileCategory = 'Video' | 'Document';
+export type FileCategory = 'Video' | 'Document' | 'Image';
 
 export interface UploadedFile {
   url: string;

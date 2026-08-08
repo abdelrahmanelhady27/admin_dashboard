@@ -36,6 +36,9 @@ namespace LinkDev.MOS.SuperApp.DataAccess
             services.AddScoped<IQuickLinkRepository, QuickLinkRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IStaticUserRepository, StaticUserRepository>();
+            services.AddScoped<IEmployeeNewsRepository, EmployeeNewsRepository>();
+            services.AddScoped<INewsCategoryRepository, NewsCategoryRepository>();
+            services.AddScoped<INewsEmojiRepository, NewsEmojiRepository>();
             services.AddScoped<IFileService, FileService>();
 
             return services;

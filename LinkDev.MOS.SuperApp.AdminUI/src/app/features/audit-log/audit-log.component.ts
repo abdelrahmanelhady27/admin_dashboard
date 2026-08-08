@@ -1,6 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuditLogService } from '../../core/services/audit-log.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuditLog } from '../../core/models/audit-log.model';
@@ -22,7 +24,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     <app-page-header title="nav.auditLog" subtitle="auditLog.subtitle" />
 
     <div class="filter-bar">
-      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <form [formGroup]="filterForm" (ngSubmit)="$event.preventDefault()">
         <div class="filter-grid">
           <input
             class="form-input"
@@ -53,7 +55,6 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
             formControlName="to"
             [attr.aria-label]="'auditLog.toDate' | translate"
           />
-          <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
           <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
       </form>
@@ -116,6 +117,7 @@ export class AuditLogComponent implements OnInit {
   private readonly auditLogService = inject(AuditLogService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
   loading = true;
   logs: AuditLog[] = [];
@@ -145,6 +147,14 @@ export class AuditLogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.pageNumber = 1;
+      this.load();
+    });
     this.load();
   }
 
@@ -175,21 +185,12 @@ export class AuditLogComponent implements OnInit {
     });
   }
 
-  applyFilters(): void {
-    this.pageNumber = 1;
-    this.load();
-  }
-
   resetFilters(): void {
     this.filterForm.reset({ search: '', actionType: '', entityType: '', from: '', to: '' });
-    this.pageNumber = 1;
-    this.load();
   }
 
   removeFilter(key: string): void {
     this.filterForm.patchValue({ [key]: '' });
-    this.pageNumber = 1;
-    this.load();
   }
 
   onPageChange(page: number): void {

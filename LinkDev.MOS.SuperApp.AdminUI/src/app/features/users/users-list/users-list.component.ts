@@ -1,7 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { UsersService } from '../../../core/services/users.service';
 import { ContentType, UserStatus } from '../../../core/models/enums';
 import { DashboardUser } from '../../../core/models/user.model';
@@ -27,7 +29,7 @@ import { ToastService } from '../../../core/services/toast.service';
     </app-page-header>
 
     <div class="filter-bar">
-      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <form [formGroup]="filterForm" (ngSubmit)="$event.preventDefault()">
         <div class="filter-grid">
           <input class="form-input" formControlName="search" [placeholder]="'users.searchPlaceholder' | translate" />
           <select class="form-select" formControlName="status">
@@ -38,7 +40,6 @@ import { ToastService } from '../../../core/services/toast.service';
             <option value="">{{ 'users.allContentTypes' | translate }}</option>
             @for (ct of contentTypes; track ct) { <option [value]="ct">{{ 'contentTypes.' + ct | translate }}</option> }
           </select>
-          <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
           <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
       </form>
@@ -128,6 +129,7 @@ export class UsersListComponent implements OnInit {
   private readonly usersService = inject(UsersService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
   loading = true;
   users: DashboardUser[] = [];
@@ -155,7 +157,17 @@ export class UsersListComponent implements OnInit {
     return chips;
   }
 
-  ngOnInit(): void { this.loadUsers(); }
+  ngOnInit(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.pageNumber = 1;
+      this.loadUsers();
+    });
+    this.loadUsers();
+  }
 
   loadUsers(): void {
     this.loading = true;
@@ -181,21 +193,12 @@ export class UsersListComponent implements OnInit {
     });
   }
 
-  applyFilters(): void {
-    this.pageNumber = 1;
-    this.loadUsers();
-  }
-
   resetFilters(): void {
     this.filterForm.reset({ search: '', status: '', contentType: '' });
-    this.pageNumber = 1;
-    this.loadUsers();
   }
 
   removeFilter(key: string): void {
     this.filterForm.patchValue({ [key]: '' });
-    this.pageNumber = 1;
-    this.loadUsers();
   }
 
   onPageChange(page: number): void {

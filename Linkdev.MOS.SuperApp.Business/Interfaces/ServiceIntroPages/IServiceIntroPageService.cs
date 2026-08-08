@@ -15,6 +15,5 @@ namespace LinkDev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages
         Task<ServiceIntroPageDto?> PublishAsync(int id);
         Task<ServiceIntroPageDto?> UnpublishAsync(int id);
         Task<bool> DeleteAsync(int id);
-        Task<ServiceIntroPageDto?> GetPublishedByServiceIdAsync(int serviceId);
     }
 }

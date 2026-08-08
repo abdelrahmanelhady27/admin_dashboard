@@ -68,7 +68,9 @@ export enum AuditEntityType {
   User = 'User',
   ServiceIntroPage = 'ServiceIntroPage',
   QuickLinks = 'QuickLinks',
-  EmployeeNews = 'EmployeeNews'
+  EmployeeNews = 'EmployeeNews',
+  NewsCategory = 'NewsCategory',
+  NewsEmoji = 'NewsEmoji'
 }
 
 export type DisplayStatus =

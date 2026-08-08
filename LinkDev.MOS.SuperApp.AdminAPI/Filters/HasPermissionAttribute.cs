@@ -6,9 +6,10 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Filters
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class HasPermissionAttribute : TypeFilterAttribute
     {
-        public HasPermissionAttribute(PermissionAction permission) : base(typeof(HasPermissionFilter))
+        public HasPermissionAttribute(params PermissionAction[] permissions)
+            : base(typeof(PermissionAuthorizationFilter))
         {
-            Arguments = [permission];
+            Arguments = [permissions];
         }
     }
 }

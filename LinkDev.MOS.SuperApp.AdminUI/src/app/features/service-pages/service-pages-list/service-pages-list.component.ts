@@ -1,7 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ServiceIntroPagesService } from '../../../core/services/service-intro-pages.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ServiceIntroPage } from '../../../core/models/service-page.model';
@@ -33,7 +35,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
     </app-page-header>
 
     <div class="filter-bar">
-      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <form [formGroup]="filterForm" (ngSubmit)="$event.preventDefault()">
         <div class="filter-grid">
           <input class="form-input" formControlName="search" [placeholder]="'servicePages.searchPlaceholder' | translate" />
           <select class="form-select" formControlName="status">
@@ -42,7 +44,6 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
               <option [value]="s">{{ 'status.' + s | translate }}</option>
             }
           </select>
-          <button type="submit" class="btn btn-primary">{{ 'common.search' | translate }}</button>
           <button type="button" class="btn btn-outline" (click)="resetFilters()">{{ 'common.reset' | translate }}</button>
         </div>
       </form>
@@ -126,6 +127,7 @@ export class ServicePagesListComponent implements OnInit {
   private readonly language = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
   pages: ServiceIntroPage[] = [];
   loading = true;
@@ -152,23 +154,24 @@ export class ServicePagesListComponent implements OnInit {
     return chips;
   }
 
-  ngOnInit(): void { this.load(); }
-
-  applyFilters(): void {
-    this.pageNumber = 1;
+  ngOnInit(): void {
+    this.filterForm.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.pageNumber = 1;
+      this.load();
+    });
     this.load();
   }
 
   resetFilters(): void {
     this.filterForm.reset({ search: '', status: '' });
-    this.pageNumber = 1;
-    this.load();
   }
 
   removeFilter(key: string): void {
     this.filterForm.patchValue({ [key]: '' });
-    this.pageNumber = 1;
-    this.load();
   }
 
   load(): void {

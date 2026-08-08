@@ -164,6 +164,70 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'employee-news/categories',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'view')],
+        loadComponent: () =>
+          import('./features/employee-news/news-categories/news-categories.component').then(
+            (m) => m.NewsCategoriesComponent,
+          ),
+      },
+      {
+        path: 'employee-news/categories/create',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'create')],
+        loadComponent: () =>
+          import('./features/employee-news/news-categories/news-category-create.component').then(
+            (m) => m.NewsCategoryCreateComponent,
+          ),
+      },
+      {
+        path: 'employee-news/categories/:id',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'view')],
+        loadComponent: () =>
+          import('./features/employee-news/news-categories/news-category-details.component').then(
+            (m) => m.NewsCategoryDetailsComponent,
+          ),
+      },
+      {
+        path: 'employee-news/categories/:id/edit',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'edit')],
+        loadComponent: () =>
+          import('./features/employee-news/news-categories/news-category-edit.component').then(
+            (m) => m.NewsCategoryEditComponent,
+          ),
+      },
+      {
+        path: 'employee-news/emojis',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'view')],
+        loadComponent: () =>
+          import('./features/employee-news/news-emojis/news-emojis.component').then(
+            (m) => m.NewsEmojisComponent,
+          ),
+      },
+      {
+        path: 'employee-news/emojis/create',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'create')],
+        loadComponent: () =>
+          import('./features/employee-news/news-emojis/news-emoji-create.component').then(
+            (m) => m.NewsEmojiCreateComponent,
+          ),
+      },
+      {
+        path: 'employee-news/emojis/:id',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'view')],
+        loadComponent: () =>
+          import('./features/employee-news/news-emojis/news-emoji-details.component').then(
+            (m) => m.NewsEmojiDetailsComponent,
+          ),
+      },
+      {
+        path: 'employee-news/emojis/:id/edit',
+        canActivate: [permissionGuard(ContentType.EmployeeNews, 'edit')],
+        loadComponent: () =>
+          import('./features/employee-news/news-emojis/news-emoji-edit.component').then(
+            (m) => m.NewsEmojiEditComponent,
+          ),
+      },
+      {
         path: 'employee-news/:id',
         canActivate: [permissionGuard(ContentType.EmployeeNews, 'view')],
         loadComponent: () =>

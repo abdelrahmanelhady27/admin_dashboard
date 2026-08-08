@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { MockAuthService } from '../../core/services/mock-auth.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -28,6 +29,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
           <span class="settings-card__icon">👤</span>
           <div>
             <h3>{{ 'settings.account' | translate }}</h3>
+            <p class="account-name">{{ auth.currentUser?.fullName }}</p>
             <p>{{ auth.currentUser?.email }}</p>
           </div>
         </div>
@@ -42,13 +44,15 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     .settings-card__icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.125rem; flex-shrink: 0; }
     .settings-card h3 { margin: 0 0 0.25rem; font-size: 0.9375rem; font-weight: 600; }
     .settings-card p { margin: 0; font-size: 0.8125rem; color: var(--text-muted); }
+    .account-name { color: var(--text-dark) !important; font-weight: 500; margin-bottom: 0.125rem !important; }
   `]
 })
 export class SettingsComponent {
-  readonly auth = inject(MockAuthService);
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   logout(): void {
     this.auth.logout();
-    window.location.href = '/login';
+    this.router.navigate(['/login']);
   }
 }

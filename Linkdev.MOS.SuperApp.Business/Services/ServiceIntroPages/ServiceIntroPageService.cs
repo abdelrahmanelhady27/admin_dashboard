@@ -222,40 +222,6 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
             return true;
         }
 
-        public async Task<ServiceIntroPageDto?> GetPublishedByServiceIdAsync(int serviceId)
-        {
-            var page = await _pageRepo.GetByServiceIdAsync(serviceId);
-            if (page == null || page.Status == PageStatus.Unpublished || string.IsNullOrWhiteSpace(page.PublishedSnapshotJson))
-            {
-                return null;
-            }
-
-            var snapshot = JsonSerializer.Deserialize<PublishedSnapshot>(page.PublishedSnapshotJson, SnapshotJsonOptions);
-            if (snapshot == null)
-            {
-                return null;
-            }
-
-            return new ServiceIntroPageDto
-            {
-                Id = page.Id,
-                ServiceId = page.ServiceId,
-                ServiceNameAr = page.Service?.NameAr ?? string.Empty,
-                ServiceNameEn = page.Service?.NameEn ?? string.Empty,
-                Status = PageStatus.Published.ToString(),
-                Description = snapshot.Description,
-                ProcessingDuration = snapshot.ProcessingDuration,
-                VideoUrl = snapshot.VideoUrl,
-                VideoFileName = snapshot.VideoFileName,
-                Documents = snapshot.Documents ?? new List<ServiceDocumentDto>(),
-                Faqs = snapshot.Faqs ?? new List<ServiceFaqDto>(),
-                CreatedAt = page.CreatedAt,
-                ModifiedAt = page.ModifiedAt,
-                ModifiedBy = page.ModifiedBy,
-                PublishedAt = page.PublishedAt
-            };
-        }
-
         private ServiceIntroPageDto MapToDto(ServiceIntroPage page)
         {
             var dto = _mapper.Map<ServiceIntroPageDto>(page);
