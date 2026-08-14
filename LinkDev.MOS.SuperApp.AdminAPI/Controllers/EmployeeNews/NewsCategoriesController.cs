@@ -9,7 +9,7 @@ using LinkDev.MOS.SuperApp.Business.DTOs.EmployeeNews.NewsEmoji;
 
 namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
 {
-    [Route("api/news-categories")]
+    [Route("api/employee-news-categories")]
     [ApiController]
     [Authorize]
     [HasFeature(FeatureType.EmployeeNews)]

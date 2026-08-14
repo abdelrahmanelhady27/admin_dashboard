@@ -30,7 +30,7 @@ const LOOKUP_PAGE_SIZE = 1000;
 @Injectable({ providedIn: 'root' })
 export class NewsEmojisService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/news-emojis`;
+  private readonly apiUrl = `${environment.apiUrl}/employee-news-emojis`;
 
   getAll(filter?: NewsEmojiFilter): Observable<PagedResult<NewsEmoji>> {
     let params = new HttpParams();

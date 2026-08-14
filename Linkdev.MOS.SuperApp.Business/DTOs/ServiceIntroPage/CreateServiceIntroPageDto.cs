@@ -14,7 +14,7 @@ namespace LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage
         public string? VideoFileName { get; set; }
 
         public List<ServiceDocumentDto> Documents { get; set; } = new();
-        public List<ServiceFaqDto> Faqs { get; set; } = new();
+        public List<int> FaqIds { get; set; } = new();
 
         public bool Publish { get; set; }
     }

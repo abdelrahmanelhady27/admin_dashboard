@@ -163,6 +163,21 @@
     "faqQuestion": "السؤال",
     "faqAnswer": "الإجابة",
     "addFaq": "إضافة سؤال",
+    "manageFaqs": "إدارة الأسئلة الشائعة",
+    "faqsSubtitle": "إنشاء وإدارة أسئلة شائعة قابلة لإعادة الاستخدام",
+    "faqDisplayOrder": "ترتيب العرض",
+    "displayOrderHint": "اختيار ترتيب موجود يدرجه هنا ويزيح العناصر التالية للأسفل.",
+    "selectFaq": "اختر سؤالاً شائعاً",
+    "createFaq": "إنشاء سؤال شائع",
+    "editFaq": "تعديل سؤال شائع",
+    "faqDetailsTitle": "تفاصيل السؤال الشائع",
+    "noFaqs": "لا توجد أسئلة شائعة",
+    "faqSearchPlaceholder": "بحث بالسؤال أو الإجابة",
+    "confirmDeleteFaq": "هل أنت متأكد من حذف هذا السؤال الشائع؟",
+    "confirmActivateFaq": "هل أنت متأكد من تفعيل هذا السؤال الشائع؟",
+    "confirmDeactivateFaq": "هل أنت متأكد من إلغاء تفعيل هذا السؤال الشائع؟",
+    "createdAt": "تاريخ الإنشاء",
+    "createdBy": "أنشئ بواسطة",
     "confirmPublish": "هل أنت متأكد من نشر هذه الصفحة؟",
     "confirmUnpublish": "هل أنت متأكد من إلغاء نشر هذه الصفحة؟",
     "confirmCancel": "هل أنت متأكد من رغبتك في إلغاء العملية؟",
@@ -269,8 +284,6 @@
     "latestUpdates": "آخر التحديثات",
     "quickActions": "إجراءات سريعة",
     "quickActionsDesc": "المهام الشائعة في متناول يدك",
-    "chartPlaceholder": "نظرة تحليلية (بيانات تجريبية)",
-    "analytics": "التحليلات",
     "statusOverview": "نظرة عامة على الحالات",
     "statusOverviewDesc": "حالة المحتوى بلمحة سريعة",
     "viewAll": "عرض الكل"
@@ -304,7 +317,8 @@
     "QuickLinks": "الروابط السريعة",
     "EmployeeNews": "أخبار الموظفين",
     "NewsCategory": "تصنيف الأخبار",
-    "NewsEmoji": "رمز الأخبار"
+    "NewsEmoji": "رمز الأخبار",
+    "ServiceFaq": "سؤال شائع للخدمة"
   },
   "settings": {
     "subtitle": "تفضيلات التطبيق",
@@ -343,6 +357,7 @@
     "attachmentNameRequired": "يجب إدخال اسم لكل مرفق (بحد أقصى 30 حرفاً).",
     "categoryHasPublishedNews": "لا يمكن إلغاء تفعيل أو حذف تصنيف مستخدم في أخبار منشورة.",
     "emojiAssignedToPublishedCategory": "لا يمكن إلغاء تفعيل أو حذف رمز معيّن لتصنيف يحتوي على أخبار منشورة.",
+    "faqAssignedToPublishedPage": "لا يمكن إلغاء تفعيل أو حذف سؤال شائع مرتبط بصفحة تعريفية منشورة.",
     "categoryRequiredForPublish": "يرجى اختيار تصنيف نشط قبل النشر."
   },
   "messages": {
@@ -367,6 +382,9 @@
     "categoryDeactivated": "تم إلغاء تفعيل التصنيف بنجاح",
     "emojiDeleted": "تم حذف الرمز بنجاح",
     "emojiActivated": "تم تفعيل الرمز بنجاح",
-    "emojiDeactivated": "تم إلغاء تفعيل الرمز بنجاح"
+    "emojiDeactivated": "تم إلغاء تفعيل الرمز بنجاح",
+    "faqDeleted": "تم حذف السؤال الشائع بنجاح",
+    "faqActivated": "تم تفعيل السؤال الشائع بنجاح",
+    "faqDeactivated": "تم إلغاء تفعيل السؤال الشائع بنجاح"
   }
 }

@@ -32,11 +32,6 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Configurations.ServiceIntroPages
                    .WithOne(x => x.ServiceIntroPage)
                    .HasForeignKey(x => x.ServiceIntroPageId)
                    .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(x => x.Faqs)
-                   .WithOne(x => x.ServiceIntroPage)
-                   .HasForeignKey(x => x.ServiceIntroPageId)
-                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -4,10 +4,11 @@ namespace LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages
 {
     public class ServiceFaq : BaseEntity
     {
-        public int ServiceIntroPageId { get; set; }
         public string Question { get; set; } = "";
         public string Answer { get; set; } = "";
+        public int DisplayOrder { get; set; }
+        public bool IsActive { get; set; } = true;
 
-        public ServiceIntroPage? ServiceIntroPage { get; set; }
+        public ICollection<ServiceIntroPageFaq> PageFaqs { get; set; } = new List<ServiceIntroPageFaq>();
     }
 }

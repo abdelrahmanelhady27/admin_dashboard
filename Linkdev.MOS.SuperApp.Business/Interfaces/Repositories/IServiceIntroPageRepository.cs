@@ -16,5 +16,6 @@ namespace LinkDev.MOS.SuperApp.Business.Interfaces.Repositories
         Task<ServiceIntroPage?> GetByServiceIdAsync(int serviceId);
         Task<IEnumerable<AvailableLinkedService>> GetAvailableLinkedServicesAsync();
         Task<LinkedService?> GetActiveLinkedServiceByIdAsync(int serviceId);
+        Task ReplaceFaqAssignmentsAsync(int pageId, IEnumerable<int> faqIds);
     }
 }

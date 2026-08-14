@@ -7,6 +7,7 @@ namespace LinkDev.MOS.SuperApp.Domain.Enums
         QuickLinks,
         EmployeeNews,
         NewsCategory,
-        NewsEmoji
+        NewsEmoji,
+        ServiceFaq
     }
 }

@@ -146,6 +146,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess.DbContexts
         public DbSet<ServiceIntroPage> ServiceIntroPages { get; set; }
         public DbSet<ServiceDocument> ServiceDocuments { get; set; }
         public DbSet<ServiceFaq> ServiceFaqs { get; set; }
+        public DbSet<ServiceIntroPageFaq> ServiceIntroPageFaqs { get; set; }
         public DbSet<AvailableLinkedService> AvailableLinkedServices { get; set; }
         public DbSet<QuickLink> QuickLinks { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }

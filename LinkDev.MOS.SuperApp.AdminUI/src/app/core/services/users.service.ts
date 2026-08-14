@@ -60,8 +60,10 @@ export class UsersService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/users`;
 
-  getCount(): number {
-    return 0;
+  getCount(): Observable<number> {
+    return this.getAll({ pageNumber: 1, pageSize: 1 }).pipe(
+      map((result) => result.totalCount)
+    );
   }
 
   getAll(filter?: UserFilter): Observable<PagedResult<DashboardUser>> {

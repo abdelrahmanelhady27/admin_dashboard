@@ -25,6 +25,7 @@ namespace LinkDev.MOS.SuperApp.Business
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IServiceIntroPageService, ServiceIntroPageService>();
+            services.AddScoped<IServiceFaqService, ServiceFaqService>();
             services.AddScoped<IQuickLinkService, QuickLinkService>();
             services.AddScoped<IAuditLogService, AuditLogService>();
             services.AddScoped<IEmployeeNewsService, EmployeeNewsService>();

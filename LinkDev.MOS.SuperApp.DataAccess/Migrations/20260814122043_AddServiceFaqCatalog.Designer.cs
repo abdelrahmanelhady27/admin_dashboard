@@ -4,6 +4,7 @@ using LinkDev.MOS.SuperApp.DataAccess.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LinkDev.MOS.SuperApp.DataAccess.Migrations
 {
     [DbContext(typeof(AdminDbContext))]
-    partial class AdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260814122043_AddServiceFaqCatalog")]
+    partial class AddServiceFaqCatalog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

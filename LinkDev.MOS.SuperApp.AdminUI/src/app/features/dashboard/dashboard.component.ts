@@ -112,26 +112,6 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
           }
         </div>
 
-        <!-- Chart placeholder -->
-        <div class="u-card dashboard-panel">
-          <div class="panel-header">
-            <div>
-              <h3>{{ 'dashboard.analytics' | translate }}</h3>
-              <p>{{ 'dashboard.chartPlaceholder' | translate }}</p>
-            </div>
-          </div>
-          <div class="chart-modern">
-            <div class="chart-bars">
-              @for (bar of chartBars; track $index) {
-                <div class="chart-bar" [style.height.%]="bar"></div>
-              }
-            </div>
-            <div class="chart-labels">
-              <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Status overview -->
         <div class="u-card dashboard-panel">
           <div class="panel-header">
@@ -196,10 +176,6 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     .news-row:hover { background: var(--page-bg); padding-inline: 0.5rem; margin-inline: -0.5rem; }
     .news-row strong { display: block; font-size: 0.8125rem; color: var(--text-dark); }
     .news-row small { font-size: 0.6875rem; color: var(--text-light); }
-    .chart-modern { padding: 0.5rem 0; }
-    .chart-bars { display: flex; align-items: flex-end; gap: 0.75rem; height: 140px; padding: 0 0.5rem; }
-    .chart-bar { flex: 1; background: linear-gradient(180deg, var(--primary-color), var(--primary-light)); border-radius: 6px 6px 0 0; min-height: 12px; transition: height 0.6s ease; opacity: 0.85; }
-    .chart-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.6875rem; color: var(--text-light); padding: 0 0.5rem; }
     .status-overview { display: flex; flex-direction: column; gap: 0.75rem; }
     .status-row { display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 0.875rem; background: var(--page-bg); border-radius: var(--radius-md); font-size: 0.8125rem; }
     .status-row span { color: var(--text-muted); }
@@ -221,7 +197,6 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       .quick-actions { grid-template-columns: 1fr; }
       .welcome-banner h2 { font-size: 1.125rem; }
       .panel-header { flex-direction: column; align-items: flex-start; }
-      .chart-bars { height: 100px; gap: 0.5rem; }
       .news-row { flex-wrap: wrap; }
     }
     @media (max-width: 479px) {
@@ -246,11 +221,11 @@ export class DashboardComponent implements OnInit {
   today = new Date();
   recentLogs: AuditLog[] = [];
   recentNews: EmployeeNews[] = [];
-  chartBars = [45, 72, 58, 90, 65, 80];
   publishedPages = 0;
   draftPages = 0;
   publishedNews = 0;
   quickLinksCount = 0;
+  totalUsers = 0;
 
   get userName(): string {
     const user = this.auth.currentUser;
@@ -260,7 +235,7 @@ export class DashboardComponent implements OnInit {
 
   get stats() {
     return [
-      { labelKey: 'dashboard.totalUsers', value: this.users.getCount(), icon: '👤', bg: 'var(--primary-light)' },
+      { labelKey: 'dashboard.totalUsers', value: this.totalUsers, icon: '👤', bg: 'var(--primary-light)' },
       { labelKey: 'dashboard.publishedPages', value: this.publishedPages, icon: '📄', bg: '#DBEAFE' },
       { labelKey: 'dashboard.draftPages', value: this.draftPages, icon: '📝', bg: 'var(--warning-light)' },
       { labelKey: 'dashboard.quickLinksCount', value: this.quickLinksCount, icon: '🔗', bg: '#F3E8FF' },
@@ -283,6 +258,15 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.users.getCount().subscribe({
+      next: (count) => {
+        this.totalUsers = count;
+      },
+      error: () => {
+        this.totalUsers = 0;
+      }
+    });
+
     this.news.getAll({ status: NewsStatus.Published, pageNumber: 1, pageSize: 4 }).subscribe({
       next: (result) => {
         this.recentNews = result.items;

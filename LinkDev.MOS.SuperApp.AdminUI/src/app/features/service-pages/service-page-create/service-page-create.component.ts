@@ -12,7 +12,7 @@ import {
 import { ContentType } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
-import { FaqEditorComponent } from '../../../shared/components/faq-editor/faq-editor.component';
+import { FaqPickerComponent } from '../../../shared/components/faq-picker/faq-picker.component';
 import { DocumentsEditorComponent } from '../../../shared/components/documents-editor/documents-editor.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { LanguageService } from '../../../core/services/language.service';
@@ -30,7 +30,7 @@ interface SystemOption {
   standalone: true,
   imports: [
     ReactiveFormsModule, RouterLink, PageHeaderComponent, FileUploaderComponent,
-    FaqEditorComponent, DocumentsEditorComponent, TranslatePipe
+    FaqPickerComponent, DocumentsEditorComponent, TranslatePipe
   ],
   template: `
     <app-page-header title="servicePages.createTitle" subtitle="servicePages.createSubtitle" />
@@ -91,7 +91,7 @@ interface SystemOption {
 
       <div class="form-section">
         <h3 class="form-section__title">{{ 'servicePages.faqs' | translate }}</h3>
-        <app-faq-editor (formReady)="onFaqsReady($event)" />
+        <app-faq-picker (formReady)="onFaqsReady($event)" />
       </div>
 
       <div class="form-action-bar">
@@ -234,13 +234,6 @@ export class ServicePageCreateComponent implements OnInit {
       this.toast.error('validation.completeRequiredFields');
       return false;
     }
-    const faqs = this.faqsForm?.value.faqs || [];
-    for (const faq of faqs) {
-      if ((faq.question && !faq.answer) || (!faq.question && faq.answer)) {
-        this.toast.error('validation.faqIncomplete');
-        return false;
-      }
-    }
     return true;
   }
 
@@ -254,7 +247,7 @@ export class ServicePageCreateComponent implements OnInit {
       videoUrl: raw.videoUrl || null,
       videoFileName: raw.videoFileName || null,
       documents: this.docsForm?.value.documents || [],
-      faqs: this.faqsForm?.value.faqs || [],
+      faqIds: this.faqsForm?.value.faqIds || [],
       publish
     }).subscribe({
       next: () => {

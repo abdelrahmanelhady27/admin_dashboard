@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   AvailableLinkedService,
-  FaqItem,
   ServiceDocument,
+  ServiceFaq,
   ServiceIntroPage
 } from '../models/service-page.model';
 import { PageStatus } from '../models/enums';
@@ -24,7 +24,7 @@ export interface CreateServiceIntroPageRequest {
   videoUrl?: string | null;
   videoFileName?: string | null;
   documents: ServiceDocument[];
-  faqs: FaqItem[];
+  faqIds: number[];
   publish: boolean;
 }
 
@@ -34,7 +34,7 @@ export interface UpdateServiceIntroPageRequest {
   videoUrl?: string | null;
   videoFileName?: string | null;
   documents: ServiceDocument[];
-  faqs: FaqItem[];
+  faqIds: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -86,7 +86,7 @@ export class ServiceIntroPagesService {
       videoUrl: dto.videoUrl || null,
       videoFileName: dto.videoFileName || null,
       documents: serializeDocuments(dto.documents),
-      faqs: serializeFaqs(dto.faqs),
+      faqIds: serializeFaqIds(dto.faqIds),
       publish: dto.publish
     };
     return this.http
@@ -101,7 +101,7 @@ export class ServiceIntroPagesService {
       videoUrl: dto.videoUrl || null,
       videoFileName: dto.videoFileName || null,
       documents: serializeDocuments(dto.documents),
-      faqs: serializeFaqs(dto.faqs)
+      faqIds: serializeFaqIds(dto.faqIds)
     };
     return this.http
       .put<ServiceIntroPage>(`${this.apiUrl}/${id}`, payload)
@@ -131,7 +131,7 @@ function normalizePage(page: ServiceIntroPage): ServiceIntroPage {
     videoUrl: page.videoUrl ?? '',
     videoFileName: page.videoFileName ?? '',
     documents: page.documents ?? [],
-    faqs: page.faqs ?? [],
+    faqs: (page.faqs ?? []) as ServiceFaq[],
     status: page.status as PageStatus
   };
 }
@@ -148,14 +148,8 @@ function serializeDocuments(documents: ServiceDocument[]) {
     }));
 }
 
-function serializeFaqs(faqs: FaqItem[]) {
-  return (faqs ?? [])
-    .filter((f) => !!f.question?.trim() && !!f.answer?.trim())
-    .map((f) => ({
-      id: toEntityId(f.id),
-      question: f.question.trim(),
-      answer: f.answer.trim()
-    }));
+function serializeFaqIds(faqIds: number[]): number[] {
+  return [...new Set((faqIds ?? []).filter((id) => Number.isFinite(id) && id > 0))].slice(0, 10);
 }
 
 function toEntityId(id: number | string | undefined): number {

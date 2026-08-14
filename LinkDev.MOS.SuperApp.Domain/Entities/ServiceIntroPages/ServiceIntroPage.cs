@@ -16,6 +16,6 @@ namespace LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages
 
         public LinkedService? Service { get; set; }
         public ICollection<ServiceDocument> Documents { get; set; } = new List<ServiceDocument>();
-        public ICollection<ServiceFaq> Faqs { get; set; } = new List<ServiceFaq>();
+        public ICollection<ServiceIntroPageFaq> PageFaqs { get; set; } = new List<ServiceIntroPageFaq>();
     }
 }

@@ -2,37 +2,37 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { NewsCategory } from '../models/employee-news.model';
+import { ServiceFaq } from '../models/service-page.model';
 import { PagedRequest, PagedResult } from '../models/paged-result.model';
 import { environment } from '../../../environments/environment.dev';
 
-export interface NewsCategoryFilter extends PagedRequest {
+export interface ServiceFaqFilter extends PagedRequest {
   search?: string;
   isActive?: boolean | null;
 }
 
-export interface CreateNewsCategoryRequest {
-  name: string;
+export interface CreateServiceFaqRequest {
+  question: string;
+  answer: string;
   displayOrder: number;
   isActive: boolean;
-  emojiIds: number[];
 }
 
-export interface UpdateNewsCategoryRequest {
-  name: string;
+export interface UpdateServiceFaqRequest {
+  question: string;
+  answer: string;
   displayOrder: number;
   isActive: boolean;
-  emojiIds: number[];
 }
 
 const LOOKUP_PAGE_SIZE = 1000;
 
 @Injectable({ providedIn: 'root' })
-export class NewsCategoriesService {
+export class ServiceFaqsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/employee-news-categories`;
+  private readonly apiUrl = `${environment.apiUrl}/service-faqs`;
 
-  getAll(filter?: NewsCategoryFilter): Observable<PagedResult<NewsCategory>> {
+  getAll(filter?: ServiceFaqFilter): Observable<PagedResult<ServiceFaq>> {
     let params = new HttpParams();
     if (filter?.search) {
       params = params.set('search', filter.search);
@@ -44,11 +44,11 @@ export class NewsCategoriesService {
     params = params.set('pageSize', String(filter?.pageSize ?? 10));
     params = params.set('sortBy', filter?.sortBy ?? 'displayOrder');
     params = params.set('sortDescending', String(filter?.sortDescending ?? false));
-    return this.http.get<PagedResult<NewsCategory>>(this.apiUrl, { params });
+    return this.http.get<PagedResult<ServiceFaq>>(this.apiUrl, { params });
   }
 
   /** Convenience for dropdowns / display-order calc — same GetAll endpoint. */
-  getLookup(activeOnly = false): Observable<NewsCategory[]> {
+  getLookup(activeOnly = false): Observable<ServiceFaq[]> {
     return this.getAll({
       isActive: activeOnly ? true : null,
       pageNumber: 1,
@@ -58,20 +58,16 @@ export class NewsCategoriesService {
     }).pipe(map((result) => result.items ?? []));
   }
 
-  getById(id: number): Observable<NewsCategory> {
-    return this.http.get<NewsCategory>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<ServiceFaq> {
+    return this.http.get<ServiceFaq>(`${this.apiUrl}/${id}`);
   }
 
-  create(dto: CreateNewsCategoryRequest): Observable<NewsCategory> {
-    return this.http.post<NewsCategory>(this.apiUrl, dto);
+  create(dto: CreateServiceFaqRequest): Observable<ServiceFaq> {
+    return this.http.post<ServiceFaq>(this.apiUrl, dto);
   }
 
-  update(id: number, dto: UpdateNewsCategoryRequest): Observable<NewsCategory> {
-    return this.http.put<NewsCategory>(`${this.apiUrl}/${id}`, dto);
-  }
-
-  saveEmojis(id: number, emojiIds: number[]): Observable<NewsCategory> {
-    return this.http.put<NewsCategory>(`${this.apiUrl}/${id}/emojis`, { emojiIds });
+  update(id: number, dto: UpdateServiceFaqRequest): Observable<ServiceFaq> {
+    return this.http.put<ServiceFaq>(`${this.apiUrl}/${id}`, dto);
   }
 
   delete(id: number): Observable<void> {

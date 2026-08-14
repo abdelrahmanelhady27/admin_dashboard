@@ -11,11 +11,12 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Configurations.ServiceIntroPages
             builder.ToTable("ServiceFaqs");
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.ServiceIntroPageId).IsRequired();
             builder.Property(x => x.Question).IsRequired().HasMaxLength(150);
             builder.Property(x => x.Answer).IsRequired().HasMaxLength(150);
+            builder.Property(x => x.DisplayOrder).IsRequired();
+            builder.Property(x => x.IsActive).IsRequired();
 
-            builder.HasIndex(x => x.ServiceIntroPageId);
+            builder.HasIndex(x => x.DisplayOrder);
         }
     }
 }

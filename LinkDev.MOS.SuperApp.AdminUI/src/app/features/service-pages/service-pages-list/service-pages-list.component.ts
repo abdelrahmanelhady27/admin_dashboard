@@ -32,6 +32,9 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
       @if (canCreate) {
         <a routerLink="/service-pages/create" class="btn btn-primary">+ {{ 'servicePages.createTitle' | translate }}</a>
       }
+      @if (canEdit) {
+        <a routerLink="/service-pages/faqs" class="btn btn-outline">{{ 'servicePages.manageFaqs' | translate }}</a>
+      }
     </app-page-header>
 
     <div class="filter-bar">

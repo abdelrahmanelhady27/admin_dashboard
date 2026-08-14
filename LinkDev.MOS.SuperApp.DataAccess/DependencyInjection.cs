@@ -33,6 +33,7 @@ namespace LinkDev.MOS.SuperApp.DataAccess
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
             services.AddScoped<IServiceIntroPageRepository, ServiceIntroPageRepository>();
+            services.AddScoped<IServiceFaqRepository, ServiceFaqRepository>();
             services.AddScoped<IQuickLinkRepository, QuickLinkRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IStaticUserRepository, StaticUserRepository>();

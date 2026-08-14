@@ -8,10 +8,16 @@ export interface ServiceDocument {
   fileUrl?: string;
 }
 
-export interface FaqItem {
-  id: number | string;
+export interface ServiceFaq {
+  id: number;
   question: string;
   answer: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  createdBy?: string | null;
+  modifiedAt?: string | null;
+  modifiedBy?: string | null;
 }
 
 export interface ServiceIntroPage {
@@ -25,7 +31,7 @@ export interface ServiceIntroPage {
   videoUrl: string;
   videoFileName: string;
   documents: ServiceDocument[];
-  faqs: FaqItem[];
+  faqs: ServiceFaq[];
   publishedSnapshot?: Partial<ServiceIntroPage>;
   createdAt: string;
   modifiedAt: string;

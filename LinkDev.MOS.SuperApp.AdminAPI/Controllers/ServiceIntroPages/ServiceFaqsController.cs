@@ -1,29 +1,29 @@
 using LinkDev.MOS.SuperApp.Business.DTOs.Common;
-using LinkDev.MOS.SuperApp.Business.DTOs.EmployeeNews.NewsEmoji;
-using LinkDev.MOS.SuperApp.Business.Interfaces.EmployeeNews;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage.ServiceFaq;
+using LinkDev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
 using LinkDev.MOS.SuperApp.Domain.Enums;
 using LinkDev.MOS.SuperApp.AdminAPI.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
+namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.ServiceIntroPages
 {
-    [Route("api/employee-news-emojis")]
+    [Route("api/service-faqs")]
     [ApiController]
     [Authorize]
-    [HasFeature(FeatureType.EmployeeNews)]
-    public class NewsEmojisController : ControllerBase
+    [HasFeature(FeatureType.ServiceIntroPage)]
+    public class ServiceFaqsController : ControllerBase
     {
-        private readonly INewsEmojiService _service;
+        private readonly IServiceFaqService _service;
 
-        public NewsEmojisController(INewsEmojiService service)
+        public ServiceFaqsController(IServiceFaqService service)
         {
             _service = service;
         }
 
         [HttpGet]
         [HasPermission(PermissionAction.Read)]
-        public async Task<ActionResult<PagedResult<NewsEmojiDto>>> GetAll([FromQuery] NewsEmojiSearchDto request)
+        public async Task<ActionResult<PagedResult<ServiceFaqDto>>> GetAll([FromQuery] ServiceFaqSearchDto request)
         {
             try
             {
@@ -37,14 +37,14 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
 
         [HttpGet("{id:int}")]
         [HasPermission(PermissionAction.Read)]
-        public async Task<ActionResult<NewsEmojiDto>> GetById(int id)
+        public async Task<ActionResult<ServiceFaqDto>> GetById(int id)
         {
             try
             {
                 var item = await _service.GetByIdAsync(id);
                 if (item == null)
                 {
-                    return NotFound(new { message = "News emoji not found." });
+                    return NotFound(new { message = "Service FAQ not found." });
                 }
 
                 return Ok(item);
@@ -57,7 +57,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
 
         [HttpPost]
         [HasPermission(PermissionAction.Add)]
-        public async Task<ActionResult<NewsEmojiDto>> Create([FromBody] CreateNewsEmojiDto dto)
+        public async Task<ActionResult<ServiceFaqDto>> Create([FromBody] CreateServiceFaqDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
 
         [HttpPut("{id:int}")]
         [HasPermission(PermissionAction.Edit)]
-        public async Task<ActionResult<NewsEmojiDto>> Update(int id, [FromBody] UpdateNewsEmojiDto dto)
+        public async Task<ActionResult<ServiceFaqDto>> Update(int id, [FromBody] UpdateServiceFaqDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -89,7 +89,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
                 var item = await _service.UpdateAsync(id, dto);
                 if (item == null)
                 {
-                    return NotFound(new { message = "News emoji not found." });
+                    return NotFound(new { message = "Service FAQ not found." });
                 }
 
                 return Ok(item);
@@ -109,7 +109,7 @@ namespace LinkDev.MOS.SuperApp.AdminAPI.Controllers.EmployeeNews
                 var success = await _service.DeleteAsync(id);
                 if (!success)
                 {
-                    return NotFound(new { message = "News emoji not found." });
+                    return NotFound(new { message = "Service FAQ not found." });
                 }
 
                 return NoContent();

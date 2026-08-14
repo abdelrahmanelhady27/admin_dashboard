@@ -12,6 +12,8 @@ const API_MESSAGE_TO_I18N: Record<string, string> = {
   'Cannot deactivate or delete a category that has published news': 'validation.categoryHasPublishedNews',
   'Cannot deactivate an emoji assigned to a category that has published news': 'validation.emojiAssignedToPublishedCategory',
   'Cannot delete an emoji assigned to a category that has published news': 'validation.emojiAssignedToPublishedCategory',
+  'Cannot deactivate a FAQ assigned to a published service intro page': 'validation.faqAssignedToPublishedPage',
+  'Cannot delete a FAQ assigned to a published service intro page': 'validation.faqAssignedToPublishedPage',
   'Please complete the required data before publishing the news item': 'validation.completeRequiredFields',
   'Please select an active category before publishing': 'validation.categoryRequiredForPublish'
 };

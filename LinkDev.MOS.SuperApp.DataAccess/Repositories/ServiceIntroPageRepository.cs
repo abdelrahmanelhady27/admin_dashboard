@@ -25,7 +25,8 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
                 .AsNoTracking()
                 .Include(p => p.Service)
                 .Include(p => p.Documents)
-                .Include(p => p.Faqs)
+                .Include(p => p.PageFaqs)
+                    .ThenInclude(pf => pf.Faq)
                 .Where(p => !p.IsDeleted);
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -87,7 +88,8 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
             return await _context.ServiceIntroPages
                 .Include(p => p.Service)
                 .Include(p => p.Documents)
-                .Include(p => p.Faqs)
+                .Include(p => p.PageFaqs)
+                    .ThenInclude(pf => pf.Faq)
                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
@@ -96,7 +98,8 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
             return await _context.ServiceIntroPages
                 .Include(p => p.Service)
                 .Include(p => p.Documents)
-                .Include(p => p.Faqs)
+                .Include(p => p.PageFaqs)
+                    .ThenInclude(pf => pf.Faq)
                 .FirstOrDefaultAsync(p => p.ServiceId == serviceId && !p.IsDeleted);
         }
 
@@ -112,6 +115,41 @@ namespace LinkDev.MOS.SuperApp.DataAccess.Repositories
             return await _context.LinkedServices
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == serviceId && !s.IsDeleted && s.IsActive);
+        }
+
+        public async Task ReplaceFaqAssignmentsAsync(int pageId, IEnumerable<int> faqIds)
+        {
+            var desired = faqIds.Distinct().ToHashSet();
+
+            var existing = await _context.ServiceIntroPageFaqs
+                .Where(pf => pf.ServiceIntroPageId == pageId)
+                .ToListAsync();
+
+            foreach (var link in existing.Where(pf => !pf.IsDeleted && !desired.Contains(pf.FaqId)))
+            {
+                link.IsDeleted = true;
+            }
+
+            foreach (var faqId in desired)
+            {
+                var softDeleted = existing.FirstOrDefault(pf => pf.FaqId == faqId && pf.IsDeleted);
+                if (softDeleted != null)
+                {
+                    softDeleted.IsDeleted = false;
+                    continue;
+                }
+
+                if (existing.Any(pf => pf.FaqId == faqId && !pf.IsDeleted))
+                {
+                    continue;
+                }
+
+                await _context.ServiceIntroPageFaqs.AddAsync(new ServiceIntroPageFaq
+                {
+                    ServiceIntroPageId = pageId,
+                    FaqId = faqId
+                });
+            }
         }
     }
 }

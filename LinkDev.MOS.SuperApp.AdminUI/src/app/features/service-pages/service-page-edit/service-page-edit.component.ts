@@ -9,14 +9,12 @@ import {
   ServiceIntroPage,
   MAX_DESCRIPTION_LENGTH,
   MAX_DOCUMENT_NAME_LENGTH,
-  MAX_FAQ_ANSWER_LENGTH,
-  MAX_FAQ_QUESTION_LENGTH,
   MAX_PROCESSING_DURATION_LENGTH
 } from '../../../core/models/service-page.model';
 import { ContentType } from '../../../core/models/enums';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
-import { FaqEditorComponent } from '../../../shared/components/faq-editor/faq-editor.component';
+import { FaqPickerComponent } from '../../../shared/components/faq-picker/faq-picker.component';
 import { DocumentsEditorComponent } from '../../../shared/components/documents-editor/documents-editor.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -29,7 +27,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
   standalone: true,
   imports: [
     ReactiveFormsModule, PageHeaderComponent, FileUploaderComponent,
-    FaqEditorComponent, DocumentsEditorComponent, ConfirmDialogComponent, TranslatePipe
+    FaqPickerComponent, DocumentsEditorComponent, ConfirmDialogComponent, TranslatePipe
   ],
   template: `
     @if (page) {
@@ -65,7 +63,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
         <app-documents-editor #docsEditor (formReady)="onDocsReady($event)" />
 
         <h3>{{ 'servicePages.faqs' | translate }}</h3>
-        <app-faq-editor #faqEditor (formReady)="onFaqsReady($event)" />
+        <app-faq-picker #faqPicker (formReady)="onFaqsReady($event)" />
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline" [disabled]="saving || uploading" (click)="saveDraft()">{{ 'common.saveAsDraft' | translate }}</button>
@@ -96,7 +94,7 @@ import { resolveApiErrorKey } from '../../../core/utils/api-error.util';
 })
 export class ServicePageEditComponent implements OnInit {
   @ViewChild('docsEditor') docsEditor?: DocumentsEditorComponent;
-  @ViewChild('faqEditor') faqEditor?: FaqEditorComponent;
+  @ViewChild('faqPicker') faqPicker?: FaqPickerComponent;
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -238,7 +236,7 @@ export class ServicePageEditComponent implements OnInit {
       videoUrl: this.form.value.videoUrl || null,
       videoFileName: this.form.value.videoFileName || null,
       documents: this.docsForm?.value.documents || [],
-      faqs: this.faqsForm?.value.faqs || []
+      faqIds: this.faqsForm?.value.faqIds || []
     };
   }
 
@@ -253,13 +251,16 @@ export class ServicePageEditComponent implements OnInit {
         return;
       }
 
-      if (this.docsEditor && this.faqEditor) {
+      if (this.docsEditor) {
         this.docsEditor.setDocuments(this.page.documents || []);
-        this.faqEditor.setFaqs(this.page.faqs || []);
       } else {
-        // Fallback: mutate the form arrays we already hold from formReady
         this.bindDocumentsToForm(this.page.documents || []);
-        this.bindFaqsToForm(this.page.faqs || []);
+      }
+
+      if (this.faqPicker) {
+        this.faqPicker.setFaqIds((this.page.faqs || []).map((f) => f.id));
+      } else {
+        this.faqsForm.patchValue({ faqIds: (this.page.faqs || []).map((f) => f.id) });
       }
       this.initialEditorsBound = true;
     });
@@ -277,20 +278,6 @@ export class ServicePageEditComponent implements OnInit {
         fileName: [item.fileName],
         fileType: [item.fileType],
         fileUrl: [item.fileUrl || '']
-      }));
-    }
-  }
-
-  private bindFaqsToForm(
-    items: { id: number | string; question: string; answer: string }[]
-  ): void {
-    const faqs = this.faqsForm!.get('faqs') as FormArray;
-    faqs.clear();
-    for (const item of items) {
-      faqs.push(this.fb.group({
-        id: [item.id],
-        question: [item.question, Validators.maxLength(MAX_FAQ_QUESTION_LENGTH)],
-        answer: [item.answer, Validators.maxLength(MAX_FAQ_ANSWER_LENGTH)]
       }));
     }
   }

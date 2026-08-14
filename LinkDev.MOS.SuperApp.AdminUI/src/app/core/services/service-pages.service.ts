@@ -179,7 +179,17 @@ export class ServicePagesService {
         videoUrl: '',
         videoFileName: '',
         documents: [],
-        faqs: [{ id: 1, question: 'How to apply?', answer: 'Submit through the portal.' }],
+        faqs: [{
+          id: 1,
+          question: 'How to apply?',
+          answer: 'Submit through the portal.',
+          displayOrder: 1,
+          isActive: true,
+          createdAt: now,
+          createdBy: 'System Administrator',
+          modifiedAt: now,
+          modifiedBy: 'System Administrator'
+        }],
         publishedSnapshot: undefined,
         createdAt: now,
         modifiedAt: now,

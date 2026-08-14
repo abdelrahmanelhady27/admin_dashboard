@@ -35,13 +35,9 @@ namespace LinkDev.MOS.SuperApp.Business.Validators.ServiceIntroPage
                 .SetValidator(new ServiceDocumentDtoValidator())
                 .When(x => x.Documents != null);
 
-            RuleFor(x => x.Faqs)
-                .Must(faqs => faqs == null || faqs.Count <= 10)
+            RuleFor(x => x.FaqIds)
+                .Must(ids => ids == null || ids.Count <= 10)
                 .WithMessage("A maximum of 10 FAQs is allowed.");
-
-            RuleForEach(x => x.Faqs)
-                .SetValidator(new ServiceFaqDtoValidator())
-                .When(x => x.Faqs != null);
         }
     }
 }

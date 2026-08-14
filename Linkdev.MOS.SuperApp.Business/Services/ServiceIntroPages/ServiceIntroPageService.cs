@@ -1,6 +1,7 @@
 using AutoMapper;
 using LinkDev.MOS.SuperApp.Business.DTOs.Common;
 using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage.ServiceFaq;
 using LinkDev.MOS.SuperApp.Business.Interfaces;
 using LinkDev.MOS.SuperApp.Business.Interfaces.AuditLogs;
 using LinkDev.MOS.SuperApp.Business.Interfaces.ServiceIntroPages;
@@ -19,17 +20,20 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
         };
 
         private readonly IServiceIntroPageRepository _pageRepo;
+        private readonly IServiceFaqRepository _faqRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAuditLogService _auditLogService;
 
         public ServiceIntroPageService(
             IServiceIntroPageRepository pageRepo,
+            IServiceFaqRepository faqRepo,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IAuditLogService auditLogService)
         {
             _pageRepo = pageRepo;
+            _faqRepo = faqRepo;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _auditLogService = auditLogService;
@@ -80,6 +84,8 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                 throw new InvalidOperationException("The selected service was not found or is not available.");
             }
 
+            await EnsureFaqsExistAsync(dto.FaqIds);
+
             var page = new ServiceIntroPage
             {
                 ServiceId = dto.ServiceId,
@@ -88,12 +94,17 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                 ProcessingDuration = dto.ProcessingDuration?.Trim() ?? "",
                 VideoUrl = dto.VideoUrl,
                 VideoFileName = dto.VideoFileName,
-                Documents = MapDocuments(dto.Documents),
-                Faqs = MapFaqs(dto.Faqs)
+                Documents = MapDocuments(dto.Documents)
             };
 
             await _pageRepo.AddAsync(page);
             await _unitOfWork.SaveChangesAsync();
+
+            if (dto.FaqIds.Count > 0)
+            {
+                await _pageRepo.ReplaceFaqAssignmentsAsync(page.Id, dto.FaqIds.Take(10));
+                await _unitOfWork.SaveChangesAsync();
+            }
 
             await _auditLogService.LogAsync(
                 AuditActionType.Create,
@@ -122,6 +133,8 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                 return null;
             }
 
+            await EnsureFaqsExistAsync(dto.FaqIds);
+
             page.Description = dto.Description?.Trim() ?? "";
             page.ProcessingDuration = dto.ProcessingDuration?.Trim() ?? "";
             page.VideoUrl = dto.VideoUrl;
@@ -133,7 +146,7 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
             }
 
             ReplaceDocuments(page, dto.Documents);
-            ReplaceFaqs(page, dto.Faqs);
+            await _pageRepo.ReplaceFaqAssignmentsAsync(id, (dto.FaqIds ?? new List<int>()).Take(10));
 
             await _unitOfWork.SaveChangesAsync();
 
@@ -222,6 +235,18 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
             return true;
         }
 
+        private async Task EnsureFaqsExistAsync(IEnumerable<int>? faqIds)
+        {
+            foreach (var faqId in (faqIds ?? Enumerable.Empty<int>()).Distinct())
+            {
+                var faq = await _faqRepo.GetActiveByIdAsync(faqId);
+                if (faq == null || !faq.IsActive)
+                {
+                    throw new InvalidOperationException($"FAQ '{faqId}' was not found or is inactive.");
+                }
+            }
+        }
+
         private ServiceIntroPageDto MapToDto(ServiceIntroPage page)
         {
             var dto = _mapper.Map<ServiceIntroPageDto>(page);
@@ -232,11 +257,28 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                 .Where(d => !d.IsDeleted)
                 .Select(d => _mapper.Map<ServiceDocumentDto>(d))
                 .ToList() ?? new List<ServiceDocumentDto>();
-            dto.Faqs = page.Faqs?
-                .Where(f => !f.IsDeleted)
-                .Select(f => _mapper.Map<ServiceFaqDto>(f))
-                .ToList() ?? new List<ServiceFaqDto>();
+            dto.Faqs = MapFaqs(page);
             return dto;
+        }
+
+        private static List<ServiceFaqDto> MapFaqs(ServiceIntroPage page)
+        {
+            return page.PageFaqs?
+                .Where(pf => !pf.IsDeleted && pf.Faq != null && !pf.Faq.IsDeleted)
+                .Select(pf => new ServiceFaqDto
+                {
+                    Id = pf.Faq!.Id,
+                    Question = pf.Faq.Question,
+                    Answer = pf.Faq.Answer,
+                    DisplayOrder = pf.Faq.DisplayOrder,
+                    IsActive = pf.Faq.IsActive,
+                    CreatedAt = pf.Faq.CreatedAt,
+                    CreatedBy = pf.Faq.CreatedBy,
+                    ModifiedAt = pf.Faq.ModifiedAt,
+                    ModifiedBy = pf.Faq.ModifiedBy
+                })
+                .OrderBy(f => f.DisplayOrder)
+                .ToList() ?? new List<ServiceFaqDto>();
         }
 
         private static PublishedSnapshot BuildSnapshot(ServiceIntroPage page)
@@ -257,14 +299,7 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                         FileName = d.FileName,
                         FileType = d.FileType
                     }).ToList() ?? new List<ServiceDocumentDto>(),
-                Faqs = page.Faqs?
-                    .Where(f => !f.IsDeleted)
-                    .Select(f => new ServiceFaqDto
-                    {
-                        Id = f.Id,
-                        Question = f.Question,
-                        Answer = f.Answer
-                    }).ToList() ?? new List<ServiceFaqDto>()
+                Faqs = MapFaqs(page)
             };
         }
 
@@ -279,18 +314,6 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                     FileUrl = d.FileUrl,
                     FileName = d.FileName,
                     FileType = d.FileType
-                }).ToList();
-        }
-
-        private static List<ServiceFaq> MapFaqs(List<ServiceFaqDto>? faqs)
-        {
-            return (faqs ?? new List<ServiceFaqDto>())
-                .Where(f => !string.IsNullOrWhiteSpace(f.Question) && !string.IsNullOrWhiteSpace(f.Answer))
-                .Take(10)
-                .Select(f => new ServiceFaq
-                {
-                    Question = f.Question.Trim(),
-                    Answer = f.Answer.Trim()
                 }).ToList();
         }
 
@@ -325,38 +348,6 @@ namespace LinkDev.MOS.SuperApp.Business.Services.ServiceIntroPages
                         FileUrl = dto.FileUrl,
                         FileName = dto.FileName,
                         FileType = dto.FileType
-                    });
-                }
-            }
-        }
-
-        private static void ReplaceFaqs(ServiceIntroPage page, List<ServiceFaqDto>? faqs)
-        {
-            var incoming = (faqs ?? new List<ServiceFaqDto>())
-                .Where(f => !string.IsNullOrWhiteSpace(f.Question) && !string.IsNullOrWhiteSpace(f.Answer))
-                .Take(10)
-                .ToList();
-
-            var incomingIds = incoming.Where(f => f.Id > 0).Select(f => f.Id).ToHashSet();
-            foreach (var existing in page.Faqs.Where(f => !incomingIds.Contains(f.Id)).ToList())
-            {
-                page.Faqs.Remove(existing);
-            }
-
-            foreach (var dto in incoming)
-            {
-                var existing = dto.Id > 0 ? page.Faqs.FirstOrDefault(f => f.Id == dto.Id) : null;
-                if (existing != null)
-                {
-                    existing.Question = dto.Question.Trim();
-                    existing.Answer = dto.Answer.Trim();
-                }
-                else
-                {
-                    page.Faqs.Add(new ServiceFaq
-                    {
-                        Question = dto.Question.Trim(),
-                        Answer = dto.Answer.Trim()
                     });
                 }
             }

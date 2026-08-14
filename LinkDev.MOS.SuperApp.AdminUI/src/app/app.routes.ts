@@ -124,6 +124,38 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'service-pages/faqs',
+        canActivate: [permissionGuard(ContentType.ServiceIntroPage, 'view')],
+        loadComponent: () =>
+          import('./features/service-pages/service-faqs/service-faqs.component').then(
+            (m) => m.ServiceFaqsComponent,
+          ),
+      },
+      {
+        path: 'service-pages/faqs/create',
+        canActivate: [permissionGuard(ContentType.ServiceIntroPage, 'create')],
+        loadComponent: () =>
+          import('./features/service-pages/service-faqs/service-faq-create.component').then(
+            (m) => m.ServiceFaqCreateComponent,
+          ),
+      },
+      {
+        path: 'service-pages/faqs/:id',
+        canActivate: [permissionGuard(ContentType.ServiceIntroPage, 'view')],
+        loadComponent: () =>
+          import('./features/service-pages/service-faqs/service-faq-details.component').then(
+            (m) => m.ServiceFaqDetailsComponent,
+          ),
+      },
+      {
+        path: 'service-pages/faqs/:id/edit',
+        canActivate: [permissionGuard(ContentType.ServiceIntroPage, 'edit')],
+        loadComponent: () =>
+          import('./features/service-pages/service-faqs/service-faq-edit.component').then(
+            (m) => m.ServiceFaqEditComponent,
+          ),
+      },
+      {
         path: 'service-pages/:id',
         canActivate: [permissionGuard(ContentType.ServiceIntroPage, 'view')],
         loadComponent: () =>

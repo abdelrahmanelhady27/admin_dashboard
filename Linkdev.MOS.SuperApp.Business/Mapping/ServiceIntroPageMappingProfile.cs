@@ -1,5 +1,6 @@
 using AutoMapper;
 using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage;
+using LinkDev.MOS.SuperApp.Business.DTOs.ServiceIntroPage.ServiceFaq;
 using LinkDev.MOS.SuperApp.Domain.Entities.ServiceIntroPages;
 
 namespace LinkDev.MOS.SuperApp.Business.Mapping
@@ -19,9 +20,7 @@ namespace LinkDev.MOS.SuperApp.Business.Mapping
                 .ForMember(dest => dest.ServiceIntroPageId, opt => opt.Ignore())
                 .ForMember(dest => dest.ServiceIntroPage, opt => opt.Ignore());
 
-            CreateMap<ServiceFaq, ServiceFaqDto>().ReverseMap()
-                .ForMember(dest => dest.ServiceIntroPageId, opt => opt.Ignore())
-                .ForMember(dest => dest.ServiceIntroPage, opt => opt.Ignore());
+            CreateMap<ServiceFaq, ServiceFaqDto>();
 
             CreateMap<LinkedService, LinkedServiceDto>()
                 .ForMember(dest => dest.SystemNameAr, opt => opt.MapFrom(src => src.System != null ? src.System.NameAr : null))
